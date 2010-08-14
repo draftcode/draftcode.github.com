@@ -1,0 +1,41 @@
+@import url("syntax.css");
+* { padding: 0px; margin: 0px; }
+* {
+    line-height: 1.3em;
+    text-decoration: none;
+}
+html {
+    margin: auto;
+    width: 800px;
+    position: relative;
+    background-color: #f3f3f3;
+}
+
+#toplink {
+    position: absolute;
+    top: 0px;
+    right: 30px;
+    padding: 8px;
+    background-color: #333631;
+}
+#toplink a:link { color: #fff; }
+#toplink a:visited { color: #fff; }
+
+h1 { margin: 100px 20px 50px; }
+h1, h2, h3 { color: #333631; text-shadow: #adadad 2px 2px 4px; }
+h1 a:link, h2 a:link, h3 a:link { color: #333631; }
+h1 a:visited, h2 a:visited, h3 a:visited { color: #333631; }
+h2:before { content: "> "; }
+h3:before { content: ">> "; }
+
+#content { font-size: 120%; }
+#content { margin-bottom: 50px; }
+#content > * { margin-top: 20px; }
+#content > p { padding: 20px 10px; }
+#content > p + p { padding-top: 0px; margin-top: 0px; }
+#content > hr { margin: 20px; 0px; border: #000 dashed 1px; }
+#content > .highlight { background-color: #d4dcda; margin: 20px 20px; padding: 20px 10px; }
+#content * li { list-style-position: inside; margin: 3px; }
+#content ul, #content ol {
+    margin-left: 20px; padding: 0px 10px;
+}
