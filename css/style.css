@@ -28,7 +28,7 @@ h1 a:visited, h2 a:visited, h3 a:visited { color: #333631; }
 h2:before { content: "> "; }
 h3:before { content: ">> "; }
 
-#content { font-size: 120%; }
+/* #content { font-size: 110%; } */
 #content { margin-bottom: 50px; }
 #content > * { margin-top: 20px; }
 #content > p { padding: 20px 10px; }
