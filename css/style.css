@@ -34,7 +34,7 @@ h3:before { content: ">> "; }
 #content > p { padding: 0px 1em; }
 #content > p + p { padding-top: 0px; margin-top: 0px; }
 #content > hr { border: #000 dashed 1px; }
-#content > .highlight { background-color: #d4dcda; padding: 20px 10px; }
+#content > p code, #content pre { background-color: #ebf6f7; padding: 3px 3px; border: 1px solid #9fa0a0; }
 #content * li { list-style-position: inside; margin: 3px; }
 #content ul, #content ol {
     margin-left: 20px; padding: 0px 10px;
