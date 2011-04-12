@@ -8,7 +8,7 @@ html {
     margin: auto;
     width: 47em;
     position: relative;
-    background-color: #f3f3f3;
+    background-color: #fdf6e3;
 }
 
 #toplink {
@@ -16,25 +16,25 @@ html {
     top: 0px;
     right: 30px;
     padding: 8px;
-    background-color: #333631;
+    background-color: #002b36;
 }
-#toplink a:link { color: #fff; }
-#toplink a:visited { color: #fff; }
+#toplink a:link { color: #93a1a1; }
+#toplink a:visited { color: #93a1a1; }
 
 h1 { margin: 100px 0px 50px; text-align: center; }
-h1, h2, h3 { color: #333631; text-shadow: #adadad 2px 2px 4px; }
-h1 a:link, h2 a:link, h3 a:link { color: #333631; }
-h1 a:visited, h2 a:visited, h3 a:visited { color: #333631; }
-h2 { border-bottom: dotted 2px; }
+h1, h1 a:link, h1 a:visited { text-shadow: #839496 2px 2px 4px; color: #dc322f; font-weight: normal; }
+h2, h3 { color: #b58900; font-weight: normal; }
+h2 { border-bottom: solid #586e75 1px; }
 h2:before { content: "> "; }
 h3:before { content: ">> "; }
 
-#content { margin-bottom: 50px; }
+#content * a:link, #content * a:visited { color: #b58900; }
+#content { margin-bottom: 50px; color: #073642; }
 #content > * { margin: 1em 0px; }
 #content > p { padding: 0px 1em; }
 #content > p + p { padding-top: 0px; margin-top: 0px; }
 #content > hr { border: #000 dashed 1px; }
-#content > p code, #content pre { background-color: #ebf6f7; padding: 3px 3px; border: 1px solid #9fa0a0; }
+#content > p code, #content pre { background-color: #002b36; padding: 3px 3px; border: 1px solid #073642; color: #839496; }
 #content * li { list-style-position: inside; margin: 3px; }
 #content ul, #content ol {
     margin-left: 20px; padding: 0px 10px;

@@ -15,12 +15,11 @@ layout: nil
     <body>
         <h1><a href="{{ page.url }}">draftcode.github.com</a></h1>
         <div id="content">
+            <ul>
+                {% for post in site.posts %}
+                <li><a href="{{ post.url }}" />{{ post.title }}</a></li>
+                {% endfor %}
+            </ul>
         </div>
-
-        <ul>
-            {% for post in site.posts %}
-            <li><a href="{{ post.url }}" />{{ post.title }}</a></li>
-            {% endfor %}
-        </ul>
     </body>
 </html>
