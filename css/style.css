@@ -31,11 +31,11 @@ h3:before { content: ">> "; }
 
 #content * a:link, #content * a:visited { color: #b58900; }
 #content { margin-bottom: 50px; color: #073642; }
-#content > * { margin: 1em 0px; }
-#content > p { padding: 0px 1em; }
+#content > * { margin: 1em auto;  }
+#content > p { padding: 0.5em 0px; width: 40em; }
 #content > p + p { padding-top: 0px; margin-top: 0px; }
 #content > hr { border: #000 dashed 1px; }
-#content > p code, #content pre { background-color: #002b36; padding: 3px 3px; border: 1px solid #073642; color: #839496; }
+#content pre { background-color: #002b36; padding: 3px 3px; border: 1px solid #073642; color: #839496; }
 #content * li { list-style-position: inside; margin: 3px; }
 #content ul, #content ol {
     margin-left: 20px; padding: 0px 10px;
