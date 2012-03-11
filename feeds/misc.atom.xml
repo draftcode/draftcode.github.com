@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/misc.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2011-03-22T19:14:54+09:00</updated><entry><title>Writing Adblock Plus filters -- 日本語訳</title><link href="http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html" rel="alternate"></link><updated>2011-03-22T19:14:54+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://adblockplus.org/en/filters"&gt;Writing Adblock Plus filters&lt;/a&gt;の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/misc.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2012-02-06T00:00:00+09:00</updated><entry><title>HomebrewでクロスコンパイルできるGCCをビルドする</title><link href="http://draftcode.github.com/2012/02/06/235454.html" rel="alternate"></link><updated>2012-02-06T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/02/06/235454.html</id><summary type="html">&lt;p&gt;Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://gist.github.com/1751385"&gt;https://gist.github.com/1751385&lt;/a&gt;のようなFormulaをつくればできます。このFormulaは&lt;a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html"&gt;http://pdos.csail.mit.edu/6.828/2011/xv6.html&lt;/a&gt;をビルドするために、&lt;a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html"&gt;http://pdos.csail.mit.edu/6.828/2011/tools.html&lt;/a&gt;の設定を参考にして書きました。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;クロスコンパイラ……ぐぬぬ……&lt;/h2&gt;
+&lt;p&gt;クロスコンパイラは、以前自分が某研究室で作っているMIPSライクなCPUを使ったマシンで動くアセンブラを書いたときにもビルドしたのですが、なぜか動かなかったりします。なんか検索してみると、動かない動かないと言っている人も結構いたりするので失敗しやすいのでしょう。今回は無事動くところまでこぎ着けました。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="homebrew"&gt;
+&lt;h2&gt;Homebrewでビルドするときの問題点&lt;/h2&gt;
+&lt;p&gt;Homebrewは既にパッケージとして用意してくれているものについてはビルドしない方針なので、GCCをビルドしたりするFormulaはありません。なので適当にでっち上げる必要があります。いろいろな人が既にGCCのFormulaを書いているので、それを参考に書けば良いのですが、適当にクロスコンパイラのFormulaを書くと失敗します。&lt;/p&gt;
+&lt;p&gt;GCCはコンパイルをした後に、binutilsを使ってバイナリをはき出します。なので、クロスコンパイルができるGCCをビルドするには、そのターゲットとなるプラットフォーム用のbinutilsが必要です。そのbinutilsのツールを探すのに、GCCはいろいろな場所をみてくれます。どこを探すかは&lt;a class="reference external" href="http://gcc.gnu.org/install/configure.html#with-as"&gt;http://gcc.gnu.org/install/configure.html#with-as&lt;/a&gt;に書いてあって、どうも
+i386-foo-bar-asというのをPATHをみて探してくれるようです。適当にbinutilsとGCCで同じTargetを指定すれば良さそうなかんじ。&lt;/p&gt;
+&lt;p&gt;が、駄目。動きません。GCCのビルドは成功するのですが、そのGCCでなんかコンパイルしようとすると、どうもアセンブラがエラーを吐いているようです。実行されているコマンドを見てみると、システム組み込みのasを使っているようです。そりゃ駄目だ。&lt;/p&gt;
+&lt;p&gt;こんなの絶対おかしいよ。ということで、GCCのソースを見てみることに。いろいろかけずり回った結果、&lt;tt class="docutils literal"&gt;gcc/gcc.c&lt;/tt&gt;の&lt;tt class="docutils literal"&gt;find_a_file()&lt;/tt&gt;あたりでファイルを探しているようなのですが、なんかi386-foo-barみたいなマシンターゲットをつけているようには見えないぞ。あやしい。ちなみにldのほうは&lt;tt class="docutils literal"&gt;gcc/collect2.c&lt;/tt&gt;の&lt;tt class="docutils literal"&gt;main&lt;/tt&gt;でそういうプレフィックスをつけていて、ファイルを探すのもasとは別のコードで行っている模様。&lt;/p&gt;
+&lt;p&gt;どうも、ldについてはインストールマニュアルに書かれている通りに探してくれているみたいですが、asについてはなんか違うようです。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;解決&lt;/h2&gt;
+&lt;p&gt;GCCが正しいアセンブラを探してくれない。仕方がないので手動でアセンブラを指定することになります。ということで、&lt;a class="reference external" href="https://gist.github.com/1751385#file_gcc_xv6.rb"&gt;https://gist.github.com/1751385#file_gcc_xv6.rb&lt;/a&gt;のように汚い感じですが、アセンブラのパスを手動で指定してあげるようにします。このようにすると、うまくコンパイルができました。(ということは、ldについてはきちんと探してくれたようです……)&lt;/p&gt;
+&lt;p&gt;もし、Xv6をコンパイルして動かしたい。しかも、Homebrewで必要なものをいれたい。ということであれば、次のようにすることでうまくインストールすることができます。
+QEMUはuse-gccを使わないとうまく動きませんでした:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;brew install https://raw.github.com/gist/1751385/binutils_xv6.rb
+brew install https://raw.github.com/gist/1751385/gcc_xv6.rb
+brew install https://raw.github.com/gist/1751385/gdb_xv6.rb
+brew install qemu --use-gcc
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>Writing Adblock Plus filters -- 日本語訳</title><link href="http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html" rel="alternate"></link><updated>2011-03-22T19:14:54+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://adblockplus.org/en/filters"&gt;Writing Adblock Plus filters&lt;/a&gt;の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．&lt;/p&gt;
 &lt;p&gt;あと，どうもURLとかフィルタルールが入っている関係で，レイアウトがすごくぐちゃぐちゃになります．それに加えて訳がいまいちなので，さらに読みづらい．超訳でもすればよかった……&lt;/p&gt;
 &lt;p&gt;Adblock Plusの新しいバージョンでは，さまざまなほうほうでフィルタを「いじる」ことができるようになっています．ここでは，その方法と使い方について説明しています．&lt;/p&gt;
 &lt;p&gt;免責事項: 例としてあげられているフィルタは，すべて単なる例として挙げており，使われることを意図しておりません．&lt;/p&gt;

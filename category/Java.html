@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>draftcode.github.com</title>
+    <meta name="description" content="">
+    <meta name="author" content="draftcode">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src=".././theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href=".././theme/bootstrap.min.css" rel="stylesheet">
+    <link href=".././theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href=".././theme/local.css" rel="stylesheet">
+    <link href=".././theme/pygments.css" rel="stylesheet">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href=".././atom.xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="../.">draftcode.github.com</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+        
+            
+        
+        
+        
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="offset2 span7">
+                
+
+
+        
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
+            <a href=".././2012/01/01/182300.html"><h1>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</h1></a>
+            01 Jan 2012
+
+
+by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
+ 
+
+
+
+ 
+        </div>
+        
+        <div><div class="section" id="id1">
+<h2>結論</h2>
+<p>配列はアレなので使ってはいけない</p>
+</div>
+<div class="section" id="javagenerics">
+<h2>JavaのGenericsとは</h2>
+<p>JavaのGenericsでは、型パラメーターは最終的にバイトコードになったら消えて<tt class="docutils literal">Object</tt>になってしまって、Generic型からその型パラメーターで示された型を実際に使う側がキャストして使うというものなんですね。だからこのようなコードに対して:</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+
+<span class="kd">class</span> <span class="nc">Main</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">l</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
+    <span class="n">l</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+    <span class="n">Integer</span> <span class="n">a</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+<p>このようなバイトコードが出力されます:</p>
+<div class="highlight"><pre>Compiled from &quot;Main.java&quot;
+class Main extends java.lang.Object{
+Main();
+  Code:
+   0:   aload_0
+   1:   invokespecial   #1; //Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V
+   4:   return
+
+public static void main(java.lang.String[]);
+  Code:
+   0:   new     #2; //class java/util/ArrayList
+   3:   dup
+   4:   invokespecial   #3; //Method java/util/ArrayList.&quot;&lt;init&gt;&quot;:()V
+   7:   astore_1
+   8:   aload_1
+   9:   iconst_1
+   10:  invokestatic    #4; //Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+   13:  invokeinterface #5,  2; //InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+   18:  pop
+   19:  aload_1
+   20:  iconst_0
+   21:  invokeinterface #6,  2; //InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+   26:  checkcast       #7; //class java/lang/Integer
+   29:  astore_2
+   30:  return
+
+}
+</pre></div>
+<p><tt class="docutils literal">ArrayList</tt>の型パラメーターが消えていて、要素を取り出すときに<tt class="docutils literal">checkcast</tt>でキャストしてますね。</p>
+</div>
+<div class="section" id="id2">
+<h2>総称配列を作るときのエラー・警告</h2>
+<p>例えば次のようなコードはgeneric array createionエラーになります:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
+</pre></div>
+<p>これは配列をアロケートするときに、バイトコードの中で型情報が必要になるのに、<tt class="docutils literal">ArrayList&lt;Integer&gt;</tt>は(バイトコードレベルでは)実際は存在せず、<tt class="docutils literal">ArrayList</tt>が存在しているからです。</p>
+<p>なので次のようなコードを書きます:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;?&gt;[</span><span class="mi">10</span><span class="o">];</span>
+</pre></div>
+<p>しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、``ArrayList``と``ArrayList&lt;Integer&gt;``は違う型ですから。</p>
+<div class="section" id="id3">
+<h3>追記</h3>
+<p>generic array creationがなぜ禁止なのかきちんと理解してなかった。</p>
+<p>Generic型の配列が作れると仮定しましょう。次のコードはエラー・警告なしでコンパイル出来ます:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
+<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span>
+
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span> <span class="c1">// ClassCastException occur!</span>
+</pre></div>
+<p>一方でGeneric型以外の配列の場合は、次のようになります:</p>
+<div class="highlight"><pre><span class="n">Number</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
+<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">Double</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="c1">// ArrayStoreException occur!</span>
+</pre></div>
+<p>Generic型以外の配列の場合、型の違うオブジェクトの参照を配列に代入しようとすると、<tt class="docutils literal">ArrayStoreException</tt>が発生しますが、Generic型の配列の場合はその例外は発生せずに、値を取り出したときに<tt class="docutils literal">ClassCastException</tt>が発生するようになります。これがGeneric型の配列が作れない理由のようです。</p>
+<p>また、総称配列が作れなくても、上のコードは次のように書き換えると、unchecked
+conversion warningが出るけれども、<tt class="docutils literal">ClassCastException</tt>が発生するように実行することが出来ます:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
+<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span>
+
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span> <span class="c1">// unchecked conversion warning</span>
+<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span> <span class="c1">// ClassCastException occur!</span>
+</pre></div>
+<p>次のように書き換えると、今度はきちんと<tt class="docutils literal">list[0] = stringArray</tt>のところで型エラーを起こしてくれます:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span> <span class="c1">// unchecked conversion warning</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
+<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span> <span class="c1">// Incompatible types error</span>
+
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>配列は使ってはいけない</h2>
+<p>総称配列のエラー・警告はJavaレベルの型とJVMレベルの型が一致していないことが原因に見えますが、実は配列を使わなければこのような問題は回避されるようです。(僕はGenericsによってJavaとJVMの型が一致しなくなったこともなんかアレな気がするんですが)</p>
+<p>また、配列がcovariantなのもまた変なエラーの原因となるので、配列さえ使わなければ……というのがかなり前から言われているようです。</p>
+</div>
+</div>
+        <hr />
+    </div>
+		
+    
+
+
+ 
+
+        
+
+
+ 
+
+    <div class='article'>
+        <a href=".././2012/01/01/182705.html"><h2>配列はCovariantなので使ってはいけない</h2></a>
+        <div class= "well small"> 01 Jan 2012
+
+
+by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
+ 
+
+
+
+ </div>
+        <div class="summary"><div class="section" id="id1">
+<h2>結論</h2>
+<p>配列はアレなので使ってはいけない。</p>
+</div>
+<div class="section" id="java">
+<h2>Javaの配列とは</h2>
+<p>Javaの配列はcovariantです。<tt class="docutils literal">Integer</tt>は<tt class="docutils literal">Number</tt>のサブクラスなんだから、<tt class="docutils literal">Integer[]</tt>も<tt class="docutils literal">Number[]</tt>のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。</p>
+<img alt="img/20120101171202.png" src="../static/img/20120101171202.png" />
+<p>見た目の型は<tt class="docutils literal">Number</tt>の配列なのに、代入できる要素は<tt class="docutils literal">Integerの</tt>要素のみという配列が作れます。ここで、<tt class="docutils literal">Integer</tt>以外の要素を代入しようとすると、同じ<tt class="docutils literal">Number</tt>を継承している<tt class="docutils literal">Long</tt>でも実行時エラーになります。このときの<tt class="docutils literal">Number</tt>の配列の実体は、<tt class="docutils literal">Integer</tt>の配列ですから。</p>
+</div>
+<div class="section" id="id2">
+<h2>配列は使ってはいけない</h2>
+<p><a class="reference external" href="http://draftcode.github.com/2012/01/01/182300.html">先の記事</a>とあわせて、配列は使ってはいけない。</p>
+</div>
+ <a class="btn btn-info xsmall" href=".././2012/01/01/182705.html">read more</a></div>
+    </div>	
+				
+    
+        <div class="pagination">
+<ul>
+
+    <li class="prev disabled"><a href="#">&larr; Previous</a></li>
+
+
+
+    <li class="active"><a href=".././category/Java.html">1</a></li>
+
+
+
+    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+
+
+</ul>
+</div>
+    
+
+ 
+
+ 
+ 
+
+
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href=".././archives.html">Archives</a>
+                <li><a href=".././atom.xml" rel="alternate">Atom feed</a></li>
+                
+            </ul>
+            </div>
+
+
+            
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                
+                <li><a href=".././category/Python.html">Python</a></li>
+                
+                <li><a href=".././category/misc.html">misc</a></li>
+                
+                <li><a href=".././category/Java.html">Java</a></li>
+                                   
+            </ul>
+            </div>
+            
+
+
+            
+
+
+            
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Social
+                </li>
+           
+                
+                <li><a href="http://twitter.com/#!/draftcode">twitter</a></li>
+                
+                <li><a href="http://github.com/draftcode">github</a></li>
+                
+            </ul>
+            </div>
+            </div>
+            
+
+        </div>  
+    </div> 
+    </div> 
+
+<footer>
+<br />
+<p><a href="../.">draftcode.github.com</a> &copy; draftcode 2012</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+
+
+<a href="http://github.com/draftcode/"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>

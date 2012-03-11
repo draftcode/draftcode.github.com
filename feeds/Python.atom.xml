@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/Python.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2012-01-22T00:00:00+09:00</updated><entry><title>「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</title><link href="http://draftcode.github.com/2012/01/22/005216.html" rel="alternate"></link><updated>2012-01-22T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/01/22/005216.html</id><summary type="html">&lt;p&gt;※酔って書いているのでアレです&lt;/p&gt;
+&lt;p&gt;久しぶりの勉強会。今まで出たのがVimの勉強会とかだったので、言語の勉強会は初めてかもしれないですね。あ、Haskellのやつに出たか。となりの研究室の先輩と参加。
+JITってどうなってるの、とかPyPyってどういう構成なのとか、PyPyでは内部でこんな事をしてるよという感じの発表で、非常に興味深く聞かせていただきました。&lt;/p&gt;
+&lt;p&gt;事前にPyPyのソースコードはダウンロードしていたので、その中を検索しながら聞いていました。最初はshomah4aさんのPyPyの概要の発表で、Python処理系としてのPyPyと言語処理系をつくるためのライブラリとしてのPyPy、という二つの側面があるらしいです。見たところ、それに対応してディレクトリも分かれているようです(pypyの方がそうだったかな)。&lt;/p&gt;
+&lt;p&gt;次のcocoatomoさんの発表は静的解析についての話でした。型理論は、研究分野がプログラミング言語理論になるので(研究室でやってることがばらばらなので、これぐらいしか言えない)、割と発表内容的には近いところでした。Types and Programming
+Languagesとか輪講で読んでいましたし。ちなみに、アルバイトでVBScriptをがしがし書いていたときは、型が無いのが本当に嫌で、VBScriptの静的解析器を書こうと思っていた時期もありました。&lt;/p&gt;
+&lt;p&gt;最後のchlereさんの発表はJITコンパイラについての話で、JITコンパイラがどうやって高速化するべきところを見つけていくのかという話でした。特に、ヒントメカニズムを与えるとこんなに速くなる、というのは驚きました。あと実行時にどうやって実行可能なコードを出力するのかというのに興味があるので、機会があったら聞いてみたいです。&lt;/p&gt;
+&lt;p&gt;勉強会が終わった後の懇親会にも参加しました。懇親会だと、いろいろな会社のいろいろな職業の人の話を聞けるので、学生の自分にとっては貴重な機会なんですよ。(と、懇親会に出る度に思います。)&lt;/p&gt;
+&lt;p&gt;特に、お向かいの席だったransuiさんのお話がおもしろくて、スピードが命なので、こういうレベルまでチューニングしたりしてますよという話とか、高校生のときにこういう俺俺言語を作ったという話を聞いたりしました。ただ、最近はそういう事をしたいという人があまりいなくて採用が大変みたいです……自分も趣味でアセンブラ作ってみたり、授業でですがFPGAを使った計算機やシミュレータ上でのメモリキャッシュアルゴリズムの実装をしてみたりとか、割と低レベルな話も好きなので、そういう仕事もおもしろそうですね。カーネルの中身とかはまだ見たことが無いので、もっと勉強しないと。&lt;/p&gt;
+&lt;p&gt;あと、アリエルのCTOの井上さんとも少しお話をしまして、最近は上流の方にも興味があるんですよと言ったら、若いうちはもっとガシガシ実装して欲しいという言葉をいただきました。ぐぬぬ。ただ、自分の主張を通すために、いろんな立場の人の考え方、ものの見方、背景とかを知っておきたい。そうしないと、下回しが出来ずに主張が通らないというのが嫌なので、プロジェクトのマネジメントをする人たちや、もっと上の経営に関わる人たちが、どういう見方をするのかを知っておきたい。このために事業戦略やプロジェクトマネジメントあたりの本を読んでいたりするので、そこら辺はさじ加減なのかなと思っています。&lt;/p&gt;
+&lt;p&gt;というところで、お開きになりました。後で見てみると、cocoatomoさんはCPython
+Readingというのを書いていたりするみたいなので、積極的に話に行けば良かった。あと型システムとかが停止するとか安全であるとか、そういうのも聞いてみたかったと、少し後悔しつつ、次の日の「(第15回)Python mini Hack-a-thon」に参加しました。&lt;/p&gt;
+</summary></entry><entry><title>CPython2.7.2のWindowsでのmultiprocessingの動作</title><link href="http://draftcode.github.com/2011/12/29/145918.html" rel="alternate"></link><updated>2011-12-29T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/12/29/145918.html</id><summary type="html">&lt;p&gt;フォークが出来るOSであれば、単純にフォークをしてそのあとに&lt;tt class="docutils literal"&gt;Process._bootstrap&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;Process.run&lt;/tt&gt;を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。&lt;/p&gt;
+&lt;p&gt;Windowsにおける&lt;tt class="docutils literal"&gt;multiprocessing&lt;/tt&gt;モジュールの動きは次のようなものになります:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;pipeを作っておく。&lt;/li&gt;
+&lt;li&gt;現在の実行ファイルに&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--multiprocessing-fork&lt;/span&gt;&lt;/tt&gt;というコマンドラインオプションと先ほどのpipeの読み出し側をつけて&lt;tt class="docutils literal"&gt;CreateProcess&lt;/tt&gt;する。&lt;/li&gt;
+&lt;li&gt;親プロセスはpipeを通じて、&lt;tt class="docutils literal"&gt;Process&lt;/tt&gt;オブジェクトを&lt;tt class="docutils literal"&gt;pickle&lt;/tt&gt;で直列化して子プロセスに送る。&lt;/li&gt;
+&lt;li&gt;子プロセスは&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--multiprocessing-fork&lt;/span&gt;&lt;/tt&gt;をフラグとして認識して、pipeから&lt;tt class="docutils literal"&gt;Process&lt;/tt&gt;オブジェクトを読み出す。&lt;/li&gt;
+&lt;li&gt;子プロセスが&lt;tt class="docutils literal"&gt;Process._bootstrap&lt;/tt&gt;を呼び出す。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Freezeされていない場合は、過程2のところでは、実行ファイルが&lt;tt class="docutils literal"&gt;python.exe&lt;/tt&gt;になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、&lt;tt class="docutils literal"&gt;multiprocessing.freeze_support&lt;/tt&gt;がそのような役割を果たします。これがFreezeされている場合に&lt;tt class="docutils literal"&gt;multiprocessing.freeze_support&lt;/tt&gt;が必要になる理由です。&lt;/p&gt;
+</summary></entry><entry><title>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</title><link href="http://draftcode.github.com/2011/12/29/153703.html" rel="alternate"></link><updated>2011-12-29T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/12/29/153703.html</id><summary type="html">&lt;p&gt;ドキュメンテーションにも書いてあるとおり、&lt;tt class="docutils literal"&gt;csv&lt;/tt&gt;モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。&lt;tt class="docutils literal"&gt;csv&lt;/tt&gt;モジュールのコアの部分はCで書かれており、&lt;tt class="docutils literal"&gt;_csv.c&lt;/tt&gt;というファイルに記述されています。&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;は与えられたfile-likeオブジェクトから&lt;tt class="docutils literal"&gt;PyString_AsString&lt;/tt&gt;をつかって&lt;tt class="docutils literal"&gt;char *&lt;/tt&gt;を得ようとします。:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="nf"&gt;Reader_iternext&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ReaderObj&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;lineobj&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fields&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+
+    &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;lineobj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyIter_Next&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;self&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;input_iter&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+        &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyString_AsString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lineobj&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;この関数は&lt;tt class="docutils literal"&gt;char *&lt;/tt&gt;を得るために使われるオブジェクトが&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;か&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;かで動作が変わります。&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;であった場合は直接そのオブジェクトのバッファが返されるのですが、&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;であった場合は、&lt;tt class="docutils literal"&gt;_PyUnicode_AsDefaultEncodedString&lt;/tt&gt;によって、デフォルトエンコーディングに変換された文字列を返す動作になっています。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cm"&gt;/*const*/&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="nf"&gt;PyString_AsString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;PyString_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;string_getbuffer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;PyStringObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;ob_sval&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt;
+&lt;span class="nf"&gt;PyString_AsStringAndSize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;Py_ssize_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;len&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;PyString_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="cp"&gt;#ifdef Py_USING_UNICODE&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PyUnicode_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_PyUnicode_AsDefaultEncodedString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+            &lt;span class="p"&gt;...&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もしデフォルトエンコーディングが変更されていた場合は、&lt;tt class="docutils literal"&gt;codecs.open&lt;/tt&gt;を使った場合や&lt;tt class="docutils literal"&gt;open&lt;/tt&gt;を使った場合とでおもしろい?結果が得られるかもしれません。&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;が返す結果は、&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;ではなく、ファイルのエンコーディングでエンコードされたそのままの&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;の配列や辞書になっています。よって、それがきちんと&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;なのか、なにかのエンコーディングでエンコードされた&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;なのかを意識しないと、あるはずのキーがないというような現象に出くわしたりします。これを意識するのは面倒くさいので、適切な&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;のラッパーを用意して使うようにした方がよいです。&lt;/p&gt;
+</summary></entry></feed>

@@ -1,5 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/all-ja.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2011-03-22T19:14:54+09:00</updated><entry><title>Writing Adblock Plus filters -- 日本語訳</title><link href="http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html" rel="alternate"></link><updated>2011-03-22T19:14:54+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://adblockplus.org/en/filters"&gt;Writing Adblock Plus filters&lt;/a&gt;の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/all-ja.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2012-02-06T00:00:00+09:00</updated><entry><title>HomebrewでクロスコンパイルできるGCCをビルドする</title><link href="http://draftcode.github.com/2012/02/06/235454.html" rel="alternate"></link><updated>2012-02-06T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/02/06/235454.html</id><summary type="html">&lt;p&gt;Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://gist.github.com/1751385"&gt;https://gist.github.com/1751385&lt;/a&gt;のようなFormulaをつくればできます。このFormulaは&lt;a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html"&gt;http://pdos.csail.mit.edu/6.828/2011/xv6.html&lt;/a&gt;をビルドするために、&lt;a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html"&gt;http://pdos.csail.mit.edu/6.828/2011/tools.html&lt;/a&gt;の設定を参考にして書きました。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;クロスコンパイラ……ぐぬぬ……&lt;/h2&gt;
+&lt;p&gt;クロスコンパイラは、以前自分が某研究室で作っているMIPSライクなCPUを使ったマシンで動くアセンブラを書いたときにもビルドしたのですが、なぜか動かなかったりします。なんか検索してみると、動かない動かないと言っている人も結構いたりするので失敗しやすいのでしょう。今回は無事動くところまでこぎ着けました。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="homebrew"&gt;
+&lt;h2&gt;Homebrewでビルドするときの問題点&lt;/h2&gt;
+&lt;p&gt;Homebrewは既にパッケージとして用意してくれているものについてはビルドしない方針なので、GCCをビルドしたりするFormulaはありません。なので適当にでっち上げる必要があります。いろいろな人が既にGCCのFormulaを書いているので、それを参考に書けば良いのですが、適当にクロスコンパイラのFormulaを書くと失敗します。&lt;/p&gt;
+&lt;p&gt;GCCはコンパイルをした後に、binutilsを使ってバイナリをはき出します。なので、クロスコンパイルができるGCCをビルドするには、そのターゲットとなるプラットフォーム用のbinutilsが必要です。そのbinutilsのツールを探すのに、GCCはいろいろな場所をみてくれます。どこを探すかは&lt;a class="reference external" href="http://gcc.gnu.org/install/configure.html#with-as"&gt;http://gcc.gnu.org/install/configure.html#with-as&lt;/a&gt;に書いてあって、どうも
+i386-foo-bar-asというのをPATHをみて探してくれるようです。適当にbinutilsとGCCで同じTargetを指定すれば良さそうなかんじ。&lt;/p&gt;
+&lt;p&gt;が、駄目。動きません。GCCのビルドは成功するのですが、そのGCCでなんかコンパイルしようとすると、どうもアセンブラがエラーを吐いているようです。実行されているコマンドを見てみると、システム組み込みのasを使っているようです。そりゃ駄目だ。&lt;/p&gt;
+&lt;p&gt;こんなの絶対おかしいよ。ということで、GCCのソースを見てみることに。いろいろかけずり回った結果、&lt;tt class="docutils literal"&gt;gcc/gcc.c&lt;/tt&gt;の&lt;tt class="docutils literal"&gt;find_a_file()&lt;/tt&gt;あたりでファイルを探しているようなのですが、なんかi386-foo-barみたいなマシンターゲットをつけているようには見えないぞ。あやしい。ちなみにldのほうは&lt;tt class="docutils literal"&gt;gcc/collect2.c&lt;/tt&gt;の&lt;tt class="docutils literal"&gt;main&lt;/tt&gt;でそういうプレフィックスをつけていて、ファイルを探すのもasとは別のコードで行っている模様。&lt;/p&gt;
+&lt;p&gt;どうも、ldについてはインストールマニュアルに書かれている通りに探してくれているみたいですが、asについてはなんか違うようです。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;解決&lt;/h2&gt;
+&lt;p&gt;GCCが正しいアセンブラを探してくれない。仕方がないので手動でアセンブラを指定することになります。ということで、&lt;a class="reference external" href="https://gist.github.com/1751385#file_gcc_xv6.rb"&gt;https://gist.github.com/1751385#file_gcc_xv6.rb&lt;/a&gt;のように汚い感じですが、アセンブラのパスを手動で指定してあげるようにします。このようにすると、うまくコンパイルができました。(ということは、ldについてはきちんと探してくれたようです……)&lt;/p&gt;
+&lt;p&gt;もし、Xv6をコンパイルして動かしたい。しかも、Homebrewで必要なものをいれたい。ということであれば、次のようにすることでうまくインストールすることができます。
+QEMUはuse-gccを使わないとうまく動きませんでした:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;brew install https://raw.github.com/gist/1751385/binutils_xv6.rb
+brew install https://raw.github.com/gist/1751385/gcc_xv6.rb
+brew install https://raw.github.com/gist/1751385/gdb_xv6.rb
+brew install qemu --use-gcc
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</title><link href="http://draftcode.github.com/2012/01/22/005216.html" rel="alternate"></link><updated>2012-01-22T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/01/22/005216.html</id><summary type="html">&lt;p&gt;※酔って書いているのでアレです&lt;/p&gt;
+&lt;p&gt;久しぶりの勉強会。今まで出たのがVimの勉強会とかだったので、言語の勉強会は初めてかもしれないですね。あ、Haskellのやつに出たか。となりの研究室の先輩と参加。
+JITってどうなってるの、とかPyPyってどういう構成なのとか、PyPyでは内部でこんな事をしてるよという感じの発表で、非常に興味深く聞かせていただきました。&lt;/p&gt;
+&lt;p&gt;事前にPyPyのソースコードはダウンロードしていたので、その中を検索しながら聞いていました。最初はshomah4aさんのPyPyの概要の発表で、Python処理系としてのPyPyと言語処理系をつくるためのライブラリとしてのPyPy、という二つの側面があるらしいです。見たところ、それに対応してディレクトリも分かれているようです(pypyの方がそうだったかな)。&lt;/p&gt;
+&lt;p&gt;次のcocoatomoさんの発表は静的解析についての話でした。型理論は、研究分野がプログラミング言語理論になるので(研究室でやってることがばらばらなので、これぐらいしか言えない)、割と発表内容的には近いところでした。Types and Programming
+Languagesとか輪講で読んでいましたし。ちなみに、アルバイトでVBScriptをがしがし書いていたときは、型が無いのが本当に嫌で、VBScriptの静的解析器を書こうと思っていた時期もありました。&lt;/p&gt;
+&lt;p&gt;最後のchlereさんの発表はJITコンパイラについての話で、JITコンパイラがどうやって高速化するべきところを見つけていくのかという話でした。特に、ヒントメカニズムを与えるとこんなに速くなる、というのは驚きました。あと実行時にどうやって実行可能なコードを出力するのかというのに興味があるので、機会があったら聞いてみたいです。&lt;/p&gt;
+&lt;p&gt;勉強会が終わった後の懇親会にも参加しました。懇親会だと、いろいろな会社のいろいろな職業の人の話を聞けるので、学生の自分にとっては貴重な機会なんですよ。(と、懇親会に出る度に思います。)&lt;/p&gt;
+&lt;p&gt;特に、お向かいの席だったransuiさんのお話がおもしろくて、スピードが命なので、こういうレベルまでチューニングしたりしてますよという話とか、高校生のときにこういう俺俺言語を作ったという話を聞いたりしました。ただ、最近はそういう事をしたいという人があまりいなくて採用が大変みたいです……自分も趣味でアセンブラ作ってみたり、授業でですがFPGAを使った計算機やシミュレータ上でのメモリキャッシュアルゴリズムの実装をしてみたりとか、割と低レベルな話も好きなので、そういう仕事もおもしろそうですね。カーネルの中身とかはまだ見たことが無いので、もっと勉強しないと。&lt;/p&gt;
+&lt;p&gt;あと、アリエルのCTOの井上さんとも少しお話をしまして、最近は上流の方にも興味があるんですよと言ったら、若いうちはもっとガシガシ実装して欲しいという言葉をいただきました。ぐぬぬ。ただ、自分の主張を通すために、いろんな立場の人の考え方、ものの見方、背景とかを知っておきたい。そうしないと、下回しが出来ずに主張が通らないというのが嫌なので、プロジェクトのマネジメントをする人たちや、もっと上の経営に関わる人たちが、どういう見方をするのかを知っておきたい。このために事業戦略やプロジェクトマネジメントあたりの本を読んでいたりするので、そこら辺はさじ加減なのかなと思っています。&lt;/p&gt;
+&lt;p&gt;というところで、お開きになりました。後で見てみると、cocoatomoさんはCPython
+Readingというのを書いていたりするみたいなので、積極的に話に行けば良かった。あと型システムとかが停止するとか安全であるとか、そういうのも聞いてみたかったと、少し後悔しつつ、次の日の「(第15回)Python mini Hack-a-thon」に参加しました。&lt;/p&gt;
+</summary></entry><entry><title>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</title><link href="http://draftcode.github.com/2012/01/01/182300.html" rel="alternate"></link><updated>2012-01-01T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/01/01/182300.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
+&lt;p&gt;配列はアレなので使ってはいけない&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="javagenerics"&gt;
+&lt;h2&gt;JavaのGenericsとは&lt;/h2&gt;
+&lt;p&gt;JavaのGenericsでは、型パラメーターは最終的にバイトコードになったら消えて&lt;tt class="docutils literal"&gt;Object&lt;/tt&gt;になってしまって、Generic型からその型パラメーターで示された型を実際に使う側がキャストして使うというものなんですね。だからこのようなコードに対して:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.List&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.ArrayList&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Main&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;l&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;();&lt;/span&gt;
+    &lt;span class="n"&gt;l&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;Integer&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;l&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+  &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このようなバイトコードが出力されます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;Compiled from &amp;quot;Main.java&amp;quot;
+class Main extends java.lang.Object{
+Main();
+  Code:
+   0:   aload_0
+   1:   invokespecial   #1; //Method java/lang/Object.&amp;quot;&amp;lt;init&amp;gt;&amp;quot;:()V
+   4:   return
+
+public static void main(java.lang.String[]);
+  Code:
+   0:   new     #2; //class java/util/ArrayList
+   3:   dup
+   4:   invokespecial   #3; //Method java/util/ArrayList.&amp;quot;&amp;lt;init&amp;gt;&amp;quot;:()V
+   7:   astore_1
+   8:   aload_1
+   9:   iconst_1
+   10:  invokestatic    #4; //Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+   13:  invokeinterface #5,  2; //InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+   18:  pop
+   19:  aload_1
+   20:  iconst_0
+   21:  invokeinterface #6,  2; //InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+   26:  checkcast       #7; //class java/lang/Integer
+   29:  astore_2
+   30:  return
+
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;ArrayList&lt;/tt&gt;の型パラメーターが消えていて、要素を取り出すときに&lt;tt class="docutils literal"&gt;checkcast&lt;/tt&gt;でキャストしてますね。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;総称配列を作るときのエラー・警告&lt;/h2&gt;
+&lt;p&gt;例えば次のようなコードはgeneric array createionエラーになります:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これは配列をアロケートするときに、バイトコードの中で型情報が必要になるのに、&lt;tt class="docutils literal"&gt;ArrayList&amp;lt;Integer&amp;gt;&lt;/tt&gt;は(バイトコードレベルでは)実際は存在せず、&lt;tt class="docutils literal"&gt;ArrayList&lt;/tt&gt;が存在しているからです。&lt;/p&gt;
+&lt;p&gt;なので次のようなコードを書きます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;?&amp;gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、``ArrayList``と``ArrayList&amp;lt;Integer&amp;gt;``は違う型ですから。&lt;/p&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h3&gt;追記&lt;/h3&gt;
+&lt;p&gt;generic array creationがなぜ禁止なのかきちんと理解してなかった。&lt;/p&gt;
+&lt;p&gt;Generic型の配列が作れると仮定しましょう。次のコードはエラー・警告なしでコンパイル出来ます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Some String&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;Integer&lt;/span&gt; &lt;span class="n"&gt;intObj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// ClassCastException occur!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;一方でGeneric型以外の配列の場合は、次のようになります:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;Number&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Double&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;valueOf&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// ArrayStoreException occur!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Generic型以外の配列の場合、型の違うオブジェクトの参照を配列に代入しようとすると、&lt;tt class="docutils literal"&gt;ArrayStoreException&lt;/tt&gt;が発生しますが、Generic型の配列の場合はその例外は発生せずに、値を取り出したときに&lt;tt class="docutils literal"&gt;ClassCastException&lt;/tt&gt;が発生するようになります。これがGeneric型の配列が作れない理由のようです。&lt;/p&gt;
+&lt;p&gt;また、総称配列が作れなくても、上のコードは次のように書き換えると、unchecked
+conversion warningが出るけれども、&lt;tt class="docutils literal"&gt;ClassCastException&lt;/tt&gt;が発生するように実行することが出来ます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Some String&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt; &lt;span class="c1"&gt;// unchecked conversion warning&lt;/span&gt;
+&lt;span class="n"&gt;Integer&lt;/span&gt; &lt;span class="n"&gt;intObj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// ClassCastException occur!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;次のように書き換えると、今度はきちんと&lt;tt class="docutils literal"&gt;list[0] = stringArray&lt;/tt&gt;のところで型エラーを起こしてくれます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt; &lt;span class="c1"&gt;// unchecked conversion warning&lt;/span&gt;
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Some String&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// Incompatible types error&lt;/span&gt;
+
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;Integer&lt;/span&gt; &lt;span class="n"&gt;intObj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;配列は使ってはいけない&lt;/h2&gt;
+&lt;p&gt;総称配列のエラー・警告はJavaレベルの型とJVMレベルの型が一致していないことが原因に見えますが、実は配列を使わなければこのような問題は回避されるようです。(僕はGenericsによってJavaとJVMの型が一致しなくなったこともなんかアレな気がするんですが)&lt;/p&gt;
+&lt;p&gt;また、配列がcovariantなのもまた変なエラーの原因となるので、配列さえ使わなければ……というのがかなり前から言われているようです。&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>配列はCovariantなので使ってはいけない</title><link href="http://draftcode.github.com/2012/01/01/182705.html" rel="alternate"></link><updated>2012-01-01T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/01/01/182705.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
+&lt;p&gt;配列はアレなので使ってはいけない。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="java"&gt;
+&lt;h2&gt;Javaの配列とは&lt;/h2&gt;
+&lt;p&gt;Javaの配列はcovariantです。&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;は&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;のサブクラスなんだから、&lt;tt class="docutils literal"&gt;Integer[]&lt;/tt&gt;も&lt;tt class="docutils literal"&gt;Number[]&lt;/tt&gt;のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。&lt;/p&gt;
+&lt;img alt="img/20120101171202.png" src="img/20120101171202.png" /&gt;
+&lt;p&gt;見た目の型は&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;の配列なのに、代入できる要素は&lt;tt class="docutils literal"&gt;Integerの&lt;/tt&gt;要素のみという配列が作れます。ここで、&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;以外の要素を代入しようとすると、同じ&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;を継承している&lt;tt class="docutils literal"&gt;Long&lt;/tt&gt;でも実行時エラーになります。このときの&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;の配列の実体は、&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;の配列ですから。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;配列は使ってはいけない&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://draftcode.github.com/2012/01/01/182300.html"&gt;先の記事&lt;/a&gt;とあわせて、配列は使ってはいけない。&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>CPython2.7.2のWindowsでのmultiprocessingの動作</title><link href="http://draftcode.github.com/2011/12/29/145918.html" rel="alternate"></link><updated>2011-12-29T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/12/29/145918.html</id><summary type="html">&lt;p&gt;フォークが出来るOSであれば、単純にフォークをしてそのあとに&lt;tt class="docutils literal"&gt;Process._bootstrap&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;Process.run&lt;/tt&gt;を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。&lt;/p&gt;
+&lt;p&gt;Windowsにおける&lt;tt class="docutils literal"&gt;multiprocessing&lt;/tt&gt;モジュールの動きは次のようなものになります:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;pipeを作っておく。&lt;/li&gt;
+&lt;li&gt;現在の実行ファイルに&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--multiprocessing-fork&lt;/span&gt;&lt;/tt&gt;というコマンドラインオプションと先ほどのpipeの読み出し側をつけて&lt;tt class="docutils literal"&gt;CreateProcess&lt;/tt&gt;する。&lt;/li&gt;
+&lt;li&gt;親プロセスはpipeを通じて、&lt;tt class="docutils literal"&gt;Process&lt;/tt&gt;オブジェクトを&lt;tt class="docutils literal"&gt;pickle&lt;/tt&gt;で直列化して子プロセスに送る。&lt;/li&gt;
+&lt;li&gt;子プロセスは&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--multiprocessing-fork&lt;/span&gt;&lt;/tt&gt;をフラグとして認識して、pipeから&lt;tt class="docutils literal"&gt;Process&lt;/tt&gt;オブジェクトを読み出す。&lt;/li&gt;
+&lt;li&gt;子プロセスが&lt;tt class="docutils literal"&gt;Process._bootstrap&lt;/tt&gt;を呼び出す。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Freezeされていない場合は、過程2のところでは、実行ファイルが&lt;tt class="docutils literal"&gt;python.exe&lt;/tt&gt;になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、&lt;tt class="docutils literal"&gt;multiprocessing.freeze_support&lt;/tt&gt;がそのような役割を果たします。これがFreezeされている場合に&lt;tt class="docutils literal"&gt;multiprocessing.freeze_support&lt;/tt&gt;が必要になる理由です。&lt;/p&gt;
+</summary></entry><entry><title>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</title><link href="http://draftcode.github.com/2011/12/29/153703.html" rel="alternate"></link><updated>2011-12-29T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/12/29/153703.html</id><summary type="html">&lt;p&gt;ドキュメンテーションにも書いてあるとおり、&lt;tt class="docutils literal"&gt;csv&lt;/tt&gt;モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。&lt;tt class="docutils literal"&gt;csv&lt;/tt&gt;モジュールのコアの部分はCで書かれており、&lt;tt class="docutils literal"&gt;_csv.c&lt;/tt&gt;というファイルに記述されています。&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;は与えられたfile-likeオブジェクトから&lt;tt class="docutils literal"&gt;PyString_AsString&lt;/tt&gt;をつかって&lt;tt class="docutils literal"&gt;char *&lt;/tt&gt;を得ようとします。:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="nf"&gt;Reader_iternext&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ReaderObj&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;lineobj&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fields&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+
+    &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;lineobj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyIter_Next&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;self&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;input_iter&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+        &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyString_AsString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lineobj&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;この関数は&lt;tt class="docutils literal"&gt;char *&lt;/tt&gt;を得るために使われるオブジェクトが&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;か&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;かで動作が変わります。&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;であった場合は直接そのオブジェクトのバッファが返されるのですが、&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;であった場合は、&lt;tt class="docutils literal"&gt;_PyUnicode_AsDefaultEncodedString&lt;/tt&gt;によって、デフォルトエンコーディングに変換された文字列を返す動作になっています。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cm"&gt;/*const*/&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="nf"&gt;PyString_AsString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;PyString_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;string_getbuffer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;PyStringObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;ob_sval&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt;
+&lt;span class="nf"&gt;PyString_AsStringAndSize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;Py_ssize_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;len&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;PyString_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="cp"&gt;#ifdef Py_USING_UNICODE&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PyUnicode_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_PyUnicode_AsDefaultEncodedString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+            &lt;span class="p"&gt;...&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もしデフォルトエンコーディングが変更されていた場合は、&lt;tt class="docutils literal"&gt;codecs.open&lt;/tt&gt;を使った場合や&lt;tt class="docutils literal"&gt;open&lt;/tt&gt;を使った場合とでおもしろい?結果が得られるかもしれません。&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;が返す結果は、&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;ではなく、ファイルのエンコーディングでエンコードされたそのままの&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;の配列や辞書になっています。よって、それがきちんと&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;なのか、なにかのエンコーディングでエンコードされた&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;なのかを意識しないと、あるはずのキーがないというような現象に出くわしたりします。これを意識するのは面倒くさいので、適切な&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;のラッパーを用意して使うようにした方がよいです。&lt;/p&gt;
+</summary></entry><entry><title>Writing Adblock Plus filters -- 日本語訳</title><link href="http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html" rel="alternate"></link><updated>2011-03-22T19:14:54+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://adblockplus.org/en/filters"&gt;Writing Adblock Plus filters&lt;/a&gt;の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．&lt;/p&gt;
 &lt;p&gt;あと，どうもURLとかフィルタルールが入っている関係で，レイアウトがすごくぐちゃぐちゃになります．それに加えて訳がいまいちなので，さらに読みづらい．超訳でもすればよかった……&lt;/p&gt;
 &lt;p&gt;Adblock Plusの新しいバージョンでは，さまざまなほうほうでフィルタを「いじる」ことができるようになっています．ここでは，その方法と使い方について説明しています．&lt;/p&gt;
 &lt;p&gt;免責事項: 例としてあげられているフィルタは，すべて単なる例として挙げており，使われることを意図しておりません．&lt;/p&gt;
