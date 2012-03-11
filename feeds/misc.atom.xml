@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/misc.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2011-03-22T19:14:54+09:00</updated><entry><title>Writing Adblock Plus filters -- 日本語訳</title><link href="http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html" rel="alternate"></link><updated>2011-03-22T19:14:54+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://adblockplus.org/en/filters"&gt;Writing Adblock Plus filters&lt;/a&gt;の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．&lt;/p&gt;
+&lt;p&gt;あと，どうもURLとかフィルタルールが入っている関係で，レイアウトがすごくぐちゃぐちゃになります．それに加えて訳がいまいちなので，さらに読みづらい．超訳でもすればよかった……&lt;/p&gt;
+&lt;p&gt;Adblock Plusの新しいバージョンでは，さまざまなほうほうでフィルタを「いじる」ことができるようになっています．ここでは，その方法と使い方について説明しています．&lt;/p&gt;
+&lt;p&gt;免責事項: 例としてあげられているフィルタは，すべて単なる例として挙げており，使われることを意図しておりません．&lt;/p&gt;
+&lt;div class="section" id="introduction-to-adblock-plus-filters"&gt;
+&lt;h2&gt;Introduction to Adblock Plus filters&lt;/h2&gt;
+&lt;p&gt;この章では，ときどきフィルタを書くようなユーザーにとって十分な方法を説明します．&lt;/p&gt;
+&lt;div class="section" id="basic-filter-rules"&gt;
+&lt;h3&gt;Basic filter rules&lt;/h3&gt;
+&lt;p&gt;一番平凡なフィルタはブロックしたいバナーのアドレスを定義することでしょう．しかしながら，こういったアドレスはページを開く度に変わってしまうのがしばしばです．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/ads/banner123.gif&lt;/span&gt;&lt;/tt&gt;というアドレスで，&lt;tt class="docutils literal"&gt;123&lt;/tt&gt;の部分がランダムな数字であるようなものを考えてみましょう．このアドレスをそのままブロックするのでは，あまり役に立ちません．もっと一般的な形のフィルタ，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/ads/banner*.gif&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/ads/*&lt;/span&gt;&lt;/tt&gt;のようなものが必要でしょう．&lt;/p&gt;
+&lt;p&gt;Note: ワイルドカードを使うことで，ブロックしすぎないように注意してください．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/*&lt;/span&gt;&lt;/tt&gt;というフィルタはすべてのバナーをブロックできるかもしれませんが，同時に，見たいものまでブロックしてしまうかもしれません．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="defining-exception-rules"&gt;
+&lt;h3&gt;Defining exception rules&lt;/h3&gt;
+&lt;p&gt;だいたいの場合は非常によくブロックできるようなフィルタが，いくつかの場合ではブロックするべきでないものもブロックしてしまうことに気づくことがあるでしょう．そんなときは，そのフィルタを外したくはないですが，他方でそのいくつかの場合に対しては，マッチさせたくないと思うでしょう．&lt;/p&gt;
+&lt;p&gt;その場合は例外ルール(exception rules)が最適です．これはフィルタを適用するべきでないケースを定義することができます．たとえば，&lt;tt class="docutils literal"&gt;adv&lt;/tt&gt;というフィルタが&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;quot;http://example.com/advice.html&lt;/span&gt;&lt;/tt&gt;というアドレスもブロックしてしまうことが気に入らないとき，&lt;tt class="docutils literal"&gt;&amp;#64;&amp;#64;advice&lt;/tt&gt;という例外ルールを定義することによってそのアドレスがブロックされないようにすることができます．例外ルールは通常のルールと同じように記述でき，ワイルドカードや正規表現を使うことができます．定義する場合には&lt;tt class="docutils literal"&gt;&amp;#64;&amp;#64;&lt;/tt&gt;を先頭につけるだけで，そのルールは例外ルールになります．&lt;/p&gt;
+&lt;p&gt;例外ルールは他の使い方もできます．もし例外ルールが&amp;quot;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;https://&lt;/span&gt;&lt;/tt&gt;で始まっている場合(さらにその前にパイプ(&lt;tt class="docutils literal"&gt;|&lt;/tt&gt;)があってもかまいません)，そのルールはページ全体を例外とすることができます．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;&amp;#64;|http://example.com&lt;/span&gt;&lt;/tt&gt;という例外ルールがあった場合，&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;のすべてのページでAdblock Plusは無効化され，何もブロックされなくなります．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="matching-at-beginning-end-of-an-address"&gt;
+&lt;h3&gt;Matching at beginning/end of an address&lt;/h3&gt;
+&lt;p&gt;通常の場合，Adblock Plusはすべてのフィルタを，最初と最後にワイルドカードがあるものとして扱います．つまり，&lt;tt class="docutils literal"&gt;ad&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;*ad*&lt;/tt&gt;という二つのフィルタには違いがないということです．だいたいの場合はこの動作が問題を起こすことはないですが，ときどき，フィルタがアドレスの最初または最後にのみマッチしてほしい場合があるでしょう．たとえば，すべてのFlashコンテンツをブロックしたいとして，&lt;tt class="docutils literal"&gt;swf&lt;/tt&gt;のようなフィルタを追加した場合，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/swf/index.html&lt;/span&gt;&lt;/tt&gt;というアドレスもブロックされてしまいます．&lt;/p&gt;
+&lt;p&gt;この問題はフィルタにパイプ(&lt;tt class="docutils literal"&gt;|&lt;/tt&gt;)をつけることで解決できます．たとえば&lt;tt class="docutils literal"&gt;swf|&lt;/tt&gt;というフィルタは，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/annoyingflash.swf&lt;/span&gt;&lt;/tt&gt;というアドレスはブロックしますが，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/swf/index.html&lt;/span&gt;&lt;/tt&gt;というアドレスはブロックしません．また，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;|http://baddomain.example/&lt;/span&gt;&lt;/tt&gt;というフィルタは，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://baddomain.example/banner.gif&lt;/span&gt;&lt;/tt&gt;はブロックしますが，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://gooddomain.example/analyze?http://baddomain.example&lt;/span&gt;&lt;/tt&gt;はブロックしません．&lt;/p&gt;
+&lt;p&gt;ときには&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/banner.gif&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;https://example.com/banner.gif&lt;/span&gt;&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://www.example.com/banner.gif&lt;/span&gt;&lt;/tt&gt;というようなアドレスをブロックしたいこともあるでしょう．これには二つのパイプをフィルタの先頭につけることで達成できます．このようにすることにより，ドメイン名の先頭からマッチするように指定することができます．&lt;tt class="docutils literal"&gt;||example.com/banner.gif&lt;/tt&gt;というフィルタは先の3つのアドレスすべてをブロックすると同時に，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://badexample.com/banner.gif&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://gooddomain.example/analyze?http://example.com/banner.gif&lt;/span&gt;&lt;/tt&gt;といったアドレスはブロックしません．(Adblock Plus 1.1以上のバージョンが必要です．)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="marking-separator-characters"&gt;
+&lt;h3&gt;Marking separator characters&lt;/h3&gt;
+&lt;p&gt;しばしばフィルタの中で分割文字(separator character)を含めなければならない場合があります．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/&lt;/span&gt;&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com:8000/&lt;/span&gt;&lt;/tt&gt;はブロックしたいが，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com.ar/&lt;/span&gt;&lt;/tt&gt;はブロックしたくないとしましょう．この場合は記号&lt;tt class="docutils literal"&gt;^&lt;/tt&gt;を分割文字のプレースホルダーとして用いることができます．この場合フィルタは&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com^&lt;/span&gt;&lt;/tt&gt;のようになります．&lt;/p&gt;
+&lt;p&gt;分割文字は英数字と&lt;tt class="docutils literal"&gt;_&lt;/tt&gt;，``-`` ，&lt;tt class="docutils literal"&gt;-&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;%&lt;/tt&gt;以外の文字すべてです．アドレスの最後も分割文字としてマッチします．分割文字をハイライトすると，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http:**//**example.com**:**8000**/**foo.bar**?**a**=**12**&amp;amp;**b**=**%D1%82%D0%B5%D1%81%D1%82&lt;/span&gt;&lt;/tt&gt;のようになります．このアドレスをブロックするならば，&lt;tt class="docutils literal"&gt;^example.com^&lt;/tt&gt;や，&lt;tt class="docutils literal"&gt;^%D1%82%D0%B5%D1%81%D1%82^&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;foo.bar&lt;/tt&gt;のようなフィルタが有効です．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comments"&gt;
+&lt;h3&gt;Comments&lt;/h3&gt;
+&lt;p&gt;エクスクラメーションマークで始まるルールはコメントとして扱われます．コメントはフィルタリストの中で，黒でなくグレーで表示されます．Adblock Plusはこのルールを無視するので，ここには何を書いても大丈夫です．フィルタの上に，そのフィルタが何をするかの説明を書いたり，フィルタリストの先頭にそれを作った作者について書くことができます．(多くのフィルタリストの作者はそうしています．)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="advanced-features"&gt;
+&lt;h3&gt;Advanced features&lt;/h3&gt;
+&lt;p&gt;この節で説明している機能は，通常はパワーユーザーやフィルタリストの作成者にしか使われないので，スキップされてもかまいません．&lt;/p&gt;
+&lt;div class="section" id="specifying-filter-options"&gt;
+&lt;h4&gt;Specifying filter options&lt;/h4&gt;
+&lt;p&gt;Adblock Plusはフィルタの動作を変える，多くのオプションを指定することができます．これらのオプションを指定するときは，フィルタの最後に&lt;tt class="docutils literal"&gt;$&lt;/tt&gt;をつけて，カンマ区切りで並べます．たとえば&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;*/ads/*$script,match-case&lt;/span&gt;&lt;/tt&gt;のようになります．このとき，&lt;tt class="docutils literal"&gt;*/ads/*&lt;/tt&gt;がフィルタで，&lt;tt class="docutils literal"&gt;script&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;match-case&lt;/span&gt;&lt;/tt&gt;がそのオプションになります．現在は次のようなオプションがサポートされています:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Type options: そのフィルタがどんな種類の要素をブロックするか(または，例外ルールの場合はホワイトリストに追加するか)を指定します．複数の種類を指定すると，指定した種類すべてにそのフィルタが適用されます．指定できる値は次の通りです．&lt;ul&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;script&lt;/tt&gt;-- HTMLのスクリプトタグによって読み込まれる外部スクリプト&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;image&lt;/tt&gt;-- HTMLのimgタグによって読み込まれるような普通の画像&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;background&lt;/tt&gt;-- CSSで指定されるような背景画像&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;stylesheet&lt;/tt&gt;-- 外部のCSSファイル&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;object&lt;/tt&gt;-- FlashやJavaアプレットのようなブラウザのプラグインによるコンテンツ&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;xbl&lt;/tt&gt;-- XBLによるバインド(通常，CSSの&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-moz-binding&lt;/span&gt;&lt;/tt&gt;によって読み込まれる)&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;ping&lt;/tt&gt;--&lt;a class="reference external" href="http://weblogs.mozillazine.org/darin/archives/009594.html"&gt;link pings&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;xmlhttprequest&lt;/tt&gt;--&lt;a class="reference external" href="http://www.w3.org/TR/XMLHttpRequest/"&gt;XMLHttpRequest&lt;/a&gt;オブジェクトによるリクエスト&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;object-subrequest&lt;/span&gt;&lt;/tt&gt;-- Flashのようなプラグインによるリクエスト&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;dtd&lt;/tt&gt;-- XML文章によって読み込まれるDTDファイル&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;subdocument&lt;/tt&gt;-- HTMLのフレームによって読み込まれる埋め込みページ&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;document&lt;/tt&gt;-- ページ自身(例外ルールのみがページに適用されます)&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;elemhide&lt;/tt&gt;--&lt;tt class="docutils literal"&gt;document&lt;/tt&gt;と似ていますがページ内の要素除去ルール
+(element hiding rules)のみ無効になります(このオプションを指定できるのは例外ルールのみ)(Adblock Plus 1.2以上のバージョンが必要です)&lt;/li&gt;
+&lt;li&gt;&lt;cite&gt;other&lt;/cite&gt;-- このリストで挙げられているもの以外すべて&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Inverse type options: フィルタが適用されるべきでない要素の種類を指定します．指定できる値は次の通りです．&lt;tt class="docutils literal"&gt;~script&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~image&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~background&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~stylesheet&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~object&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~xbl&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~ping&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~xmlhttprequest&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~object-subrequest&lt;/span&gt;&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~dtd&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~subdocument&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~document&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~elemhide&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~other&lt;/tt&gt;．&lt;/li&gt;
+&lt;li&gt;Restriction to third-party/first-party requests:&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;third-party&lt;/span&gt;&lt;/tt&gt;オプションが指定されている場合，現在見ているページと違うところの要素にのみ，そのフィルタが適用されます．同様に，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~third-party&lt;/span&gt;&lt;/tt&gt;オプションが指定されていた場合は，現  在見ているページと同じところの要素にのみ，そのフィルタが適用されます．(訳注:  たぶん同じところ(origin)って同じドメインとかだと思うんですが，よくわかりません．)&lt;/li&gt;
+&lt;li&gt;Domain restrictions:&lt;tt class="docutils literal"&gt;domain=example.com&lt;/tt&gt;のようなオプションが指定されている場合，そのフィルタは&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;のドメインのページにのみ適用されます．&lt;tt class="docutils literal"&gt;domain=example.com|example.net&lt;/tt&gt;のように，パイプを区切り文字にして複数のドメインを指定することができます．この場合は，&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;example.net&lt;/tt&gt;のページに適用されます．ドメイン名が&lt;tt class="docutils literal"&gt;~&lt;/tt&gt;で始まっている場合，そのドメインでは適用されないようになります．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;domain=~example.com&lt;/span&gt;&lt;/tt&gt;は，&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;以外のドメインのページで適用するという意味になります．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;domain=example.com|~foo.example.com&lt;/span&gt;&lt;/tt&gt;は，&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;のドメインのページで適用するが，サブドメイン&lt;tt class="docutils literal"&gt;foo.example.com&lt;/tt&gt;は例外として適用しないということになります．&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;match-case&lt;/span&gt;&lt;/tt&gt;-- フィルタが大文字と小文字を区別するようになります．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;*/BannerAd.gif$match-case&lt;/span&gt;&lt;/tt&gt;というフィルタは，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/BannerAd.gif&lt;/span&gt;&lt;/tt&gt;はブロックしますが，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/bannerad.gif&lt;/span&gt;&lt;/tt&gt;はブロックしません．&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;collapse&lt;/tt&gt;-- このオプションは，全体の&lt;tt class="docutils literal"&gt;Collapse blocked elements&lt;/tt&gt;を上書きし，フィルタがブロックした要素を折りたたむようにします．同様に，&lt;tt class="docutils literal"&gt;~collapse&lt;/tt&gt;は要素が折りたたまれないようにします．&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-regular-expressions"&gt;
+&lt;h4&gt;Using regular expressions&lt;/h4&gt;
+&lt;p&gt;フィルタがマッチする，しないについて，より細かい制御をしたい場合は，正規表現を使うことができます．たとえば，&lt;tt class="docutils literal"&gt;/banner\d+&lt;/tt&gt;というフィルタは&lt;tt class="docutils literal"&gt;banner123&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;banner321&lt;/tt&gt;にはマッチしますが，&lt;tt class="docutils literal"&gt;banner&lt;/tt&gt;にはマッチしません．正規表現の書き方については&lt;cite&gt;正規表現についてのドキュメント&lt;/cite&gt;を参照してください．&lt;/p&gt;
+&lt;p&gt;Note: パフォーマンス上の理由から，正規表現を使わなくてもよいなら使わないことをおすすめします．&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="element-hiding"&gt;
+&lt;h2&gt;Element hiding&lt;/h2&gt;
+&lt;div class="section" id="basic-rules"&gt;
+&lt;h3&gt;Basic rules&lt;/h3&gt;
+&lt;p&gt;広告がウェブページの中に，テキストとして埋め込まれているために，ブロックできないことがあるでしょう．そういったページのソースコードを見ると，次のようになっています:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;textad&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+Cheapest tofu, only here and now!
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+
+&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;sponsorad&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+Really cheap tofu, click here!
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+
+&lt;span class="nt"&gt;&amp;lt;textad&amp;gt;&lt;/span&gt;
+Only here you get the best tofu!
+&lt;span class="nt"&gt;&amp;lt;/textad&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ウェブページを読み込むと一緒に広告まで読み込まれてしまいます．こういったときには，広告を隠すことしかできません．そのために，要素を隠すことが必要になります．&lt;/p&gt;
+&lt;p&gt;上の例の最初の広告は，&lt;tt class="docutils literal"&gt;textad&lt;/tt&gt;というクラスの&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;要素の中に入っています．このような広告は&lt;tt class="docutils literal"&gt;##div.textad&lt;/tt&gt;のようなルールで隠すことができます．この&lt;tt class="docutils literal"&gt;##&lt;/tt&gt;というマークは要素除去ルールであることを示していて，それいがいは隠すべき要素を指定するセレクタになっています．要素は&lt;tt class="docutils literal"&gt;id&lt;/tt&gt;を使うことによっても隠すことができます．&lt;tt class="docutils literal"&gt;##div#sponsorad&lt;/tt&gt;は二番目のような広告を隠すことができます．要素名は指定しなくてもかまいません．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##*#sponsorad&lt;/span&gt;&lt;/tt&gt;というルールも同じように働きます．また，要素名のみ指定することもできます．&lt;tt class="docutils literal"&gt;##textad&lt;/tt&gt;というルールは三番目のような広告を隠します．&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://adblockplus.org/en/elemhidehelper"&gt;Element Hiding Helper extension&lt;/a&gt;は適切な要素を選び出し，対応したルールを書くことを，ソースコードを見ることなしにできるよう手助けをしてくれます．とは言っても，基本的なHTMLについての知識はあったほうがよいでしょう．&lt;/p&gt;
+&lt;p&gt;Note: 要素除去は通常のフィルタとは全く違った動きをします．要素除去ルールではワイルドカードが使えないことに注意してください．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="limiting-rules-to-certain-domains"&gt;
+&lt;h3&gt;Limiting rules to certain domains&lt;/h3&gt;
+&lt;p&gt;たいていの場合，要素除去ルールは特定のサイトのみに適用して，それ以外のサイトでは適用されないようにしたいでしょう．たとえば&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##*.sponsor&lt;/span&gt;&lt;/tt&gt;というルールはいくつかのサイトでは広告ではない要素も隠してしまうかもしれません．これを&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;example.com##*.sponsor&lt;/span&gt;&lt;/tt&gt;というように変えることで，このルールが&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://something.example.com/&lt;/span&gt;&lt;/tt&gt;で適用されるようになり，同時に&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.org/&lt;/span&gt;&lt;/tt&gt;では適用されないようになります．ドメインはカンマで区切ることで複数指定することができます．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;domain1.example.com,domain2.example,domain3.example##*.sponsor&lt;/span&gt;&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;ドメイン名が&lt;tt class="docutils literal"&gt;~&lt;/tt&gt;で始まっている場合，そのルールはそのドメイン上のページでは適用されなくなります．(Adblock Plus 1.1以上のバージョンが必要です．)たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~example.com##*.sponsor&lt;/span&gt;&lt;/tt&gt;は&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;以外のドメインすべてで適用されるようになり，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;example.com,~foo.example.com##*.sponsor&lt;/span&gt;&lt;/tt&gt;は&lt;tt class="docutils literal"&gt;foo.example.com&lt;/tt&gt;を除いた&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;上で適用されるようになります．&lt;/p&gt;
+&lt;p&gt;Note: 要素除去の実装方法の関係で，フルドメイン名しか指定することができません．つまり，&lt;tt class="docutils literal"&gt;domain&lt;/tt&gt;という指定によって，&lt;tt class="docutils literal"&gt;domain.example&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;domain.test&lt;/tt&gt;のようなドメインを対象にすることはできません．&lt;/p&gt;
+&lt;p&gt;Note: ドメイン指定をした要素除去ルールは，ブラウザのユーザーインターフェースにも使うことができます．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;browser##menuitem#javascriptConsole&lt;/span&gt;&lt;/tt&gt;は
+FirefoxのToolメニューにあるJavascript Consoleを隠します．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="attribute-selectors"&gt;
+&lt;h3&gt;Attribute selectors&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;id&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;class&lt;/tt&gt;も無いような要素は除去するのが難しいかもしれません．このときは他の属性を指定することができます．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##table[width=&amp;quot;80%&amp;quot;]&lt;/span&gt;&lt;/tt&gt;というルールは&lt;tt class="docutils literal"&gt;width&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;80%&lt;/tt&gt;に指定されているようなテーブルを隠します．属性の値を完全に指定しなくてもかまいません．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##div[title*=&amp;quot;adv&amp;quot;]&lt;/span&gt;&lt;/tt&gt;というルールは&lt;tt class="docutils literal"&gt;title&lt;/tt&gt;の中に&lt;tt class="docutils literal"&gt;adv&lt;/tt&gt;という文字列が入っているような&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;要素を隠します．属性の値は先頭や末尾にもマッチさせることができます．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##div[title^=&amp;quot;adv&amp;quot;][title$=&amp;quot;ert&amp;quot;]&lt;/span&gt;&lt;/tt&gt;といったフィルタは，&lt;tt class="docutils literal"&gt;title&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;adv&lt;/tt&gt;で始まり&lt;tt class="docutils literal"&gt;ert&lt;/tt&gt;で終わるような&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;要素を隠します．また，このように複数の条件を使うことができます．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;table[width=&amp;quot;80%&amp;quot;][bgcolor=&amp;quot;white&amp;quot;]&lt;/span&gt;&lt;/tt&gt;は，&lt;tt class="docutils literal"&gt;width&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;80%&lt;/tt&gt;かつ，&lt;tt class="docutils literal"&gt;bgcolor&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;white&lt;/tt&gt;であるようなテーブルを隠します．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="advanced-selectors"&gt;
+&lt;h3&gt;Advanced selectors&lt;/h3&gt;
+&lt;p&gt;FirefoxでサポートされているCSSセレクタは要素除去ルールでも使うことができます．&lt;tt class="docutils literal"&gt;##div.adheader + *&lt;/tt&gt;というルールは&lt;tt class="docutils literal"&gt;adheader&lt;/tt&gt;クラスの&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;要素に続く，すべての要素を隠します．CSSセレクタのすべてのリストは，&lt;a class="reference external" href="http://www.w3.org/TR/css3-selectors/"&gt;W3C CSS
+specification&lt;/a&gt;で見ることができます．(すべてのセレクタがFirefoxでサポートされているわけではないことに注意してください)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="simplified-element-hiding-syntax"&gt;
+&lt;h3&gt;Simplified element hiding syntax&lt;/h3&gt;
+&lt;p&gt;Adblock Plusでは，後方互換性のために，&lt;tt class="docutils literal"&gt;#div(id=foo)&lt;/tt&gt;のような単純な要素除去ルールをサポートしています．このような書き方は推奨しておらず，CSSセレクタによる方法を推奨しています．この書き方は将来のどこかのタイミングで無効になる予定です．&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>Macを大きいディスプレイにつなげるときはMini DisplayPort &amp;lt;-&amp;gt; DisplayPort変換ケーブルを使う</title><link href="http://draftcode.github.com/2011/03/14/42aa3a98-4e10-11e0-bcea-d8a25efffee9.html" rel="alternate"></link><updated>2011-03-14T16:54:16+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2011/03/14/42aa3a98-4e10-11e0-bcea-d8a25efffee9.html</id><summary type="html">&lt;p&gt;Macbook Proを修理に出したときに，どうしてもレポートを書かなければいけない感じだったので，Mac miniを購入しました．Macbook Proは3年ぐらい前のモデルだったので，大きいDVIポートがあり，DELLのU2711のような大きいディスプレイでも直接接続して最適な解像度が出せたのですが，今のMacについているようなMini DisplayPortだと，DVIとの変換ケーブルを使っても，フルHD程度までしか出力することができません．これはDVIのシングルリンクとかデュアルリンクとかの問題らしいんですが，それを解決するためにはAppleの高いデュアルリンク対応の変換アダプタを購入しなければいけません．&lt;/p&gt;
+&lt;p&gt;もっとシンプルな解決方法を目指します．最近のディスプレイはDisplayPortがついているようなので，それに変換すれば良いのです．実際自分はMini DisplayPortとDisplayPortの変換ケーブルを使って，大きい解像度の出力ができるようになっています．&lt;/p&gt;
+&lt;p&gt;残念ながら，このような変換ケーブルはあまり製造されていないようです．自分は&lt;a class="reference external" href="http://store.shopping.yahoo.co.jp/ats/0203.html"&gt;ATS Direct&lt;/a&gt;というサイトで購入しました．&lt;/p&gt;
+&lt;p&gt;またDisplayPortは音声出力も対応しているので，U2711の音声出力から音を出すこともできています．しかしながらU2711側では音量調節ができないので，音量調節ができるようなもの(スピーカーなど)でないと，音が大きすぎて耳がつぶれます．ヘッドホンとかは難しいです．ちなみに出力切り替えはSoundflowerを使うと便利です．&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;追記 (2011-06-22)&lt;/h2&gt;
+&lt;p&gt;どうも探し方が悪かったようで，他にもいくつか見つかりました．&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://www.amazon.co.jp/dp/B004KB5HM6/"&gt;http://www.amazon.co.jp/dp/B004KB5HM6/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://www.amazon.co.jp/dp/B004GCHNP8/"&gt;http://www.amazon.co.jp/dp/B004GCHNP8/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://direct.eizo.co.jp/shop/g/gPM200-BK/"&gt;http://direct.eizo.co.jp/shop/g/gPM200-BK/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ただ，ものによっては映らないものもあるみたいですね．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;追記 (2012-03-11)&lt;/h2&gt;
+&lt;p&gt;音声出力の切り替えはOptionキーを押しながらメニューバーの音量調節アイコンをクリックすると、出力装置の切り替えができるので、これが便利です。最近はU2711に別のスピーカーをつけて、そのスピーカーについている音声出力端子にヘッドホンをつけたりしています。&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>アキュムレータについて</title><link href="http://draftcode.github.com/2010/08/15/accumulator_programming.html" rel="alternate"></link><updated>2010-08-15T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2010/08/15/accumulator_programming.html</id><summary type="html">&lt;p&gt;コンピュータプログラミングの概念・技法・モデルの中で，アキュムレータという概念が出てきました．たぶん，いろいろなところで使ってきた手法を，一般化して名前をつけたため，違うモノのように見えるだけだと思うのですが，混乱しているので整理します．&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;再帰計算と反復計算&lt;/h2&gt;
+&lt;p&gt;宣言的プログラミングにおいては，単純に再帰関数を書いてしまうと効率が悪いことが多いので，現実的には再帰計算の特殊な場合である，反復計算になるようにプログラムを書きます．再帰的データ構造を扱う再帰計算を反復計算にするにあたっては，問題を状態変換の列に作り直す必要がありました．&lt;/p&gt;
+&lt;p&gt;通常の場合，再帰形を書かずにに反復形を書くことが多いです．その場合に用いられる形式として，アキュムレータプログラミングという形式があります．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;反復計算におけるアキュムレータ&lt;/h2&gt;
+&lt;p&gt;反復計算は次のような制御抽象として表現できました:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;proc {Iterate S IsDone Transform ?R}
+    if {IsDone S} then R = S
+    else S1 in
+        S1 = {Transform S}
+        {Iterate S1 IsDone Transform R}
+    end
+end
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;アキュムレータは入力と出力の状態の対になります．この場合において，&lt;tt class="docutils literal"&gt;S&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;R&lt;/tt&gt;の対がアキュムレータとなっています．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;再帰的データ構造を扱う場合の反復計算&lt;/h2&gt;
+&lt;p&gt;再帰的データ構造を扱う計算をするときに，基本の場合と再帰の場合の二つの場合がありました．それを踏まえて，上述の反復計算を書き直すと次のようになります:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;proc {P X S1 ?Sn}
+    if {BaseCase X} then
+        S1 = Sn
+    else
+        {P1 ．．．S1 S2}
+        ．．．
+        {Pn ．．．Sm Sn}
+    end
+end
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;基本の場合(&lt;tt class="docutils literal"&gt;{BaseCase X} == true&lt;/tt&gt;の場合)は，既に状態変換の列の中で，一番最後の最終状態に居ることになるので，出力状態はそのままになります．&lt;/p&gt;
+&lt;p&gt;再帰の場合はいくつかの状態変換を施した後，再帰関数を呼んでいます．このとき，呼んでいる各関数もアキュムレータスタイルで書かれています．そのため，最後に呼ばれている関数では，その関数の出力状態がそのまま，呼び出し元の関数の出力状態&lt;tt class="docutils literal"&gt;Sn&lt;/tt&gt;になるようになっています．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;考察&lt;/h2&gt;
+&lt;p&gt;最後に再帰関数を呼ぶことによって，末尾再帰最適化がなされる(2章の練習問題で見たように，相互再帰では，自分自身の関数以外を呼んでもスタックが一定以上消費されない)のですが，その前に関数を呼んでしまうと，関数本体で一度しか再帰関数を呼ばないという条件を満たさなくなってしまうので，スタックを一定以上消費しないとは言えないと思います．&lt;/p&gt;
+&lt;p&gt;たぶんアキュムレータスタイルというのは，「再帰計算を反復計算にするときの一般的な形式」ではなく，「再帰計算を反復計算にした場合のスタイルを一般化した形式」として捉えるのが妥当だと思います．アキュムレータスタイルで，再帰の場合の本体で1つだけ相互再帰集合の関数を呼び出しており，かつその関数が本体の末尾に呼ばれているときのみ，スタックを一定以上消費しない反復計算になるのであって，それ以外の場合は「あまりメモリを消費しない」再帰計算にとどまると考えられます．このことについては，アキュムレータスタイルで書かれたマージソートのところでも「メモリ使用量は少ない」と述べられているだけなので，そういうことでしょう．再帰計算を反復計算にできる一般的な形式と思って読むと，なんでこれでスタックを消費しないと言えるの?と疑問に思ったりします．&lt;/p&gt;
+&lt;p&gt;Schemeでは再帰的データ構造としてリストに絞ったアキュムレータを提供していて，次のようになっています．&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;fold&lt;/span&gt; &lt;span class="nv"&gt;kcons&lt;/span&gt; &lt;span class="nv"&gt;knil&lt;/span&gt; &lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let &lt;/span&gt;&lt;span class="nv"&gt;loop&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nf"&gt;l&lt;/span&gt; &lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;r&lt;/span&gt; &lt;span class="nv"&gt;knil&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null? &lt;/span&gt;&lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;r&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;loop&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr &lt;/span&gt;&lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;kcons&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car &lt;/span&gt;&lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;r&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;この場合のアキュムレータは&lt;tt class="docutils literal"&gt;r&lt;/tt&gt;になります．Schemeではすべて関数なので，出力状態を明示的に指定しなくても良く，対になっているように見えませんが，最後にきちんと&lt;tt class="docutils literal"&gt;r&lt;/tt&gt;を返しているので，ここからもアキュムレータが&lt;tt class="docutils literal"&gt;r&lt;/tt&gt;であることを確認できます．逆からたどると，初期状態は&lt;tt class="docutils literal"&gt;knil&lt;/tt&gt;となっていると言えます．&lt;tt class="docutils literal"&gt;l&lt;/tt&gt;はリストなので，&lt;tt class="docutils literal"&gt;BaseCase&lt;/tt&gt;にあたるものは&lt;tt class="docutils literal"&gt;null?&lt;/tt&gt;になっています．また，この場合は末尾で直接再帰になっているので，スタックを消費しません．&lt;/p&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h3&gt;蛇足&lt;/h3&gt;
+&lt;p&gt;Schemeの場合，ある関数を呼び出した後にやるべき計算を取り出せるという機能があって，それは(自分も含めて)多くの人の中で「強力そうなのは知っているが，正直なところそれがどういうもので，何に有効なのかよくわからない『継続』」として知られています．&lt;/p&gt;
+&lt;p&gt;関数型プログラミングは宣言的プログラミングにおける，部分値を扱うことを制限して，完全値のみで計算するようにした計算モデルなので，継続ってある計算をするために必要な完全値が計算ができないという理由により，その値を必要とする計算を取り出しておいて，いったん制御フローを他の部分に移すためのものとしてみれるのではないでしょうか．それ以外にも，今その値は存在しているけれども，それをつかって計算をするよりも先に別の計算をしたい場合のフロー制御としても使えるとは思いますが．&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>情報工学科に所属する前後の学習の道筋</title><link href="http://draftcode.github.com/2010/08/15/learning_path.html" rel="alternate"></link><updated>2010-08-15T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2010/08/15/learning_path.html</id><summary type="html">&lt;p&gt;自分も現在学習途中であるし，これはこのように勉強しろというようなたいそうなことは言えないのですが，どういうことを思って，どういう勉強を進めてきたかということを書いてみたいと思います．&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;計算機プログラムの構造と解釈を読み始めた&lt;/h2&gt;
+&lt;p&gt;買ったのは浪人をすることに決めたときでした．そこから4月か5月ぐらいまではやっていたような気がしますが，大して進まずに放置しました．実際に割と進んだのはB2のときでした．ちなみに現在も止まったままです．きっと多くの人が有名な本だし読んでおこうと思いつつも止まっているのではないでしょうか．自分もその一人です．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="c"&gt;
+&lt;h2&gt;プログラミング言語Cを読んだ&lt;/h2&gt;
+&lt;p&gt;読み始めたのはB1の5月からでした．以前にもCの特に有用ではなさそうな本を読みましたが，情報工学科を志望しているのだしCぐらいできていてもいいのではないだろうかということでこの本だったと思います．この本については演習を含めてだいたい1ヶ月か2ヶ月ぐらいで読み終えたと思います．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;Cを使うアルバイトを始めた&lt;/h2&gt;
+&lt;p&gt;プログラミング言語Cを読み終えたので，Cを使うアルバイトをはじめました．現在ではそういうバイトは少なくなっているのかもしれないですが，たまたま見つけたのでそこに応募しました．現在も一応続けています．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="mfc"&gt;
+&lt;h2&gt;MFCに触れた&lt;/h2&gt;
+&lt;p&gt;アルバイトの研修の最初の方は基本的なCの演習でしたが，後半の方はMFCを使った
+Windowsアプリケーションの開発でしたので，MFCに触れることになりました．必然的にC++も触れることになっています．MFCを使うにあたってリファレンスを参照するので，
+MSDNをひいていたりしました．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;プログラミング言語C++を読み始めた&lt;/h2&gt;
+&lt;p&gt;MFCはC++のフレームワークですので，C++の知識が必要になると思い，プログラミング言語C++を購入しました．この本に関しては評判はイマイチでしたが，言語をデザインした人が書いた本だからという理由で購入しました．&lt;/p&gt;
+&lt;p&gt;この本はまだ途中までしか読んでいないですし，読んだ部分もほぼ覚えていません．というのも，アルバイトの中で実際に使っているのはC++というよりBetter Cでしたので，C++の様々な機能(と呼んで差し支えないのかわかりませんが)は(幸か不幸か)あまり使用することがなかったのです．&lt;/p&gt;
+&lt;p&gt;同時期にC++のデザインと進化を購入しましたが，まだ読んでいません．&lt;/p&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h3&gt;この頃のコード&lt;/h3&gt;
+&lt;p&gt;C++かぶれになっていたので，STLやテンプレートやクラスを多用するコードでした．前述の通り，バイト先ではほぼBetter Cでしたので，書いたコードを社員さんにレビューしてもらうと，(幸か不幸か)反応がイマイチでした．研修の頃は，実際の業務でいじるコードを見ていないので，なんだろうなぁという感想を抱いていましたが，研修が終わり，実際の業務に入ったときにBetter Cのように書いてあるコードをみて，納得がいきました．(そして自分は周りにあわせてCっぽくC++を使うようになりました．)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="win32api"&gt;
+&lt;h2&gt;Win32APIに触れた&lt;/h2&gt;
+&lt;p&gt;研修ではMFCを使っていたので，Win32APIを直接使うことはありませんでしたが，実業務ではほぼWin32APIをつかったプログラミングでしたので，MSDNを読みながらプログラムを書くということをやっていました．この時期には古い(Windows95あたりの)Win32APIについての本がバイト先にありましたので，それをめくりつつOSが提供する基本的なサービス，つまりメモリ割り当てやメモリマッピング，スレッド・プロセスの概念，プロセス間同期について知ることとなりました．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;エキスパートCプログラミングを読んだ&lt;/h2&gt;
+&lt;p&gt;C++が提供する様々な抽象化は，遊ぶ分には楽しいけれども，適切にそれを使用できる人と一緒ではないと，仕事では使えないという印象を受けたので，C++に関することは中断し，Cについてより詳しく知ることにしました．実際のところプログラミング言語CだけではCについての知識は足りないとは思います．&lt;/p&gt;
+&lt;p&gt;エキスパートCプログラミングは，そのような足りない部分の一部を補ってくれました．特にポインタと配列の違いは，実際のところこの本を読むまで説明できなかったと思いますし，この本を読むことによって，コードを書くときに意識する視点の一つ，コンパイラは何をどう見るのかという視点を獲得することができました．この視点がないと，sizeofが展開される値についての正しい判断をすることができませんでした．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="linkers-loaders"&gt;
+&lt;h2&gt;Linkers &amp;amp; Loadersを読み始めた&lt;/h2&gt;
+&lt;p&gt;エキスパートCプログラミングを読んだあと，コンパイラがはき出すオブジェクトコードについての知識が欲しいと思いました．アセンブラについての知識は後で獲得することになるのですが，コンパイル後のコードについて，リンカやローダが行う作業や，オブジェクトコードそれ自体が含むものがなんなのかということについて知ることになりました．&lt;/p&gt;
+&lt;p&gt;オブジェクトコードが含むものを知ることができたため，コンパイラがどういう視点でソースコードを見ているのかということについて，よりよい推測ができるようになりました．翻訳単位という概念はエキスパートCプログラミングでもありましたが，
+Linkers&amp;amp; Loadersを読むことによって，複数のオブジェクトコード間での参照をするときに，どうやって解決しているかということも推測できるようになりました．&lt;/p&gt;
+&lt;div class="section" id="c-linkers-loaders"&gt;
+&lt;h3&gt;エキスパートCプログラミング と Linkers &amp;amp; Loadersの与えた影響&lt;/h3&gt;
+&lt;p&gt;上記の二冊は，自分のコーディングに対する姿勢に大きく影響を与えています．どんなに高級な言語でも，必ずそれは機械語レベルまで落とされるということを強く意識できるようになりました．例えば，自分はアルバイトでVBScriptを書くアルバイトを(上記の仕事とは別に)やっているのですが，そのときもCOMのVariantに意識を落とし，COMが提供するバイナリ標準についての知識を活用しながら，値渡しと参照渡しが混在する関数の間を行き来しています．&lt;/p&gt;
+&lt;p&gt;また，いかに抽象化されたレイヤで動くプログラムだろうと，それは必ず現実の計算機で実行されているということがはっきりと意識するようになりました．もともと(計算機科学について学習する上で)最初に選んだ本が計算機プログラムの構造と解釈であるのというのもあるかもしれませんが，Lispのようなかなり抽象化のレベルが高い言語が，どうやって計算機の上で動くオブジェクトコードに変換されるのか，ということに関心を寄せるようになりました．&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h2&gt;λ計算について知った&lt;/h2&gt;
+&lt;p&gt;Linkers &amp;amp; Loadersと前後して，チューリング機械や再帰的関数，λ計算についての基本的な知識を得ました．Schemeで出てくるlambdaというものについて知っておきたかったというのもありますし，たまたま大学の授業で計算論の科目があったというのもあります．これらの分野の興味はより進んでいって，サークルで行っている研究室紹介を行うために，関連した研究室へ取材に行くことになりました．&lt;/p&gt;
+&lt;p&gt;訪問した研究室はプログラム意味論について研究しているところでしたので，初学者の自分にはなかなか理解できなかったところもありましたが，なんとか研究室を紹介できるレベルまでもっていくことができました．また，この時期には論理学についての基礎知識も得ることができました．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h2&gt;現在について&lt;/h2&gt;
+&lt;p&gt;ここまでが情報工学科3年になるまでにたどった学習の道筋です．現在はコンピュータアーキテクチャを学ぶために，パターソン&amp;amp;ヘネシー コンピュータの構成と設計 ハードウエアとソフトウエアのインタフェースを読んでいます．また，アルゴリズムとデータ構造について学ぶために，アルゴリズムイントロダクションを読んでいます．&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry></feed>
