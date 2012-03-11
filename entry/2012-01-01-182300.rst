@@ -1,0 +1,160 @@
+=========================================================================
+Generic型の配列を作るとgeneric array creationやunchecked conversionが出る
+=========================================================================
+:Author: draftcode
+:Date:   2012-01-01
+:category: Java
+:Slug:   182300
+
+結論
+====
+
+配列はアレなので使ってはいけない
+
+JavaのGenericsとは
+==================
+
+JavaのGenericsでは、型パラメーターは最終的にバイトコードになったら消えて
+``Object`` になってしまって、Generic型からその型パラメーターで示された型を実際
+に使う側がキャストして使うというものなんですね。だからこのようなコードに対し
+て:
+
+.. code-block:: java
+
+   import java.util.List;
+   import java.util.ArrayList;
+
+   class Main {
+     public static void main(String[] args) {
+       List<Integer> l = new ArrayList<Integer>();
+       l.add(1);
+       Integer a = l.get(0);
+     }
+   }
+
+このようなバイトコードが出力されます:
+
+.. code-block:: text
+
+   Compiled from "Main.java"
+   class Main extends java.lang.Object{
+   Main();
+     Code:
+      0:   aload_0
+      1:   invokespecial   #1; //Method java/lang/Object."<init>":()V
+      4:   return
+
+   public static void main(java.lang.String[]);
+     Code:
+      0:   new     #2; //class java/util/ArrayList
+      3:   dup
+      4:   invokespecial   #3; //Method java/util/ArrayList."<init>":()V
+      7:   astore_1
+      8:   aload_1
+      9:   iconst_1
+      10:  invokestatic    #4; //Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      13:  invokeinterface #5,  2; //InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+      18:  pop
+      19:  aload_1
+      20:  iconst_0
+      21:  invokeinterface #6,  2; //InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+      26:  checkcast       #7; //class java/lang/Integer
+      29:  astore_2
+      30:  return
+
+   }
+
+``ArrayList`` の型パラメーターが消えていて、要素を取り出すときに ``checkcast``
+でキャストしてますね。
+
+総称配列を作るときのエラー・警告
+================================
+
+例えば次のようなコードはgeneric array createionエラーになります:
+
+.. code-block:: java
+
+   ArrayList<Integer>[] list = new ArrayList<Integer>[10];
+
+これは配列をアロケートするときに、バイトコードの中で型情報が必要になるのに、
+``ArrayList<Integer>`` は(バイトコードレベルでは)実際は存在せず、
+``ArrayList`` が存在しているからです。
+
+なので次のようなコードを書きます:
+
+.. code-block:: java
+
+   ArrayList<Integer>[] list = new ArrayList[10];
+   ArrayList<Integer>[] list = new ArrayList<?>[10];
+
+しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするとき
+は、``ArrayList``と``ArrayList<Integer>``は違う型ですから。
+
+追記
+----
+
+generic array creationがなぜ禁止なのかきちんと理解してなかった。
+
+Generic型の配列が作れると仮定しましょう。次のコードはエラー・警告なしでコンパ
+イル出来ます:
+
+.. code-block:: java
+
+   ArrayList[] list = new ArrayList<Integer>[10];
+   ArrayList<String> stringArray = new ArrayList<String>();
+   stringArray.add("Some String");
+   list[0] = stringArray;
+
+   ArrayList<Integer> intArray = list[0];
+   Integer intObj = intArray.get(0); // ClassCastException occur!
+
+一方でGeneric型以外の配列の場合は、次のようになります:
+
+.. code-block:: java
+
+   Number[] list = new Integer[10];
+   list[0] = Double.valueOf(1); // ArrayStoreException occur!
+
+Generic型以外の配列の場合、型の違うオブジェクトの参照を配列に代入しようとする
+と、 ``ArrayStoreException`` が発生しますが、Generic型の配列の場合はそ
+の例外は発生せずに、値を取り出したときに ``ClassCastException`` が発生
+するようになります。これがGeneric型の配列が作れない理由のようです。
+
+また、総称配列が作れなくても、上のコードは次のように書き換えると、unchecked
+conversion warningが出るけれども、 ``ClassCastException`` が発生するよ
+うに実行することが出来ます:
+
+.. code-block:: java
+
+   ArrayList[] list = new ArrayList[10];
+   ArrayList<String> stringArray = new ArrayList<String>();
+   stringArray.add("Some String");
+   list[0] = stringArray;
+
+   ArrayList<Integer> intArray = list[0]; // unchecked conversion warning
+   Integer intObj = intArray.get(0); // ClassCastException occur!
+
+次のように書き換えると、今度はきちんと ``list[0] = stringArray`` のところで型
+エラーを起こしてくれます:
+
+.. code-block:: java
+
+   ArrayList<Integer>[] list = new ArrayList[10]; // unchecked conversion warning
+   ArrayList<String> stringArray = new ArrayList<String>();
+   stringArray.add("Some String");
+   list[0] = stringArray; // Incompatible types error
+
+   ArrayList<Integer> intArray = list[0];
+   Integer intObj = intArray.get(0);
+
+配列は使ってはいけない
+======================
+
+総称配列のエラー・警告はJavaレベルの型とJVMレベルの型が一致していないことが原
+因に見えますが、実は配列を使わなければこのような問題は回避されるようです。(僕
+はGenericsによってJavaとJVMの型が一致しなくなったこともなんかアレな気がするん
+ですが)
+
+また、配列がcovariantなのもまた変なエラーの原因となるので、配列さえ使わなけれ
+ば……というのがかなり前から言われているようです。
+
