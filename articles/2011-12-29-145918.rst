@@ -3,7 +3,7 @@ CPython2.7.2のWindowsでのmultiprocessingの動作
 ==============================================
 :Author: draftcode
 :Date:   2011-12-29
-:category: Python
+:Category: Python
 :Slug:   145918
 
 フォークが出来るOSであれば、単純にフォークをしてそのあとに

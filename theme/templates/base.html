@@ -42,7 +42,7 @@
             
         {% if DISPLAY_PAGES_ON_MENU %}
         {% for page in PAGES %}
-            <li><a href="{{ SITEURL }}/pages/{{ page.url }}">{{ page.title }}</a></li>
+            <li><a href="{{ SITEURL }}/{{ page.url }}">{{ page.title }}</a></li>
         {% endfor %}
         {% endif %}
         </ul>
@@ -56,11 +56,11 @@
     <div class="content">
     <div class="row">
 
-        <div class="offset2 span7">
+        <div class="offset2 span8">
         {% block content %}{% endblock %}
         </div>
         
-        <div class="span3">
+        <div class="span2">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
@@ -123,7 +123,7 @@
             </div>
             {% endif %}
 
-        </div> {# End span3 #} 
+        </div> {# End span2 #} 
     </div> {# End row #}
     </div> {# End content #}
 

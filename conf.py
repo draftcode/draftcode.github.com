@@ -3,35 +3,31 @@
 from __future__ import unicode_literals
 
 AUTHOR = 'draftcode'
+DELETE_OUTPUT_DIRECTORY = True
+PATH = '.'
+PAGE_DIR = 'pages'
+ARTICLE_DIR = 'articles'
 SITENAME = 'draftcode.github.com'
 SITEURL = 'http://draftcode.github.com'
-AUTHOR_URL = SITEURL
-PATH = 'entry/'
-THEME = 'theme/'
-
-ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}.html'
-ARTICLE_SAVE_AS = '{date:%Y}/{date:%m}/{date:%d}/{slug}.html'
-GITHUB_URL = 'http://github.com/draftcode/'
-DISQUS_SITENAME = 'draftcode-github-com'
-PDF_GENERATOR = False
-WITH_PAGINATION = True
-DEFAULT_LANG = 'ja'
+STATIC_PATHS = ["images"]
 TIMEZONE = 'Asia/Tokyo'
 
-FEED = "atom.xml"
-# FEED_RSS = None
-# CATEGORY_FEED = None
-# TRANSLATION_FEED = None
+ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}.html'
+ARTICLE_SAVE_AS = ARTICLE_URL
 
+FEED = "atom.xml"
+
+DEFAULT_LANG = 'ja'
+
+THEME = 'theme/'
+
+DISQUS_SITENAME = 'draftcode-github-com'
+GITHUB_URL = 'http://github.com/draftcode/'
 SOCIAL = (('twitter', 'http://twitter.com/#!/draftcode'),
           ('github', 'http://github.com/draftcode'),)
 TWITTER_USERNAME = 'draftcode'
 
-# static paths will be copied under the same name
-STATIC_PATHS = ["img",]
-
-# A list of files to copy from the source to the destination
-FILES_TO_COPY = (('extra/robots.txt', 'robots.txt'),)
+##############################################################################
 
 import unicodedata
 import docutils.nodes
