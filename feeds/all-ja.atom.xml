@@ -150,7 +150,7 @@ conversion warningが出るけれども、&lt;tt class="docutils literal"&gt;Cla
 &lt;div class="section" id="java"&gt;
 &lt;h2&gt;Javaの配列とは&lt;/h2&gt;
 &lt;p&gt;Javaの配列はcovariantです。&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;は&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;のサブクラスなんだから、&lt;tt class="docutils literal"&gt;Integer[]&lt;/tt&gt;も&lt;tt class="docutils literal"&gt;Number[]&lt;/tt&gt;のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。&lt;/p&gt;
-&lt;img alt="img/20120101171202.png" src="img/20120101171202.png" /&gt;
+&lt;img alt="images/20120101171202.png" src="images/20120101171202.png" /&gt;
 &lt;p&gt;見た目の型は&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;の配列なのに、代入できる要素は&lt;tt class="docutils literal"&gt;Integerの&lt;/tt&gt;要素のみという配列が作れます。ここで、&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;以外の要素を代入しようとすると、同じ&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;を継承している&lt;tt class="docutils literal"&gt;Long&lt;/tt&gt;でも実行時エラーになります。このときの&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;の配列の実体は、&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;の配列ですから。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;

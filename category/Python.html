@@ -40,6 +40,8 @@
             
         
         
+            <li><a href=".././pages/about.html">About</a></li>
+        
         
         </ul>
         </div>
@@ -52,10 +54,7 @@
     <div class="content">
     <div class="row">
 
-        <div class="offset2 span7">
-                
-
-
+        <div class="offset2 span8">
         
 
 
@@ -74,7 +73,7 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
 
  
         </div>
-        
+
         <div><p>※酔って書いているのでアレです</p>
 <p>久しぶりの勉強会。今まで出たのがVimの勉強会とかだったので、言語の勉強会は初めてかもしれないですね。あ、Haskellのやつに出たか。となりの研究室の先輩と参加。
 JITってどうなってるの、とかPyPyってどういう構成なのとか、PyPyでは内部でこんな事をしてるよという感じの発表で、非常に興味深く聞かせていただきました。</p>
@@ -90,20 +89,15 @@ Readingというのを書いていたりするみたいなので、積極的に�
 </div>
         <hr />
     </div>
-		
+
     
 
 
- 
-
-        
-
-
- 
 
     <div class='article'>
-        <a href=".././2011/12/29/145918.html"><h2>CPython2.7.2のWindowsでのmultiprocessingの動作</h2></a>
-        <div class= "well small"> 29 Dec 2011
+        <div class="content-title">
+            <a href=".././2011/12/29/145918.html"><h1>CPython2.7.2のWindowsでのmultiprocessingの動作</h1></a>
+            29 Dec 2011
 
 
 by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
@@ -111,8 +105,10 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
 
 
 
- </div>
-        <div class="summary"><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
+ 
+        </div>
+
+        <div><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
 <p>Windowsにおける<tt class="docutils literal">multiprocessing</tt>モジュールの動きは次のようなものになります:</p>
 <ol class="arabic simple">
 <li>pipeを作っておく。</li>
@@ -121,21 +117,19 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
 <li>子プロセスは<tt class="docutils literal"><span class="pre">--multiprocessing-fork</span></tt>をフラグとして認識して、pipeから<tt class="docutils literal">Process</tt>オブジェクトを読み出す。</li>
 <li>子プロセスが<tt class="docutils literal">Process._bootstrap</tt>を呼び出す。</li>
 </ol>
-<p>Freezeされていない場合は、過程2のところでは、実行ファイルが<tt class="docutils literal">python.exe</tt>になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、<tt class="docutils literal">multiprocessing.freeze_support ...</tt></p> <a class="btn btn-info xsmall" href=".././2011/12/29/145918.html">read more</a></div>
-    </div>	
-				
+<p>Freezeされていない場合は、過程2のところでは、実行ファイルが<tt class="docutils literal">python.exe</tt>になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、<tt class="docutils literal">multiprocessing.freeze_support</tt>がそのような役割を果たします。これがFreezeされている場合に<tt class="docutils literal">multiprocessing.freeze_support</tt>が必要になる理由です。</p>
+</div>
+        <hr />
+    </div>
+
     
 
- 
 
-        
-
-
- 
 
     <div class='article'>
-        <a href=".././2011/12/29/153703.html"><h2>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</h2></a>
-        <div class= "well small"> 29 Dec 2011
+        <div class="content-title">
+            <a href=".././2011/12/29/153703.html"><h1>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</h1></a>
+            29 Dec 2011
 
 
 by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
@@ -143,8 +137,10 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
 
 
 
- </div>
-        <div class="summary"><p>ドキュメンテーションにも書いてあるとおり、<tt class="docutils literal">csv</tt>モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。<tt class="docutils literal">csv</tt>モジュールのコアの部分はCで書かれており、<tt class="docutils literal">_csv.c</tt>というファイルに記述されています。</p>
+ 
+        </div>
+
+        <div><p>ドキュメンテーションにも書いてあるとおり、<tt class="docutils literal">csv</tt>モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。<tt class="docutils literal">csv</tt>モジュールのコアの部分はCで書かれており、<tt class="docutils literal">_csv.c</tt>というファイルに記述されています。</p>
 <p><tt class="docutils literal">csv.Reader</tt>は与えられたfile-likeオブジェクトから<tt class="docutils literal">PyString_AsString</tt>をつかって<tt class="docutils literal">char *</tt>を得ようとします。:</p>
 <div class="highlight"><pre><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
 <span class="nf">Reader_iternext</span><span class="p">(</span><span class="n">ReaderObj</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>
@@ -162,9 +158,38 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-<p>この関数は<tt class="docutils literal">char *</tt>を得るために使われるオブジェクトが<tt class="docutils literal">str</tt>か<tt class="docutils literal">unicode</tt>かで動作が変わります。<tt class="docutils literal">str</tt>であった場合は直接そのオブジェクトのバッファが返されるのですが、<tt class="docutils literal">unicode</tt>であった場合は、<tt class="docutils literal">_PyUnicode_AsDefaultEncodedString</tt>によって、デフォルトエンコーディングに変換された文字列を返す動作になっています ...</p> <a class="btn btn-info xsmall" href=".././2011/12/29/153703.html">read more</a></div>
-    </div>	
-				
+<p>この関数は<tt class="docutils literal">char *</tt>を得るために使われるオブジェクトが<tt class="docutils literal">str</tt>か<tt class="docutils literal">unicode</tt>かで動作が変わります。<tt class="docutils literal">str</tt>であった場合は直接そのオブジェクトのバッファが返されるのですが、<tt class="docutils literal">unicode</tt>であった場合は、<tt class="docutils literal">_PyUnicode_AsDefaultEncodedString</tt>によって、デフォルトエンコーディングに変換された文字列を返す動作になっています。</p>
+<div class="highlight"><pre><span class="cm">/*const*/</span> <span class="kt">char</span> <span class="o">*</span>
+<span class="nf">PyString_AsString</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">op</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">string_getbuffer</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">PyStringObject</span> <span class="o">*</span><span class="p">)</span><span class="n">op</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ob_sval</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span>
+<span class="nf">PyString_AsStringAndSize</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">obj</span><span class="p">,</span>
+                         <span class="k">register</span> <span class="kt">char</span> <span class="o">**</span><span class="n">s</span><span class="p">,</span>
+                         <span class="k">register</span> <span class="n">Py_ssize_t</span> <span class="o">*</span><span class="n">len</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">...</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
+<span class="cp">#ifdef Py_USING_UNICODE</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">PyUnicode_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">_PyUnicode_AsDefaultEncodedString</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+            <span class="p">...</span>
+        <span class="p">}</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+<p>このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もしデフォルトエンコーディングが変更されていた場合は、<tt class="docutils literal">codecs.open</tt>を使った場合や<tt class="docutils literal">open</tt>を使った場合とでおもしろい?結果が得られるかもしれません。</p>
+<p><tt class="docutils literal">csv.Reader</tt>が返す結果は、<tt class="docutils literal">unicode</tt>ではなく、ファイルのエンコーディングでエンコードされたそのままの<tt class="docutils literal">str</tt>の配列や辞書になっています。よって、それがきちんと<tt class="docutils literal">unicode</tt>なのか、なにかのエンコーディングでエンコードされた<tt class="docutils literal">str</tt>なのかを意識しないと、あるはずのキーがないというような現象に出くわしたりします。これを意識するのは面倒くさいので、適切な<tt class="docutils literal">csv.Reader</tt>のラッパーを用意して使うようにした方がよいです。</p>
+</div>
+        <hr />
+    </div>
+
     
         <div class="pagination">
 <ul>
@@ -185,14 +210,12 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
     
 
  
-
- 
  
 
 
         </div>
         
-        <div class="span3">
+        <div class="span2">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
@@ -217,7 +240,7 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
                 
                 <li><a href=".././category/Python.html">Python</a></li>
                 
-                <li><a href=".././category/misc.html">misc</a></li>
+                <li><a href=".././category/articles.html">articles</a></li>
                 
                 <li><a href=".././category/Java.html">Java</a></li>
                                    

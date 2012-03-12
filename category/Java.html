@@ -40,6 +40,8 @@
             
         
         
+            <li><a href=".././pages/about.html">About</a></li>
+        
         
         </ul>
         </div>
@@ -52,10 +54,7 @@
     <div class="content">
     <div class="row">
 
-        <div class="offset2 span7">
-                
-
-
+        <div class="offset2 span8">
         
 
 
@@ -74,7 +73,7 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
 
  
         </div>
-        
+
         <div><div class="section" id="id1">
 <h2>結論</h2>
 <p>配列はアレなので使ってはいけない</p>
@@ -181,20 +180,15 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
 </div>
         <hr />
     </div>
-		
+
     
 
 
- 
-
-        
-
-
- 
 
     <div class='article'>
-        <a href=".././2012/01/01/182705.html"><h2>配列はCovariantなので使ってはいけない</h2></a>
-        <div class= "well small"> 01 Jan 2012
+        <div class="content-title">
+            <a href=".././2012/01/01/182705.html"><h1>配列はCovariantなので使ってはいけない</h1></a>
+            01 Jan 2012
 
 
 by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
@@ -202,24 +196,27 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
 
 
 
- </div>
-        <div class="summary"><div class="section" id="id1">
+ 
+        </div>
+
+        <div><div class="section" id="id1">
 <h2>結論</h2>
 <p>配列はアレなので使ってはいけない。</p>
 </div>
 <div class="section" id="java">
 <h2>Javaの配列とは</h2>
 <p>Javaの配列はcovariantです。<tt class="docutils literal">Integer</tt>は<tt class="docutils literal">Number</tt>のサブクラスなんだから、<tt class="docutils literal">Integer[]</tt>も<tt class="docutils literal">Number[]</tt>のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。</p>
-<img alt="img/20120101171202.png" src="../static/img/20120101171202.png" />
+<img alt="images/20120101171202.png" src="../static/images/20120101171202.png" />
 <p>見た目の型は<tt class="docutils literal">Number</tt>の配列なのに、代入できる要素は<tt class="docutils literal">Integerの</tt>要素のみという配列が作れます。ここで、<tt class="docutils literal">Integer</tt>以外の要素を代入しようとすると、同じ<tt class="docutils literal">Number</tt>を継承している<tt class="docutils literal">Long</tt>でも実行時エラーになります。このときの<tt class="docutils literal">Number</tt>の配列の実体は、<tt class="docutils literal">Integer</tt>の配列ですから。</p>
 </div>
 <div class="section" id="id2">
 <h2>配列は使ってはいけない</h2>
 <p><a class="reference external" href="http://draftcode.github.com/2012/01/01/182300.html">先の記事</a>とあわせて、配列は使ってはいけない。</p>
 </div>
- <a class="btn btn-info xsmall" href=".././2012/01/01/182705.html">read more</a></div>
-    </div>	
-				
+</div>
+        <hr />
+    </div>
+
     
         <div class="pagination">
 <ul>
@@ -240,14 +237,12 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
     
 
  
-
- 
  
 
 
         </div>
         
-        <div class="span3">
+        <div class="span2">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
@@ -272,7 +267,7 @@ by <a class="url fn" href=".././author/draftcode.html">draftcode</a>
                 
                 <li><a href=".././category/Python.html">Python</a></li>
                 
-                <li><a href=".././category/misc.html">misc</a></li>
+                <li><a href=".././category/articles.html">articles</a></li>
                 
                 <li><a href=".././category/Java.html">Java</a></li>
                                    
