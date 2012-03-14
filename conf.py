@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 AUTHOR = 'draftcode'
+DEFAULT_CATEGORY = "Articles"
 DELETE_OUTPUT_DIRECTORY = True
 PATH = '.'
 PAGE_DIR = 'pages'
@@ -23,8 +24,8 @@ THEME = 'theme/'
 
 DISQUS_SITENAME = 'draftcode-github-com'
 GITHUB_URL = 'http://github.com/draftcode/'
-SOCIAL = (('twitter', 'http://twitter.com/#!/draftcode'),
-          ('github', 'http://github.com/draftcode'),)
+SOCIAL = (('Twitter', 'http://twitter.com/#!/draftcode'),
+          ('GitHub', 'http://github.com/draftcode'),)
 TWITTER_USERNAME = 'draftcode'
 
 ##############################################################################
