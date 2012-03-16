@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/Articles.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2012-02-06T00:00:00+09:00</updated><entry><title>HomebrewでクロスコンパイルできるGCCをビルドする</title><link href="http://draftcode.github.com/2012/02/06/235454.html" rel="alternate"></link><updated>2012-02-06T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/02/06/235454.html</id><summary type="html">&lt;p&gt;Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/Articles.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2012-03-16T20:07:46+09:00</updated><entry><title>PelicanとGitHub Pagesを使う</title><link href="http://draftcode.github.com/2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html" rel="alternate"></link><updated>2012-03-16T20:07:46+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html</id><summary type="html">&lt;p&gt;reStructuredTextが使いたかったので、Pythonで書かれてる&lt;a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html"&gt;Pelican&lt;/a&gt;という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;Pelican&lt;/h2&gt;
+&lt;p&gt;最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
+Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みのやつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので気に入って使っています。&lt;/p&gt;
+&lt;p&gt;自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。開発中のバージョンを使うにはこれだけでOK:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git clone https://github.com/ametaireau/pelican.git
+cd pelican
+python setup.py develop
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになります。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="github-pages"&gt;
+&lt;h2&gt;GitHub Pages&lt;/h2&gt;
+&lt;p&gt;なんかGitHubには&lt;a class="reference external" href="http://pages.github.com/"&gt;GitHub Pages&lt;/a&gt;っていうPushすると中のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしました。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
+Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次のようなブランチ構成にしてみました:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;source   -&amp;gt; origin/source
+gh-pages -&amp;gt; origin/master
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;こういう風にするには、たぶん次のようにすればいいはず:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git init .
+git branch -m master source
+git remote add origin &amp;lt;自分のGitHubリポジトリでコピーしてきたなにか&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;gh-pagesはなんかよしなに作ってくれる&lt;a class="reference external" href="https://github.com/davisp/ghp-import"&gt;ghp-import&lt;/a&gt;があるので、それを導入しました:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;pip install ghp-import
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conf-py"&gt;
+&lt;h2&gt;conf.pyを書く&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source/conf.py"&gt;conf.py&lt;/a&gt;みたいに書いています。なんか下の方で怪しいことしてますが。ディレクトリ構成は&lt;a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source"&gt;draftcode/draftcode.github.com&lt;/a&gt;みたいになってます。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="post-commit"&gt;
+&lt;h2&gt;post-commitを仕込む&lt;/h2&gt;
+&lt;p&gt;次のような内容のファイルを、&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;.git/hooks/post-commit&lt;/span&gt;&lt;/tt&gt;に仕込んでおきます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;pelican -s conf.py &amp;amp;&amp;amp; ghp-import output &amp;amp;&amp;amp; git push origin gh-pages:master source:source
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>HomebrewでクロスコンパイルできるGCCをビルドする</title><link href="http://draftcode.github.com/2012/02/06/235454.html" rel="alternate"></link><updated>2012-02-06T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/02/06/235454.html</id><summary type="html">&lt;p&gt;Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。&lt;/p&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;結論&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://gist.github.com/1751385"&gt;https://gist.github.com/1751385&lt;/a&gt;のようなFormulaをつくればできます。このFormulaは&lt;a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html"&gt;http://pdos.csail.mit.edu/6.828/2011/xv6.html&lt;/a&gt;をビルドするために、&lt;a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html"&gt;http://pdos.csail.mit.edu/6.828/2011/tools.html&lt;/a&gt;の設定を参考にして書きました。&lt;/p&gt;

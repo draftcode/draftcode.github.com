@@ -28,6 +28,62 @@
 
     <div class='article'>
         <div class="content-title">
+            <a href=".././2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html"><h1>PelicanとGitHub Pagesを使う</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/03/16</span>
+    <a href=".././category/Articles.html" class="label label-info">Articles</a>
+</div> 
+        </div>
+
+        <div><p>reStructuredTextが使いたかったので、Pythonで書かれてる<a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html">Pelican</a>という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。</p>
+<div class="section" id="id1">
+<h2>Pelican</h2>
+<p>最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
+Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みのやつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので気に入って使っています。</p>
+<p>自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。開発中のバージョンを使うにはこれだけでOK:</p>
+<div class="highlight"><pre>git clone https://github.com/ametaireau/pelican.git
+cd pelican
+python setup.py develop
+</pre></div>
+<p>こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになります。</p>
+</div>
+<div class="section" id="github-pages">
+<h2>GitHub Pages</h2>
+<p>なんかGitHubには<a class="reference external" href="http://pages.github.com/">GitHub Pages</a>っていうPushすると中のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしました。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
+Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次のようなブランチ構成にしてみました:</p>
+<div class="highlight"><pre>source   -&gt; origin/source
+gh-pages -&gt; origin/master
+</pre></div>
+<p>こういう風にするには、たぶん次のようにすればいいはず:</p>
+<div class="highlight"><pre>git init .
+git branch -m master source
+git remote add origin &lt;自分のGitHubリポジトリでコピーしてきたなにか&gt;
+</pre></div>
+<p>gh-pagesはなんかよしなに作ってくれる<a class="reference external" href="https://github.com/davisp/ghp-import">ghp-import</a>があるので、それを導入しました:</p>
+<div class="highlight"><pre>pip install ghp-import
+</pre></div>
+</div>
+<div class="section" id="conf-py">
+<h2>conf.pyを書く</h2>
+<p><a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source/conf.py">conf.py</a>みたいに書いています。なんか下の方で怪しいことしてますが。ディレクトリ構成は<a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source">draftcode/draftcode.github.com</a>みたいになってます。</p>
+</div>
+<div class="section" id="post-commit">
+<h2>post-commitを仕込む</h2>
+<p>次のような内容のファイルを、<tt class="docutils literal"><span class="pre">.git/hooks/post-commit</span></tt>に仕込んでおきます:</p>
+<div class="highlight"><pre>pelican -s conf.py &amp;&amp; ghp-import output &amp;&amp; git push origin gh-pages:master source:source
+</pre></div>
+<p>これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!</p>
+</div>
+</div>
+        <hr />
+    </div>
+
+    
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <a href=".././2012/02/06/235454.html"><h1>HomebrewでクロスコンパイルできるGCCをビルドする</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2012/02/06</span>
@@ -430,9 +486,9 @@ Linkers&amp; Loadersを読むことによって，複数のオブジェクトコ
         <ul class="nav nav-list">
             <li class="nav-header">Categories</li>
             
-            <li><a href=".././category/Python.html">Python</a></li>
             <li><a href=".././category/Articles.html">Articles</a></li>
             <li><a href=".././category/Java.html">Java</a></li>
+            <li><a href=".././category/Python.html">Python</a></li>
         </ul>
     </div>
 
