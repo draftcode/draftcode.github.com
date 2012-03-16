@@ -1,0 +1,92 @@
+===========================
+PelicanとGitHub Pagesを使う
+===========================
+:Author: draftcode
+:Date:   2012-03-16 20:07:46
+:Slug:   42a4fd48-6f58-11e1-bdce-040ccee352e6
+
+reStructuredTextが使いたかったので、Pythonで書かれてる `Pelican`_ という静的
+ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。
+
+.. _`Pelican`: http://pelican.notmyidea.org/en/2.8/index.html
+
+Pelican
+=======
+
+最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
+Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル
+内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ
+内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みの
+やつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので
+気に入って使っています。
+
+自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。
+開発中のバージョンを使うにはこれだけでOK:
+
+.. code-block:: text
+
+   git clone https://github.com/ametaireau/pelican.git
+   cd pelican
+   python setup.py develop
+
+こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張
+られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになり
+ます。
+
+GitHub Pages
+============
+
+なんかGitHubには `GitHub Pages`_ っていうPushすると中のHTMLが公開されるという
+おしゃれ機能があって、それを使って公開するようにしました。で、自分が使っている
+のはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、
+どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
+Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次の
+ようなブランチ構成にしてみました:
+
+.. code-block:: text
+
+   source   -> origin/source
+   gh-pages -> origin/master
+
+こういう風にするには、たぶん次のようにすればいいはず:
+
+.. code-block:: text
+
+   git init .
+   git branch -m master source
+   git remote add origin <自分のGitHubリポジトリでコピーしてきたなにか>
+
+gh-pagesはなんかよしなに作ってくれる `ghp-import`_ があるので、それを導入しま
+した:
+
+.. code-block:: text
+
+   pip install ghp-import
+
+.. _`GitHub Pages`: http://pages.github.com/
+.. _`ghp-import`: https://github.com/davisp/ghp-import
+
+conf.pyを書く
+=============
+
+`conf.py`_ みたいに書いています。なんか下の方で怪しいことしてますが。ディレク
+トリ構成は `draftcode/draftcode.github.com`_ みたいになってます。
+
+.. _`conf.py`:
+   https://github.com/draftcode/draftcode.github.com/tree/source/conf.py
+
+.. _`draftcode/draftcode.github.com`:
+   https://github.com/draftcode/draftcode.github.com/tree/source
+
+post-commitを仕込む
+===================
+
+次のような内容のファイルを、 ``.git/hooks/post-commit`` に仕込んでおきます:
+
+.. code-block:: text
+
+   pelican -s conf.py && ghp-import output && git push origin gh-pages:master source:source
+
+これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こ
+うの方のページにも反映されます。やったね!
+
