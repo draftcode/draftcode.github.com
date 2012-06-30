@@ -7,7 +7,7 @@ How to build draftcode.github.com
 
 clone してきます。
 
-.. code-block::
+::
 
     git clone git://github.com/draftcode/draftcode.github.com.git
     git remote add dropbox ~/Dropbox/repositories/draftcode.github.com.git
@@ -15,7 +15,7 @@ clone してきます。
 
 `Pelican`_ が必要です。
 
-.. code-block::
+::
 
     git clone https://github.com/ametaireau/pelican.git
     cd pelican
@@ -23,13 +23,13 @@ clone してきます。
 
 `ghp-import`_ が必要です。
 
-.. code-block::
+::
 
     pip install ghp-import
 
 ``.git/hooks/post-commit`` に次のようなコードを仕込んでおきます:
 
-.. code-block::
+::
 
     pelican -s conf.py && ghp-import output && git push origin gh-pages:master source:source
     git push dropbox gh-pages:gh-pages source:source
