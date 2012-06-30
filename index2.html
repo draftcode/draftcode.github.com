@@ -6,19 +6,19 @@
     <meta name="author" content="draftcode">
 
     <!--[if lt IE 9]>
-    <script src=".././theme/html5.js"></script>
+    <script src="./theme/html5.js"></script>
     <![endif]-->
 
-    <link href=".././theme/bootstrap.min.css" rel="stylesheet">
-    <link href=".././theme/local.css" rel="stylesheet">
-    <link href=".././theme/pygments.css" rel="stylesheet">
-    <link rel="alternate" type="application/atom+xml" title="Atom" href=".././atom.xml">
+    <link href="./theme/bootstrap.min.css" rel="stylesheet">
+    <link href="./theme/local.css" rel="stylesheet">
+    <link href="./theme/pygments.css" rel="stylesheet">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="./atom.xml">
     <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
 </head>
 
 <body>
 
-<h1 id="site-title"><a href="../.">draftcode.github.com</a></h1>
+<h1 id="site-title"><a href=".">draftcode.github.com</a></h1>
 
 <div id="content">
 
@@ -28,11 +28,39 @@
 
     <div class='article'>
         <div class="content-title">
-            <a href=".././2012/01/01/182300.html"><h1>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</h1></a>
+            <a href="./2012/01/22/005216.html"><h1>「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/01/22</span>
+    <a href="./category/Python.html" class="label label-info">Python</a>
+</div>
+        </div>
+
+        <div><p>※酔って書いているのでアレです</p>
+<p>久しぶりの勉強会。今まで出たのがVimの勉強会とかだったので、言語の勉強会は初めてかもしれないですね。あ、Haskellのやつに出たか。となりの研究室の先輩と参加。
+JITってどうなってるの、とかPyPyってどういう構成なのとか、PyPyでは内部でこんな事をしてるよという感じの発表で、非常に興味深く聞かせていただきました。</p>
+<p>事前にPyPyのソースコードはダウンロードしていたので、その中を検索しながら聞いていました。最初はshomah4aさんのPyPyの概要の発表で、Python処理系としてのPyPyと言語処理系をつくるためのライブラリとしてのPyPy、という二つの側面があるらしいです。見たところ、それに対応してディレクトリも分かれているようです(pypyの方がそうだったかな)。</p>
+<p>次のcocoatomoさんの発表は静的解析についての話でした。型理論は、研究分野がプログラミング言語理論になるので(研究室でやってることがばらばらなので、これぐらいしか言えない)、割と発表内容的には近いところでした。Types and Programming
+Languagesとか輪講で読んでいましたし。ちなみに、アルバイトでVBScriptをがしがし書いていたときは、型が無いのが本当に嫌で、VBScriptの静的解析器を書こうと思っていた時期もありました。</p>
+<p>最後のchlereさんの発表はJITコンパイラについての話で、JITコンパイラがどうやって高速化するべきところを見つけていくのかという話でした。特に、ヒントメカニズムを与えるとこんなに速くなる、というのは驚きました。あと実行時にどうやって実行可能なコードを出力するのかというのに興味があるので、機会があったら聞いてみたいです。</p>
+<p>勉強会が終わった後の懇親会にも参加しました。懇親会だと、いろいろな会社のいろいろな職業の人の話を聞けるので、学生の自分にとっては貴重な機会なんですよ。(と、懇親会に出る度に思います。)</p>
+<p>特に、お向かいの席だったransuiさんのお話がおもしろくて、スピードが命なので、こういうレベルまでチューニングしたりしてますよという話とか、高校生のときにこういう俺俺言語を作ったという話を聞いたりしました。ただ、最近はそういう事をしたいという人があまりいなくて採用が大変みたいです……自分も趣味でアセンブラ作ってみたり、授業でですがFPGAを使った計算機やシミュレータ上でのメモリキャッシュアルゴリズムの実装をしてみたりとか、割と低レベルな話も好きなので、そういう仕事もおもしろそうですね。カーネルの中身とかはまだ見たことが無いので、もっと勉強しないと。</p>
+<p>あと、アリエルのCTOの井上さんとも少しお話をしまして、最近は上流の方にも興味があるんですよと言ったら、若いうちはもっとガシガシ実装して欲しいという言葉をいただきました。ぐぬぬ。ただ、自分の主張を通すために、いろんな立場の人の考え方、ものの見方、背景とかを知っておきたい。そうしないと、下回しが出来ずに主張が通らないというのが嫌なので、プロジェクトのマネジメントをする人たちや、もっと上の経営に関わる人たちが、どういう見方をするのかを知っておきたい。このために事業戦略やプロジェクトマネジメントあたりの本を読んでいたりするので、そこら辺はさじ加減なのかなと思っています。</p>
+<p>というところで、お開きになりました。後で見てみると、cocoatomoさんはCPython
+Readingというのを書いていたりするみたいなので、積極的に話に行けば良かった。あと型システムとかが停止するとか安全であるとか、そういうのも聞いてみたかったと、少し後悔しつつ、次の日の「(第15回)Python mini Hack-a-thon」に参加しました。</p>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
+            <a href="./2012/01/01/182300.html"><h1>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2012/01/01</span>
-    <a href=".././category/Java.html" class="label label-info">Java</a>
-</div> 
+    <a href="./category/Java.html" class="label label-info">Java</a>
+</div>
         </div>
 
         <div><div class="section" id="id1">
@@ -94,7 +122,7 @@ public static void main(java.lang.String[]);
 <div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
 <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;?&gt;[</span><span class="mi">10</span><span class="o">];</span>
 </pre></div>
-<p>しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、``ArrayList``と``ArrayList&lt;Integer&gt;``は違う型ですから。</p>
+<p>しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、<tt class="docutils literal">ArrayList</tt>と<tt class="docutils literal">ArrayList&lt;Integer&gt;</tt>は違う型ですから。</p>
 <div class="section" id="id3">
 <h3>追記</h3>
 <p>generic array creationがなぜ禁止なのかきちんと理解してなかった。</p>
@@ -142,17 +170,16 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
         <hr />
     </div>
 
-    
 
 
 
     <div class='article'>
         <div class="content-title">
-            <a href=".././2012/01/01/182705.html"><h1>配列はCovariantなので使ってはいけない</h1></a>
+            <a href="./2012/01/01/182705.html"><h1>配列はCovariantなので使ってはいけない</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2012/01/01</span>
-    <a href=".././category/Java.html" class="label label-info">Java</a>
-</div> 
+    <a href="./category/Java.html" class="label label-info">Java</a>
+</div>
         </div>
 
         <div><div class="section" id="id1">
@@ -162,7 +189,7 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
 <div class="section" id="java">
 <h2>Javaの配列とは</h2>
 <p>Javaの配列はcovariantです。<tt class="docutils literal">Integer</tt>は<tt class="docutils literal">Number</tt>のサブクラスなんだから、<tt class="docutils literal">Integer[]</tt>も<tt class="docutils literal">Number[]</tt>のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。</p>
-<img alt="images/20120101171202.png" src="../static/images/20120101171202.png" />
+<img alt="images/20120101171202.png" src="static/images/20120101171202.png" />
 <p>見た目の型は<tt class="docutils literal">Number</tt>の配列なのに、代入できる要素は<tt class="docutils literal">Integerの</tt>要素のみという配列が作れます。ここで、<tt class="docutils literal">Integer</tt>以外の要素を代入しようとすると、同じ<tt class="docutils literal">Number</tt>を継承している<tt class="docutils literal">Long</tt>でも実行時エラーになります。このときの<tt class="docutils literal">Number</tt>の配列の実体は、<tt class="docutils literal">Integer</tt>の配列ですから。</p>
 </div>
 <div class="section" id="id2">
@@ -173,26 +200,31 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
         <hr />
     </div>
 
-    
-        <div class="pagination">
+
+ 
+    <div class="pagination">
 <ul>
 
-    <li class="prev disabled"><a href="#">&larr; Previous</a></li>
+
+    <li class="prev"><a href="./index.html">&larr; Previous</a></li>
 
 
 
-    <li class="active"><a href=".././category/Java.html">1</a></li>
+    <li class=""><a href="./index.html">1</a></li>
+
+    <li class="active"><a href="./index2.html">2</a></li>
+
+    <li class=""><a href="./index3.html">3</a></li>
+
+    <li class=""><a href="./index4.html">4</a></li>
 
 
 
-    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+    <li class="next"><a href="./index3.html">Next &rarr;</a></li>
 
 
 </ul>
 </div>
-    
-
- 
  
 
 
@@ -205,8 +237,8 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
         </ul>
 
         <div style="padding: 10px;">
-            <a id="about-image" href=".././pages/about.html" rel="alternate"><img src=".././static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
-            <p>東京で情報工学を専攻している大学生です。</p>
+            <a id="about-image" href="./pages/about.html" rel="alternate"><img src="./static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
+            <p>東京で情報工学を専攻している大学院生です。</p>
         </div>
     </div>
 
@@ -214,8 +246,8 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
         <ul class="nav nav-list">
             <li class="nav-header">Site</li>
 
-            <li><a href=".././archives.html">Archives</a>
-            <li><a href=".././atom.xml" rel="alternate">Atom feed</a></li>
+            <li><a href="./archives.html">Archives</a>
+            <li><a href="./atom.xml" rel="alternate">Atom feed</a></li>
         </ul>
     </div>
 
@@ -223,9 +255,9 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
         <ul class="nav nav-list">
             <li class="nav-header">Categories</li>
             
-            <li><a href=".././category/Articles.html">Articles</a></li>
-            <li><a href=".././category/Java.html">Java</a></li>
-            <li><a href=".././category/Python.html">Python</a></li>
+            <li><a href="./category/Articles.html">Articles</a></li>
+            <li><a href="./category/Java.html">Java</a></li>
+            <li><a href="./category/Python.html">Python</a></li>
         </ul>
     </div>
 

@@ -2,32 +2,124 @@
 <html lang="ja">
 <head>
     <meta charset="utf-8">
-    <title>Writing Adblock Plus filters -- 日本語訳 - draftcode.github.com</title>
+    <title>draftcode.github.com</title>
     <meta name="author" content="draftcode">
 
     <!--[if lt IE 9]>
-    <script src="../../.././theme/html5.js"></script>
+    <script src="./theme/html5.js"></script>
     <![endif]-->
 
-    <link href="../../.././theme/bootstrap.min.css" rel="stylesheet">
-    <link href="../../.././theme/local.css" rel="stylesheet">
-    <link href="../../.././theme/pygments.css" rel="stylesheet">
-    <link rel="alternate" type="application/atom+xml" title="Atom" href="../../.././atom.xml">
+    <link href="./theme/bootstrap.min.css" rel="stylesheet">
+    <link href="./theme/local.css" rel="stylesheet">
+    <link href="./theme/pygments.css" rel="stylesheet">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="./atom.xml">
     <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
 </head>
 
 <body>
 
-<h1 id="site-title"><a href="../../../.">draftcode.github.com</a></h1>
+<h1 id="site-title"><a href=".">draftcode.github.com</a></h1>
 
 <div id="content">
 
+
+
+
+
     <div class='article'>
         <div class="content-title">
-            <h1>Writing Adblock Plus filters -- 日本語訳</h1>
+            <a href="./2011/12/29/145918.html"><h1>CPython2.7.2のWindowsでのmultiprocessingの動作</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2011/12/29</span>
+    <a href="./category/Python.html" class="label label-info">Python</a>
+</div>
+        </div>
+
+        <div><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
+<p>Windowsにおける<tt class="docutils literal">multiprocessing</tt>モジュールの動きは次のようなものになります:</p>
+<ol class="arabic simple">
+<li>pipeを作っておく。</li>
+<li>現在の実行ファイルに<tt class="docutils literal"><span class="pre">--multiprocessing-fork</span></tt>というコマンドラインオプションと先ほどのpipeの読み出し側をつけて<tt class="docutils literal">CreateProcess</tt>する。</li>
+<li>親プロセスはpipeを通じて、<tt class="docutils literal">Process</tt>オブジェクトを<tt class="docutils literal">pickle</tt>で直列化して子プロセスに送る。</li>
+<li>子プロセスは<tt class="docutils literal"><span class="pre">--multiprocessing-fork</span></tt>をフラグとして認識して、pipeから<tt class="docutils literal">Process</tt>オブジェクトを読み出す。</li>
+<li>子プロセスが<tt class="docutils literal">Process._bootstrap</tt>を呼び出す。</li>
+</ol>
+<p>Freezeされていない場合は、過程2のところでは、実行ファイルが<tt class="docutils literal">python.exe</tt>になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、<tt class="docutils literal">multiprocessing.freeze_support</tt>がそのような役割を果たします。これがFreezeされている場合に<tt class="docutils literal">multiprocessing.freeze_support</tt>が必要になる理由です。</p>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
+            <a href="./2011/12/29/153703.html"><h1>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2011/12/29</span>
+    <a href="./category/Python.html" class="label label-info">Python</a>
+</div>
+        </div>
+
+        <div><p>ドキュメンテーションにも書いてあるとおり、<tt class="docutils literal">csv</tt>モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。<tt class="docutils literal">csv</tt>モジュールのコアの部分はCで書かれており、<tt class="docutils literal">_csv.c</tt>というファイルに記述されています。</p>
+<p><tt class="docutils literal">csv.Reader</tt>は与えられたfile-likeオブジェクトから<tt class="docutils literal">PyString_AsString</tt>をつかって<tt class="docutils literal">char *</tt>を得ようとします。:</p>
+<div class="highlight"><pre><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">Reader_iternext</span><span class="p">(</span><span class="n">ReaderObj</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">lineobj</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">fields</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">line</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span>
+    <span class="p">...</span>
+
+    <span class="k">do</span> <span class="p">{</span>
+        <span class="n">lineobj</span> <span class="o">=</span> <span class="n">PyIter_Next</span><span class="p">(</span><span class="n">self</span><span class="o">-&gt;</span><span class="n">input_iter</span><span class="p">);</span>
+        <span class="p">...</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">PyString_AsString</span><span class="p">(</span><span class="n">lineobj</span><span class="p">);</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>この関数は<tt class="docutils literal">char *</tt>を得るために使われるオブジェクトが<tt class="docutils literal">str</tt>か<tt class="docutils literal">unicode</tt>かで動作が変わります。<tt class="docutils literal">str</tt>であった場合は直接そのオブジェクトのバッファが返されるのですが、<tt class="docutils literal">unicode</tt>であった場合は、<tt class="docutils literal">_PyUnicode_AsDefaultEncodedString</tt>によって、デフォルトエンコーディングに変換された文字列を返す動作になっています。</p>
+<div class="highlight"><pre><span class="cm">/*const*/</span> <span class="kt">char</span> <span class="o">*</span>
+<span class="nf">PyString_AsString</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">op</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">string_getbuffer</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">PyStringObject</span> <span class="o">*</span><span class="p">)</span><span class="n">op</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ob_sval</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span>
+<span class="nf">PyString_AsStringAndSize</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">obj</span><span class="p">,</span>
+                         <span class="k">register</span> <span class="kt">char</span> <span class="o">**</span><span class="n">s</span><span class="p">,</span>
+                         <span class="k">register</span> <span class="n">Py_ssize_t</span> <span class="o">*</span><span class="n">len</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">...</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
+<span class="cp">#ifdef Py_USING_UNICODE</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">PyUnicode_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">_PyUnicode_AsDefaultEncodedString</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+            <span class="p">...</span>
+        <span class="p">}</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+<p>このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もしデフォルトエンコーディングが変更されていた場合は、<tt class="docutils literal">codecs.open</tt>を使った場合や<tt class="docutils literal">open</tt>を使った場合とでおもしろい?結果が得られるかもしれません。</p>
+<p><tt class="docutils literal">csv.Reader</tt>が返す結果は、<tt class="docutils literal">unicode</tt>ではなく、ファイルのエンコーディングでエンコードされたそのままの<tt class="docutils literal">str</tt>の配列や辞書になっています。よって、それがきちんと<tt class="docutils literal">unicode</tt>なのか、なにかのエンコーディングでエンコードされた<tt class="docutils literal">str</tt>なのかを意識しないと、あるはずのキーがないというような現象に出くわしたりします。これを意識するのは面倒くさいので、適切な<tt class="docutils literal">csv.Reader</tt>のラッパーを用意して使うようにした方がよいです。</p>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
+            <a href="./2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html"><h1>Writing Adblock Plus filters -- 日本語訳</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2011/03/22</span>
-    <a href="../../.././category/Articles.html" class="label label-info">Articles</a>
+    <a href="./category/Articles.html" class="label label-info">Articles</a>
 </div>
         </div>
 
@@ -148,24 +240,36 @@ specification</a>で見ることができます．(すべてのセレクタがFi
 </div>
 </div>
 </div>
-
-        <hr>
-
-        <h2>Comments</h2>
-        
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'draftcode-github-com'; 
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
+        <hr />
     </div>
+
+
+ 
+    <div class="pagination">
+<ul>
+
+
+    <li class="prev"><a href="./index2.html">&larr; Previous</a></li>
+
+
+
+    <li class=""><a href="./index.html">1</a></li>
+
+    <li class=""><a href="./index2.html">2</a></li>
+
+    <li class="active"><a href="./index3.html">3</a></li>
+
+    <li class=""><a href="./index4.html">4</a></li>
+
+
+
+    <li class="next"><a href="./index4.html">Next &rarr;</a></li>
+
+
+</ul>
+</div>
+ 
+
 
 </div>
 
@@ -176,7 +280,7 @@ specification</a>で見ることができます．(すべてのセレクタがFi
         </ul>
 
         <div style="padding: 10px;">
-            <a id="about-image" href="../../.././pages/about.html" rel="alternate"><img src="../../.././static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
+            <a id="about-image" href="./pages/about.html" rel="alternate"><img src="./static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
             <p>東京で情報工学を専攻している大学院生です。</p>
         </div>
     </div>
@@ -185,8 +289,8 @@ specification</a>で見ることができます．(すべてのセレクタがFi
         <ul class="nav nav-list">
             <li class="nav-header">Site</li>
 
-            <li><a href="../../.././archives.html">Archives</a>
-            <li><a href="../../.././atom.xml" rel="alternate">Atom feed</a></li>
+            <li><a href="./archives.html">Archives</a>
+            <li><a href="./atom.xml" rel="alternate">Atom feed</a></li>
         </ul>
     </div>
 
@@ -194,9 +298,9 @@ specification</a>で見ることができます．(すべてのセレクタがFi
         <ul class="nav nav-list">
             <li class="nav-header">Categories</li>
             
-            <li><a href="../../.././category/Articles.html">Articles</a></li>
-            <li><a href="../../.././category/Java.html">Java</a></li>
-            <li><a href="../../.././category/Python.html">Python</a></li>
+            <li><a href="./category/Articles.html">Articles</a></li>
+            <li><a href="./category/Java.html">Java</a></li>
+            <li><a href="./category/Python.html">Python</a></li>
         </ul>
     </div>
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com" rel="alternate"></link><link href="http://draftcode.github.com/feeds/Java.atom.xml" rel="self"></link><id>http://draftcode.github.com</id><updated>2012-01-01T00:00:00+09:00</updated><entry><title>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</title><link href="http://draftcode.github.com/2012/01/01/182300.html" rel="alternate"></link><updated>2012-01-01T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/01/01/182300.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com/" rel="alternate"></link><link href="http://draftcode.github.com//feeds/Java.atom.xml" rel="self"></link><id>http://draftcode.github.com/</id><updated>2012-01-01T00:00:00+09:00</updated><entry><title>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</title><link href="http://draftcode.github.com/2012/01/01/182300.html" rel="alternate"></link><updated>2012-01-01T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-01-01:2012/01/01/182300.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
 &lt;h2&gt;結論&lt;/h2&gt;
 &lt;p&gt;配列はアレなので使ってはいけない&lt;/p&gt;
 &lt;/div&gt;
@@ -58,7 +58,7 @@ public static void main(java.lang.String[]);
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
 &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;?&amp;gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、``ArrayList``と``ArrayList&amp;lt;Integer&amp;gt;``は違う型ですから。&lt;/p&gt;
+&lt;p&gt;しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、&lt;tt class="docutils literal"&gt;ArrayList&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;ArrayList&amp;lt;Integer&amp;gt;&lt;/tt&gt;は違う型ですから。&lt;/p&gt;
 &lt;div class="section" id="id3"&gt;
 &lt;h3&gt;追記&lt;/h3&gt;
 &lt;p&gt;generic array creationがなぜ禁止なのかきちんと理解してなかった。&lt;/p&gt;
@@ -102,7 +102,7 @@ conversion warningが出るけれども、&lt;tt class="docutils literal"&gt;Cla
 &lt;p&gt;総称配列のエラー・警告はJavaレベルの型とJVMレベルの型が一致していないことが原因に見えますが、実は配列を使わなければこのような問題は回避されるようです。(僕はGenericsによってJavaとJVMの型が一致しなくなったこともなんかアレな気がするんですが)&lt;/p&gt;
 &lt;p&gt;また、配列がcovariantなのもまた変なエラーの原因となるので、配列さえ使わなければ……というのがかなり前から言われているようです。&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>配列はCovariantなので使ってはいけない</title><link href="http://draftcode.github.com/2012/01/01/182705.html" rel="alternate"></link><updated>2012-01-01T00:00:00+09:00</updated><author><name>draftcode</name></author><id>http://draftcode.github.com/2012/01/01/182705.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
+</summary></entry><entry><title>配列はCovariantなので使ってはいけない</title><link href="http://draftcode.github.com/2012/01/01/182705.html" rel="alternate"></link><updated>2012-01-01T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-01-01:2012/01/01/182705.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
 &lt;h2&gt;結論&lt;/h2&gt;
 &lt;p&gt;配列はアレなので使ってはいけない。&lt;/p&gt;
 &lt;/div&gt;

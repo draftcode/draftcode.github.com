@@ -28,216 +28,11 @@
 
     <div class='article'>
         <div class="content-title">
-            <a href=".././2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html"><h1>Introduction to Domain TheoryのLecture1を読む</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2012/03/20</span>
-    <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div> 
-        </div>
-
-        <div><p>Graham Hutton先生の<a class="reference external" href="http://www.cs.nott.ac.uk/~gmh/domains.html">Introduction to Domain Theory</a>を読んだメモです。</p>
-<div class="section" id="denotational-semantics">
-<h2>Denotational Semantics</h2>
-<p>BNFを使って形式的にAbstract syntaxが定義されたプログラミング言語Pを考えたときに、そのPのDenotational semanticsは次の二つから構成されるんだよーという話。</p>
-<ol class="arabic">
-<li><p class="first">a semantic domain for each syntactic category</p>
-<p>ここでいうカテゴリーは、expressionとかcommandとか。</p>
-</li>
-<li><p class="first">a valuation function for each syntactic category</p>
-<p>で、このvaluation functionっていうのはシンタックスの各フレーズに対して、
-semantic domainの中の意味を割り当てるものですよー。</p>
-</li>
-</ol>
-<p>で、なんかvaluation functionはhomomorphismじゃないといけないとしている。この
-homomorphismであるということは、各フレーズの意味を割り当てるときは、そのフレーズの中のさらに小さいフレーズの意味から構成されるようなことらしい。で、一般的にはこういう性質のことを、compositionalityと言うらしい。</p>
-</div>
-<div class="section" id="foundational-problems">
-<h2>Foundational Problems</h2>
-<p>で、そもそもこのDomain Theoryがなんで生まれたのかというと、Denotational
-semanticsがuntyped lambda-calculusに適切な意味を与えられなかったから、生まれたらしい。</p>
-<p>で、じゃあ、なんで与えられなかったのか、というところについて、とりあえず単純に集合を使って、semantic domainを与えてみようじゃないかということをしてみる。その与えられなかった理由については、主に二つの理由があって:</p>
-<ol class="arabic simple">
-<li>recursively defined programs</li>
-<li>recursively defined semantic domains</li>
-</ol>
-<p>についての問題らしい。</p>
-<div class="section" id="recursively-defined-programs">
-<h3>1. Recursively Defined Programs</h3>
-<p>なんか直感的には無限ループになるようなプログラムを、ある集合上の関数として対応づけようとすると、そんな関数はネェってなったり、どんな関数でもそのプログラムに対応することになってしまったりして、困るという話。</p>
-<p>この問題を扱うには「終了しない」ということをsemanticsのレベルで表す必要があるよね、とも言っている。</p>
-</div>
-<div class="section" id="recursively-defined-semantic-domains">
-<h3>2. Recursively Defined Semantic Domains</h3>
-<p>次は、関数とか手続きというものを値として扱えるようになったときに、じゃあ、そういった値ってどういう集合なんでしょうねー、関数って言うのは関数から関数への関数も関数なので、これじゃあ関数の集合っていうのが考えられないですよねーというお話。</p>
-<p>で、関数の集合と同型な集合があればいいかなーとしてみても、やっぱり駄目で、ちょっと関数の集合の部分集合を考えてみても、濃度的に段違いなんですねー。あー、可算濃度とか対角線論法とか学部1年のときにやったなー。</p>
-</div>
-</div>
-<div class="section" id="a-first-step-to-scott-domains-lifted-sets">
-<h2>A First Step To Scott-Domains : Lifted Sets</h2>
-<p>ということで、やっぱり集合をsemantic domainにするのは無理っぽいので、一つだけ、なんかエラーとか計算が終了しないとか未定義だとか、そういう値を導入しようということを、どえらい人は考えたんDA!</p>
-<p>そういった値である、bottomというものを単純に一つ加えた集合をflat domainとか
-lifted setとか呼ぶらしい。で、そういった集合では、bottomとそうじゃない値の間に、information orderingという関係が定義できるNE!と、言っている。で、このbottomを含んだ集合をsemantic domainとすると、さっきの1. Recursively Defined
-Programsで問題にしていた、終了しないプログラムに意味が与えられるらしい。</p>
-</div>
-<div class="section" id="partial-orderings">
-<h2>Partial Orderings</h2>
-<p>じゃあ、もうちょっと複雑にして、いくつかの値をとるような関数というものを考えてみよう、という話。とりあえず、2引数の関数はそれぞれの引数の集合の直積を引数にとる関数と考えられる。</p>
-<p>このとき、それぞれの引数の集合が、flat domainだったら、その直積上にも
-information orderingを考えることができる。で、こういう直積はflat setsではなくてpartially ordered sets(posets)になるね。posetsだから、反射律、対称律、推移律が成り立つ。もっというと、bottomというものはbasepointというものらしいので、こういった直積が入ったりすることを考えると、semantic domainsはpointed posetsということができるらしい。</p>
-</div>
-<div class="section" id="monotonic-functions">
-<h2>Monotonic Functions</h2>
-<p>ということで、semantic domainsを(pointed) posetsにするとすると、プログラムは、そういったposets上の関数としてモデル化できるはず。でも、そういった関数すべてがプログラムのモデルとしてふさわしいわけじゃない。</p>
-<p>ここからがよくわからなかったんだけれども、入力と出力で、information orderingが保存されることを要求されるらしい。で、こういった関数のことを、monotonicと呼ぶらしい。</p>
-<p>なんかこの、計算可能な関数はmonotonicであるとか、情報がたくさんあった方が結果の情報もたくさんあるというのがよくわからない。じゃあ、逆にmonotonicじゃないと何がまずいのか、とかもよくわからない。</p>
-</div>
-<div class="section" id="excercises">
-<h2>Excercises</h2>
-<ul>
-<li><pre class="first literal-block">
-E[[proc C]]sigma = proc C
-E[[I]]sigma =  C[[C]]sigma (if I = proc C)
-             | sigma(I) (otherwise)
-</pre>
-</li>
-<li><p class="first">3-&gt;3 を書き下すとたぶん10個</p>
-</li>
-<li><p class="first">N-&gt;M の数は:</p>
-<pre class="literal-block">
-F(N, M) =   1 (if M = 1)
-          | M (if N = 1)
-          | F(N, M-1) + F(N-1, M)
-</pre>
-</li>
-</ul>
-<p>最後の問題は、chainの元のN個のポイントのうち、一番下のポイントが、M個のポイントのどこに写されるのかで場合分けする。</p>
-<ol class="arabic">
-<li><p class="first">一番下のポイントが先のM個のポイントのうち、一番下以外に写される。</p>
-<p>その数は<tt class="docutils literal">F(N, <span class="pre">M-1)</span></tt>と等しい。</p>
-</li>
-<li><p class="first">一番下のポイントが先のM個のポイントのうち、一番下に写される。</p>
-<p>このとき、別に残りのN-1個のポイントがどう写されようと、その対応関係が、
-(N-1)-&gt;Mのmonotonic functionであれば、N-1個のポイントの一番下にもう一個付け加えて、それがM個のポイントの一番下に写されたものもmonotonic functionになる。つまり、この場合は(N-1)-&gt;Mのすべてのmonotonic functionの一番下に割り当てを追加してあげれば良いだけ。ということは、その数は<tt class="docutils literal"><span class="pre">F(N-1,</span> M)</tt>と等しいということになる。</p>
-</li>
-</ol>
-</div>
-</div>
-        <hr />
-    </div>
-
-    
-
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href=".././2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html"><h1>PelicanとGitHub Pagesを使う</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2012/03/16</span>
-    <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div> 
-        </div>
-
-        <div><p>reStructuredTextが使いたかったので、Pythonで書かれてる<a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html">Pelican</a>という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。</p>
-<div class="section" id="id1">
-<h2>Pelican</h2>
-<p>最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
-Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みのやつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので気に入って使っています。</p>
-<p>自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。開発中のバージョンを使うにはこれだけでOK:</p>
-<div class="highlight"><pre>git clone https://github.com/ametaireau/pelican.git
-cd pelican
-python setup.py develop
-</pre></div>
-<p>こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになります。</p>
-</div>
-<div class="section" id="github-pages">
-<h2>GitHub Pages</h2>
-<p>なんかGitHubには<a class="reference external" href="http://pages.github.com/">GitHub Pages</a>っていうPushすると中のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしました。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
-Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次のようなブランチ構成にしてみました:</p>
-<div class="highlight"><pre>source   -&gt; origin/source
-gh-pages -&gt; origin/master
-</pre></div>
-<p>こういう風にするには、たぶん次のようにすればいいはず:</p>
-<div class="highlight"><pre>git init .
-git branch -m master source
-git remote add origin &lt;自分のGitHubリポジトリでコピーしてきたなにか&gt;
-</pre></div>
-<p>gh-pagesはなんかよしなに作ってくれる<a class="reference external" href="https://github.com/davisp/ghp-import">ghp-import</a>があるので、それを導入しました:</p>
-<div class="highlight"><pre>pip install ghp-import
-</pre></div>
-</div>
-<div class="section" id="conf-py">
-<h2>conf.pyを書く</h2>
-<p><a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source/conf.py">conf.py</a>みたいに書いています。なんか下の方で怪しいことしてますが。ディレクトリ構成は<a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source">draftcode/draftcode.github.com</a>みたいになってます。</p>
-</div>
-<div class="section" id="post-commit">
-<h2>post-commitを仕込む</h2>
-<p>次のような内容のファイルを、<tt class="docutils literal"><span class="pre">.git/hooks/post-commit</span></tt>に仕込んでおきます:</p>
-<div class="highlight"><pre>pelican -s conf.py &amp;&amp; ghp-import output &amp;&amp; git push origin gh-pages:master source:source
-</pre></div>
-<p>これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!</p>
-</div>
-</div>
-        <hr />
-    </div>
-
-    
-
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href=".././2012/02/06/235454.html"><h1>HomebrewでクロスコンパイルできるGCCをビルドする</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2012/02/06</span>
-    <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div> 
-        </div>
-
-        <div><p>Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。</p>
-<div class="section" id="id1">
-<h2>結論</h2>
-<p><a class="reference external" href="https://gist.github.com/1751385">https://gist.github.com/1751385</a>のようなFormulaをつくればできます。このFormulaは<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html">http://pdos.csail.mit.edu/6.828/2011/xv6.html</a>をビルドするために、<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html">http://pdos.csail.mit.edu/6.828/2011/tools.html</a>の設定を参考にして書きました。</p>
-</div>
-<div class="section" id="id2">
-<h2>クロスコンパイラ……ぐぬぬ……</h2>
-<p>クロスコンパイラは、以前自分が某研究室で作っているMIPSライクなCPUを使ったマシンで動くアセンブラを書いたときにもビルドしたのですが、なぜか動かなかったりします。なんか検索してみると、動かない動かないと言っている人も結構いたりするので失敗しやすいのでしょう。今回は無事動くところまでこぎ着けました。</p>
-</div>
-<div class="section" id="homebrew">
-<h2>Homebrewでビルドするときの問題点</h2>
-<p>Homebrewは既にパッケージとして用意してくれているものについてはビルドしない方針なので、GCCをビルドしたりするFormulaはありません。なので適当にでっち上げる必要があります。いろいろな人が既にGCCのFormulaを書いているので、それを参考に書けば良いのですが、適当にクロスコンパイラのFormulaを書くと失敗します。</p>
-<p>GCCはコンパイルをした後に、binutilsを使ってバイナリをはき出します。なので、クロスコンパイルができるGCCをビルドするには、そのターゲットとなるプラットフォーム用のbinutilsが必要です。そのbinutilsのツールを探すのに、GCCはいろいろな場所をみてくれます。どこを探すかは<a class="reference external" href="http://gcc.gnu.org/install/configure.html#with-as">http://gcc.gnu.org/install/configure.html#with-as</a>に書いてあって、どうも
-i386-foo-bar-asというのをPATHをみて探してくれるようです。適当にbinutilsとGCCで同じTargetを指定すれば良さそうなかんじ。</p>
-<p>が、駄目。動きません。GCCのビルドは成功するのですが、そのGCCでなんかコンパイルしようとすると、どうもアセンブラがエラーを吐いているようです。実行されているコマンドを見てみると、システム組み込みのasを使っているようです。そりゃ駄目だ。</p>
-<p>こんなの絶対おかしいよ。ということで、GCCのソースを見てみることに。いろいろかけずり回った結果、<tt class="docutils literal">gcc/gcc.c</tt>の<tt class="docutils literal">find_a_file()</tt>あたりでファイルを探しているようなのですが、なんかi386-foo-barみたいなマシンターゲットをつけているようには見えないぞ。あやしい。ちなみにldのほうは<tt class="docutils literal">gcc/collect2.c</tt>の<tt class="docutils literal">main</tt>でそういうプレフィックスをつけていて、ファイルを探すのもasとは別のコードで行っている模様。</p>
-<p>どうも、ldについてはインストールマニュアルに書かれている通りに探してくれているみたいですが、asについてはなんか違うようです。</p>
-</div>
-<div class="section" id="id3">
-<h2>解決</h2>
-<p>GCCが正しいアセンブラを探してくれない。仕方がないので手動でアセンブラを指定することになります。ということで、<a class="reference external" href="https://gist.github.com/1751385#file_gcc_xv6.rb">https://gist.github.com/1751385#file_gcc_xv6.rb</a>のように汚い感じですが、アセンブラのパスを手動で指定してあげるようにします。このようにすると、うまくコンパイルができました。(ということは、ldについてはきちんと探してくれたようです……)</p>
-<p>もし、Xv6をコンパイルして動かしたい。しかも、Homebrewで必要なものをいれたい。ということであれば、次のようにすることでうまくインストールすることができます。
-QEMUはuse-gccを使わないとうまく動きませんでした:</p>
-<div class="highlight"><pre>brew install https://raw.github.com/gist/1751385/binutils_xv6.rb
-brew install https://raw.github.com/gist/1751385/gcc_xv6.rb
-brew install https://raw.github.com/gist/1751385/gdb_xv6.rb
-brew install qemu --use-gcc
-</pre></div>
-</div>
-</div>
-        <hr />
-    </div>
-
-    
-
-
-
-    <div class='article'>
-        <div class="content-title">
             <a href=".././2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html"><h1>Writing Adblock Plus filters -- 日本語訳</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2011/03/22</span>
     <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div> 
+</div>
         </div>
 
         <div><p><a class="reference external" href="http://adblockplus.org/en/filters">Writing Adblock Plus filters</a>の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．</p>
@@ -267,7 +62,7 @@ brew install qemu --use-gcc
 <div class="section" id="marking-separator-characters">
 <h3>Marking separator characters</h3>
 <p>しばしばフィルタの中で分割文字(separator character)を含めなければならない場合があります．たとえば，<tt class="docutils literal"><span class="pre">http://example.com/</span></tt>と<tt class="docutils literal"><span class="pre">http://example.com:8000/</span></tt>はブロックしたいが，<tt class="docutils literal"><span class="pre">http://example.com.ar/</span></tt>はブロックしたくないとしましょう．この場合は記号<tt class="docutils literal">^</tt>を分割文字のプレースホルダーとして用いることができます．この場合フィルタは<tt class="docutils literal"><span class="pre">http://example.com^</span></tt>のようになります．</p>
-<p>分割文字は英数字と<tt class="docutils literal">_</tt>，``-`` ，<tt class="docutils literal">-</tt>，<tt class="docutils literal">%</tt>以外の文字すべてです．アドレスの最後も分割文字としてマッチします．分割文字をハイライトすると，<tt class="docutils literal"><span class="pre">http:**//**example.com**:**8000**/**foo.bar**?**a**=**12**&amp;**b**=**%D1%82%D0%B5%D1%81%D1%82</span></tt>のようになります．このアドレスをブロックするならば，<tt class="docutils literal">^example.com^</tt>や，<tt class="docutils literal">^%D1%82%D0%B5%D1%81%D1%82^</tt>，<tt class="docutils literal">foo.bar</tt>のようなフィルタが有効です．</p>
+<p>分割文字は英数字と<tt class="docutils literal">_</tt>，<tt class="docutils literal">-</tt>，<tt class="docutils literal">-</tt>，<tt class="docutils literal">%</tt>以外の文字すべてです．アドレスの最後も分割文字としてマッチします．分割文字をハイライトすると，<tt class="docutils literal"><span class="pre">http:**//**example.com**:**8000**/**foo.bar**?**a**=**12**&amp;**b**=**%D1%82%D0%B5%D1%81%D1%82</span></tt>のようになります．このアドレスをブロックするならば，<tt class="docutils literal">^example.com^</tt>や，<tt class="docutils literal">^%D1%82%D0%B5%D1%81%D1%82^</tt>，<tt class="docutils literal">foo.bar</tt>のようなフィルタが有効です．</p>
 </div>
 <div class="section" id="comments">
 <h3>Comments</h3>
@@ -360,7 +155,6 @@ specification</a>で見ることができます．(すべてのセレクタがFi
         <hr />
     </div>
 
-    
 
 
 
@@ -370,7 +164,7 @@ specification</a>で見ることができます．(すべてのセレクタがFi
             <div class="metadata">
     <span class="label label-inverse">2011/03/14</span>
     <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div> 
+</div>
         </div>
 
         <div><p>Macbook Proを修理に出したときに，どうしてもレポートを書かなければいけない感じだったので，Mac miniを購入しました．Macbook Proは3年ぐらい前のモデルだったので，大きいDVIポートがあり，DELLのU2711のような大きいディスプレイでも直接接続して最適な解像度が出せたのですが，今のMacについているようなMini DisplayPortだと，DVIとの変換ケーブルを使っても，フルHD程度までしか出力することができません．これはDVIのシングルリンクとかデュアルリンクとかの問題らしいんですが，それを解決するためにはAppleの高いデュアルリンク対応の変換アダプタを購入しなければいけません．</p>
@@ -395,7 +189,6 @@ specification</a>で見ることができます．(すべてのセレクタがFi
         <hr />
     </div>
 
-    
 
 
 
@@ -405,7 +198,7 @@ specification</a>で見ることができます．(すべてのセレクタがFi
             <div class="metadata">
     <span class="label label-inverse">2010/08/15</span>
     <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div> 
+</div>
         </div>
 
         <div><p>コンピュータプログラミングの概念・技法・モデルの中で，アキュムレータという概念が出てきました．たぶん，いろいろなところで使ってきた手法を，一般化して名前をつけたため，違うモノのように見えるだけだと思うのですが，混乱しているので整理します．</p>
@@ -464,101 +257,29 @@ end
         <hr />
     </div>
 
-    
 
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href=".././2010/08/15/learning_path.html"><h1>情報工学科に所属する前後の学習の道筋</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2010/08/15</span>
-    <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div> 
-        </div>
-
-        <div><p>自分も現在学習途中であるし，これはこのように勉強しろというようなたいそうなことは言えないのですが，どういうことを思って，どういう勉強を進めてきたかということを書いてみたいと思います．</p>
-<div class="section" id="id2">
-<h2>計算機プログラムの構造と解釈を読み始めた</h2>
-<p>買ったのは浪人をすることに決めたときでした．そこから4月か5月ぐらいまではやっていたような気がしますが，大して進まずに放置しました．実際に割と進んだのはB2のときでした．ちなみに現在も止まったままです．きっと多くの人が有名な本だし読んでおこうと思いつつも止まっているのではないでしょうか．自分もその一人です．</p>
-</div>
-<div class="section" id="c">
-<h2>プログラミング言語Cを読んだ</h2>
-<p>読み始めたのはB1の5月からでした．以前にもCの特に有用ではなさそうな本を読みましたが，情報工学科を志望しているのだしCぐらいできていてもいいのではないだろうかということでこの本だったと思います．この本については演習を含めてだいたい1ヶ月か2ヶ月ぐらいで読み終えたと思います．</p>
-</div>
-<div class="section" id="id3">
-<h2>Cを使うアルバイトを始めた</h2>
-<p>プログラミング言語Cを読み終えたので，Cを使うアルバイトをはじめました．現在ではそういうバイトは少なくなっているのかもしれないですが，たまたま見つけたのでそこに応募しました．現在も一応続けています．</p>
-</div>
-<div class="section" id="mfc">
-<h2>MFCに触れた</h2>
-<p>アルバイトの研修の最初の方は基本的なCの演習でしたが，後半の方はMFCを使った
-Windowsアプリケーションの開発でしたので，MFCに触れることになりました．必然的にC++も触れることになっています．MFCを使うにあたってリファレンスを参照するので，
-MSDNをひいていたりしました．</p>
-</div>
-<div class="section" id="id4">
-<h2>プログラミング言語C++を読み始めた</h2>
-<p>MFCはC++のフレームワークですので，C++の知識が必要になると思い，プログラミング言語C++を購入しました．この本に関しては評判はイマイチでしたが，言語をデザインした人が書いた本だからという理由で購入しました．</p>
-<p>この本はまだ途中までしか読んでいないですし，読んだ部分もほぼ覚えていません．というのも，アルバイトの中で実際に使っているのはC++というよりBetter Cでしたので，C++の様々な機能(と呼んで差し支えないのかわかりませんが)は(幸か不幸か)あまり使用することがなかったのです．</p>
-<p>同時期にC++のデザインと進化を購入しましたが，まだ読んでいません．</p>
-<div class="section" id="id5">
-<h3>この頃のコード</h3>
-<p>C++かぶれになっていたので，STLやテンプレートやクラスを多用するコードでした．前述の通り，バイト先ではほぼBetter Cでしたので，書いたコードを社員さんにレビューしてもらうと，(幸か不幸か)反応がイマイチでした．研修の頃は，実際の業務でいじるコードを見ていないので，なんだろうなぁという感想を抱いていましたが，研修が終わり，実際の業務に入ったときにBetter Cのように書いてあるコードをみて，納得がいきました．(そして自分は周りにあわせてCっぽくC++を使うようになりました．)</p>
-</div>
-</div>
-<div class="section" id="win32api">
-<h2>Win32APIに触れた</h2>
-<p>研修ではMFCを使っていたので，Win32APIを直接使うことはありませんでしたが，実業務ではほぼWin32APIをつかったプログラミングでしたので，MSDNを読みながらプログラムを書くということをやっていました．この時期には古い(Windows95あたりの)Win32APIについての本がバイト先にありましたので，それをめくりつつOSが提供する基本的なサービス，つまりメモリ割り当てやメモリマッピング，スレッド・プロセスの概念，プロセス間同期について知ることとなりました．</p>
-</div>
-<div class="section" id="id6">
-<h2>エキスパートCプログラミングを読んだ</h2>
-<p>C++が提供する様々な抽象化は，遊ぶ分には楽しいけれども，適切にそれを使用できる人と一緒ではないと，仕事では使えないという印象を受けたので，C++に関することは中断し，Cについてより詳しく知ることにしました．実際のところプログラミング言語CだけではCについての知識は足りないとは思います．</p>
-<p>エキスパートCプログラミングは，そのような足りない部分の一部を補ってくれました．特にポインタと配列の違いは，実際のところこの本を読むまで説明できなかったと思いますし，この本を読むことによって，コードを書くときに意識する視点の一つ，コンパイラは何をどう見るのかという視点を獲得することができました．この視点がないと，sizeofが展開される値についての正しい判断をすることができませんでした．</p>
-</div>
-<div class="section" id="linkers-loaders">
-<h2>Linkers &amp; Loadersを読み始めた</h2>
-<p>エキスパートCプログラミングを読んだあと，コンパイラがはき出すオブジェクトコードについての知識が欲しいと思いました．アセンブラについての知識は後で獲得することになるのですが，コンパイル後のコードについて，リンカやローダが行う作業や，オブジェクトコードそれ自体が含むものがなんなのかということについて知ることになりました．</p>
-<p>オブジェクトコードが含むものを知ることができたため，コンパイラがどういう視点でソースコードを見ているのかということについて，よりよい推測ができるようになりました．翻訳単位という概念はエキスパートCプログラミングでもありましたが，
-Linkers&amp; Loadersを読むことによって，複数のオブジェクトコード間での参照をするときに，どうやって解決しているかということも推測できるようになりました．</p>
-<div class="section" id="c-linkers-loaders">
-<h3>エキスパートCプログラミング と Linkers &amp; Loadersの与えた影響</h3>
-<p>上記の二冊は，自分のコーディングに対する姿勢に大きく影響を与えています．どんなに高級な言語でも，必ずそれは機械語レベルまで落とされるということを強く意識できるようになりました．例えば，自分はアルバイトでVBScriptを書くアルバイトを(上記の仕事とは別に)やっているのですが，そのときもCOMのVariantに意識を落とし，COMが提供するバイナリ標準についての知識を活用しながら，値渡しと参照渡しが混在する関数の間を行き来しています．</p>
-<p>また，いかに抽象化されたレイヤで動くプログラムだろうと，それは必ず現実の計算機で実行されているということがはっきりと意識するようになりました．もともと(計算機科学について学習する上で)最初に選んだ本が計算機プログラムの構造と解釈であるのというのもあるかもしれませんが，Lispのようなかなり抽象化のレベルが高い言語が，どうやって計算機の上で動くオブジェクトコードに変換されるのか，ということに関心を寄せるようになりました．</p>
-</div>
-</div>
-<div class="section" id="id7">
-<h2>λ計算について知った</h2>
-<p>Linkers &amp; Loadersと前後して，チューリング機械や再帰的関数，λ計算についての基本的な知識を得ました．Schemeで出てくるlambdaというものについて知っておきたかったというのもありますし，たまたま大学の授業で計算論の科目があったというのもあります．これらの分野の興味はより進んでいって，サークルで行っている研究室紹介を行うために，関連した研究室へ取材に行くことになりました．</p>
-<p>訪問した研究室はプログラム意味論について研究しているところでしたので，初学者の自分にはなかなか理解できなかったところもありましたが，なんとか研究室を紹介できるレベルまでもっていくことができました．また，この時期には論理学についての基礎知識も得ることができました．</p>
-</div>
-<div class="section" id="id8">
-<h2>現在について</h2>
-<p>ここまでが情報工学科3年になるまでにたどった学習の道筋です．現在はコンピュータアーキテクチャを学ぶために，パターソン&amp;ヘネシー コンピュータの構成と設計 ハードウエアとソフトウエアのインタフェースを読んでいます．また，アルゴリズムとデータ構造について学ぶために，アルゴリズムイントロダクションを読んでいます．</p>
-</div>
-</div>
-        <hr />
-    </div>
-
-    
-        <div class="pagination">
+ 
+    <div class="pagination">
 <ul>
 
-    <li class="prev disabled"><a href="#">&larr; Previous</a></li>
+
+    <li class="prev"><a href=".././category/Articles.html">&larr; Previous</a></li>
 
 
 
-    <li class="active"><a href=".././category/Articles.html">1</a></li>
+    <li class=""><a href=".././category/Articles.html">1</a></li>
+
+    <li class="active"><a href=".././category/Articles2.html">2</a></li>
+
+    <li class=""><a href=".././category/Articles3.html">3</a></li>
 
 
 
-    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+    <li class="next"><a href=".././category/Articles3.html">Next &rarr;</a></li>
 
 
 </ul>
 </div>
-    
-
- 
  
 
 
@@ -572,7 +293,7 @@ Linkers&amp; Loadersを読むことによって，複数のオブジェクトコ
 
         <div style="padding: 10px;">
             <a id="about-image" href=".././pages/about.html" rel="alternate"><img src=".././static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
-            <p>東京で情報工学を専攻している大学生です。</p>
+            <p>東京で情報工学を専攻している大学院生です。</p>
         </div>
     </div>
 
