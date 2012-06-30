@@ -8,18 +8,16 @@
     <div class='article'>
         <div class="content-title">
             <a href="{{ SITEURL }}/{{ article.url }}"><h1>{{ article.title }}</h1></a>
-            {% include "metadata.html" %} 
+            {% include "metadata.html" %}
         </div>
 
         <div>{{ article.content }}</div>
         <hr />
     </div>
 
-    {% if loop.last and (articles_page.has_previous() or not articles_page.has_previous() and loop.length > 1) %}
-        {% include 'pagination.html' %}
-    {% endif %}
 
 {% endfor %} {# For article #}
+    {% include 'pagination.html' %}
 {% endif %} {# If articles #}
 
 {% endblock content %}
