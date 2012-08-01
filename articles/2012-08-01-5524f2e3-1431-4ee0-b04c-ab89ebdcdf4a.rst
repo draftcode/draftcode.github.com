@@ -89,8 +89,11 @@
 
     リードコピーアップデート。Wikipedia参照。
 
-    Writerはコピーを持って、Readerがすべて出て行った後に、そのコピーとのスワッ
-    プを行う。
+    どうも、Writerが入るときに、コピーを作ってそっちの方を指すようにする。で、
+    Readerは読み終わったら上手いことやって、さっきまで見ていた複製元が既に不要
+    になっていたら破棄するようにするものらしい。
+
+    http://togetter.com/li/153033
 
 .. topic:: get_cpu, put_cpu (include/linux/smp.h)
 
