@@ -28,6 +28,105 @@
 
     <div class='article'>
         <div class="content-title">
+            <a href=".././2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html"><h1>第(1+1)回 六本木 Linux カーネル読書会 参加メモ</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/08/01</span>
+    <a href=".././category/Articles.html" class="label label-info">Articles</a>
+</div>
+        </div>
+
+        <div><p><a class="reference external" href="http://connpass.com/event/824/">第(1+1)回 六本木 Linux カーネル読書会</a>に行ってきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあたり。</p>
+<div class="topic">
+<p class="topic-title first">do_fork (kernel/fork.c)</p>
+<p>do_forkはsys_cloneやsys_vfork、sys_forkから呼ばれる。</p>
+<dl class="docutils">
+<dt>sys_clone</dt>
+<dd>arch/x86/kernel/process.c</dd>
+<dt>sys_vfork</dt>
+<dd>arch/x86/kernel/process.c</dd>
+<dt>sys_fork</dt>
+<dd>arch/x86/kernel/process.c</dd>
+<dt>task_struct</dt>
+<dd>include/linux/sched.h</dd>
+</dl>
+</div>
+<div class="topic">
+<p class="topic-title first">vfork</p>
+<p>古いBSDでfork &amp; execを効率的に行うための仕組み。現在では使われていない。</p>
+<p>古いBSDだと、メモリ空間がCopy on Writeではなくて、fork時にコピーするようになっているらしい。このため、fork &amp; execをやろうとすると、無駄にメモリ空間のコピーが走ってしまう。これを防ぐために、vforkというものが生まれた。vforkは子プロセスが親プロセスのメモリ空間を使って動く。このままだと、親プロセスと子プロセスのスタックも共有してしまうので、まず、親プロセスを停止し、次に子プロセスを動かす。子プロセスがexecveを呼ぶかexitするまで、親プロセスは停止する。親プロセスのメモリ空間を利用するため、子プロセスの動きが大きく制約される。</p>
+<p><a class="reference external" href="http://surf.ml.seikei.ac.jp/~nakano/JMwww/html/LDP_man-pages/man2/vfork.2.html">http://surf.ml.seikei.ac.jp/~nakano/JMwww/html/LDP_man-pages/man2/vfork.2.html</a></p>
+<p>現代的なプログラムではvforkは使ってはいけない。</p>
+<p><a class="reference external" href="http://www.jpcert.or.jp/sc-rules/c-pos33-c.html">http://www.jpcert.or.jp/sc-rules/c-pos33-c.html</a></p>
+</div>
+<div class="topic">
+<p class="topic-title first">メモリ空間</p>
+<p>カーネル空間とユーザー空間に分かれている。</p>
+<dl class="docutils">
+<dt>__user</dt>
+<dd>include/linux/compiler.h</dd>
+<dt>__kernel</dt>
+<dd>include/linux/compiler.h</dd>
+</dl>
+<p>それぞれでメモリ管理をしているので仮想メモリ空間を指すことになる。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">copy_process (kernel/fork.c)</p>
+<p>親プロセスのtask_structをコピーしている。</p>
+<ul class="simple">
+<li>dup_task_structを呼んでる。</li>
+<li>sched_forkを呼んでる。</li>
+</ul>
+</div>
+<div class="topic">
+<p class="topic-title first">sched_fork (kernel/sched/core.c)</p>
+<p>プロセスが実行される前のスケジューラ周りのセットアップを行うみたい。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">dup_task_struct (kernel/fork.c)</p>
+<p>task_structのメモリ確保はkmem_cache_alloc_nodeで確保している。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">kmem_cache_alloc_node (include/kernel/slab.h)</p>
+<p>カーネル空間のメモリを確保する関数。メモリの種類がいろいろ選べるらしい。</p>
+<p><a class="reference external" href="http://www.mech.tohoku-gakuin.ac.jp/rde/contents/linux/drivers/tips1.html">http://www.mech.tohoku-gakuin.ac.jp/rde/contents/linux/drivers/tips1.html</a></p>
+<p>kmem_cache_alloc_node の node は tsk_fork_get_node から取ってきている。しかしnodeは無視されてしまう。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">tsk_fork_get_node (kernel/kthread.c)</p>
+<p>どうもNUMAアーキテクチャで気にするものらしい。</p>
+<p>NUMA は Non-Uniform Memory Access の略で、たしかそれぞれのプロセッサでメモリを持っていて、他のプロセッサが持っているメモリにアクセスするときは、そのプロセッサにお願いして読みに行くというアーキテクチャだったと思う。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">RCUとは</p>
+<p>リードコピーアップデート。Wikipedia参照。</p>
+<p>Writerはコピーを持って、Readerがすべて出て行った後に、そのコピーとのスワップを行う。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">get_cpu, put_cpu (include/linux/smp.h)</p>
+<dl class="docutils">
+<dt>get_cpu</dt>
+<dd>CPUの割り込みを禁止し、現在のCPUIDを返す。</dd>
+<dt>put_cpu</dt>
+<dd>CPUの割り込みを有効化。</dd>
+</dl>
+</div>
+<div class="topic">
+<p class="topic-title first">wake_up_new_task (kernel/sched/core.c)</p>
+<p>do_forkの中で呼び出される。スケジューラに実際に登録する？</p>
+</div>
+<div class="topic">
+<p class="topic-title first">do_execve (fs/exec.c)</p>
+<p>これは次回で。</p>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <a href=".././2010/08/15/accumulator_programming.html"><h1>アキュムレータについて</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2010/08/15</span>
@@ -194,80 +293,6 @@ F(N, M) =   1 (if M = 1)
     </div>
 
 
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href=".././2010/08/15/learning_path.html"><h1>情報工学科に所属する前後の学習の道筋</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2010/08/15</span>
-    <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div>
-        </div>
-
-        <div><p>自分も現在学習途中であるし，これはこのように勉強しろというようなたいそうなことは言えないのですが，どういうことを思って，どういう勉強を進めてきたかということを書いてみたいと思います．</p>
-<div class="section" id="id2">
-<h2>計算機プログラムの構造と解釈を読み始めた</h2>
-<p>買ったのは浪人をすることに決めたときでした．そこから4月か5月ぐらいまではやっていたような気がしますが，大して進まずに放置しました．実際に割と進んだのはB2のときでした．ちなみに現在も止まったままです．きっと多くの人が有名な本だし読んでおこうと思いつつも止まっているのではないでしょうか．自分もその一人です．</p>
-</div>
-<div class="section" id="c">
-<h2>プログラミング言語Cを読んだ</h2>
-<p>読み始めたのはB1の5月からでした．以前にもCの特に有用ではなさそうな本を読みましたが，情報工学科を志望しているのだしCぐらいできていてもいいのではないだろうかということでこの本だったと思います．この本については演習を含めてだいたい1ヶ月か2ヶ月ぐらいで読み終えたと思います．</p>
-</div>
-<div class="section" id="id3">
-<h2>Cを使うアルバイトを始めた</h2>
-<p>プログラミング言語Cを読み終えたので，Cを使うアルバイトをはじめました．現在ではそういうバイトは少なくなっているのかもしれないですが，たまたま見つけたのでそこに応募しました．現在も一応続けています．</p>
-</div>
-<div class="section" id="mfc">
-<h2>MFCに触れた</h2>
-<p>アルバイトの研修の最初の方は基本的なCの演習でしたが，後半の方はMFCを使った
-Windowsアプリケーションの開発でしたので，MFCに触れることになりました．必然的にC++も触れることになっています．MFCを使うにあたってリファレンスを参照するので，
-MSDNをひいていたりしました．</p>
-</div>
-<div class="section" id="id4">
-<h2>プログラミング言語C++を読み始めた</h2>
-<p>MFCはC++のフレームワークですので，C++の知識が必要になると思い，プログラミング言語C++を購入しました．この本に関しては評判はイマイチでしたが，言語をデザインした人が書いた本だからという理由で購入しました．</p>
-<p>この本はまだ途中までしか読んでいないですし，読んだ部分もほぼ覚えていません．というのも，アルバイトの中で実際に使っているのはC++というよりBetter Cでしたので，C++の様々な機能(と呼んで差し支えないのかわかりませんが)は(幸か不幸か)あまり使用することがなかったのです．</p>
-<p>同時期にC++のデザインと進化を購入しましたが，まだ読んでいません．</p>
-<div class="section" id="id5">
-<h3>この頃のコード</h3>
-<p>C++かぶれになっていたので，STLやテンプレートやクラスを多用するコードでした．前述の通り，バイト先ではほぼBetter Cでしたので，書いたコードを社員さんにレビューしてもらうと，(幸か不幸か)反応がイマイチでした．研修の頃は，実際の業務でいじるコードを見ていないので，なんだろうなぁという感想を抱いていましたが，研修が終わり，実際の業務に入ったときにBetter Cのように書いてあるコードをみて，納得がいきました．(そして自分は周りにあわせてCっぽくC++を使うようになりました．)</p>
-</div>
-</div>
-<div class="section" id="win32api">
-<h2>Win32APIに触れた</h2>
-<p>研修ではMFCを使っていたので，Win32APIを直接使うことはありませんでしたが，実業務ではほぼWin32APIをつかったプログラミングでしたので，MSDNを読みながらプログラムを書くということをやっていました．この時期には古い(Windows95あたりの)Win32APIについての本がバイト先にありましたので，それをめくりつつOSが提供する基本的なサービス，つまりメモリ割り当てやメモリマッピング，スレッド・プロセスの概念，プロセス間同期について知ることとなりました．</p>
-</div>
-<div class="section" id="id6">
-<h2>エキスパートCプログラミングを読んだ</h2>
-<p>C++が提供する様々な抽象化は，遊ぶ分には楽しいけれども，適切にそれを使用できる人と一緒ではないと，仕事では使えないという印象を受けたので，C++に関することは中断し，Cについてより詳しく知ることにしました．実際のところプログラミング言語CだけではCについての知識は足りないとは思います．</p>
-<p>エキスパートCプログラミングは，そのような足りない部分の一部を補ってくれました．特にポインタと配列の違いは，実際のところこの本を読むまで説明できなかったと思いますし，この本を読むことによって，コードを書くときに意識する視点の一つ，コンパイラは何をどう見るのかという視点を獲得することができました．この視点がないと，sizeofが展開される値についての正しい判断をすることができませんでした．</p>
-</div>
-<div class="section" id="linkers-loaders">
-<h2>Linkers &amp; Loadersを読み始めた</h2>
-<p>エキスパートCプログラミングを読んだあと，コンパイラがはき出すオブジェクトコードについての知識が欲しいと思いました．アセンブラについての知識は後で獲得することになるのですが，コンパイル後のコードについて，リンカやローダが行う作業や，オブジェクトコードそれ自体が含むものがなんなのかということについて知ることになりました．</p>
-<p>オブジェクトコードが含むものを知ることができたため，コンパイラがどういう視点でソースコードを見ているのかということについて，よりよい推測ができるようになりました．翻訳単位という概念はエキスパートCプログラミングでもありましたが，
-Linkers&amp; Loadersを読むことによって，複数のオブジェクトコード間での参照をするときに，どうやって解決しているかということも推測できるようになりました．</p>
-<div class="section" id="c-linkers-loaders">
-<h3>エキスパートCプログラミング と Linkers &amp; Loadersの与えた影響</h3>
-<p>上記の二冊は，自分のコーディングに対する姿勢に大きく影響を与えています．どんなに高級な言語でも，必ずそれは機械語レベルまで落とされるということを強く意識できるようになりました．例えば，自分はアルバイトでVBScriptを書くアルバイトを(上記の仕事とは別に)やっているのですが，そのときもCOMのVariantに意識を落とし，COMが提供するバイナリ標準についての知識を活用しながら，値渡しと参照渡しが混在する関数の間を行き来しています．</p>
-<p>また，いかに抽象化されたレイヤで動くプログラムだろうと，それは必ず現実の計算機で実行されているということがはっきりと意識するようになりました．もともと(計算機科学について学習する上で)最初に選んだ本が計算機プログラムの構造と解釈であるのというのもあるかもしれませんが，Lispのようなかなり抽象化のレベルが高い言語が，どうやって計算機の上で動くオブジェクトコードに変換されるのか，ということに関心を寄せるようになりました．</p>
-</div>
-</div>
-<div class="section" id="id7">
-<h2>λ計算について知った</h2>
-<p>Linkers &amp; Loadersと前後して，チューリング機械や再帰的関数，λ計算についての基本的な知識を得ました．Schemeで出てくるlambdaというものについて知っておきたかったというのもありますし，たまたま大学の授業で計算論の科目があったというのもあります．これらの分野の興味はより進んでいって，サークルで行っている研究室紹介を行うために，関連した研究室へ取材に行くことになりました．</p>
-<p>訪問した研究室はプログラム意味論について研究しているところでしたので，初学者の自分にはなかなか理解できなかったところもありましたが，なんとか研究室を紹介できるレベルまでもっていくことができました．また，この時期には論理学についての基礎知識も得ることができました．</p>
-</div>
-<div class="section" id="id8">
-<h2>現在について</h2>
-<p>ここまでが情報工学科3年になるまでにたどった学習の道筋です．現在はコンピュータアーキテクチャを学ぶために，パターソン&amp;ヘネシー コンピュータの構成と設計 ハードウエアとソフトウエアのインタフェースを読んでいます．また，アルゴリズムとデータ構造について学ぶために，アルゴリズムイントロダクションを読んでいます．</p>
-</div>
-</div>
-        <hr />
-    </div>
-
-
  
     <div class="pagination">
 <ul>
@@ -285,9 +310,11 @@ Linkers&amp; Loadersを読むことによって，複数のオブジェクトコ
 
     <li class="active"><a href=".././author/draftcode4.html">4</a></li>
 
+    <li class=""><a href=".././author/draftcode5.html">5</a></li>
 
 
-    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+
+    <li class="next"><a href=".././author/draftcode5.html">Next &rarr;</a></li>
 
 
 </ul>

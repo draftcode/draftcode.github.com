@@ -28,6 +28,105 @@
 
     <div class='article'>
         <div class="content-title">
+            <a href="./2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html"><h1>第(1+1)回 六本木 Linux カーネル読書会 参加メモ</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/08/01</span>
+    <a href="./category/Articles.html" class="label label-info">Articles</a>
+</div>
+        </div>
+
+        <div><p><a class="reference external" href="http://connpass.com/event/824/">第(1+1)回 六本木 Linux カーネル読書会</a>に行ってきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあたり。</p>
+<div class="topic">
+<p class="topic-title first">do_fork (kernel/fork.c)</p>
+<p>do_forkはsys_cloneやsys_vfork、sys_forkから呼ばれる。</p>
+<dl class="docutils">
+<dt>sys_clone</dt>
+<dd>arch/x86/kernel/process.c</dd>
+<dt>sys_vfork</dt>
+<dd>arch/x86/kernel/process.c</dd>
+<dt>sys_fork</dt>
+<dd>arch/x86/kernel/process.c</dd>
+<dt>task_struct</dt>
+<dd>include/linux/sched.h</dd>
+</dl>
+</div>
+<div class="topic">
+<p class="topic-title first">vfork</p>
+<p>古いBSDでfork &amp; execを効率的に行うための仕組み。現在では使われていない。</p>
+<p>古いBSDだと、メモリ空間がCopy on Writeではなくて、fork時にコピーするようになっているらしい。このため、fork &amp; execをやろうとすると、無駄にメモリ空間のコピーが走ってしまう。これを防ぐために、vforkというものが生まれた。vforkは子プロセスが親プロセスのメモリ空間を使って動く。このままだと、親プロセスと子プロセスのスタックも共有してしまうので、まず、親プロセスを停止し、次に子プロセスを動かす。子プロセスがexecveを呼ぶかexitするまで、親プロセスは停止する。親プロセスのメモリ空間を利用するため、子プロセスの動きが大きく制約される。</p>
+<p><a class="reference external" href="http://surf.ml.seikei.ac.jp/~nakano/JMwww/html/LDP_man-pages/man2/vfork.2.html">http://surf.ml.seikei.ac.jp/~nakano/JMwww/html/LDP_man-pages/man2/vfork.2.html</a></p>
+<p>現代的なプログラムではvforkは使ってはいけない。</p>
+<p><a class="reference external" href="http://www.jpcert.or.jp/sc-rules/c-pos33-c.html">http://www.jpcert.or.jp/sc-rules/c-pos33-c.html</a></p>
+</div>
+<div class="topic">
+<p class="topic-title first">メモリ空間</p>
+<p>カーネル空間とユーザー空間に分かれている。</p>
+<dl class="docutils">
+<dt>__user</dt>
+<dd>include/linux/compiler.h</dd>
+<dt>__kernel</dt>
+<dd>include/linux/compiler.h</dd>
+</dl>
+<p>それぞれでメモリ管理をしているので仮想メモリ空間を指すことになる。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">copy_process (kernel/fork.c)</p>
+<p>親プロセスのtask_structをコピーしている。</p>
+<ul class="simple">
+<li>dup_task_structを呼んでる。</li>
+<li>sched_forkを呼んでる。</li>
+</ul>
+</div>
+<div class="topic">
+<p class="topic-title first">sched_fork (kernel/sched/core.c)</p>
+<p>プロセスが実行される前のスケジューラ周りのセットアップを行うみたい。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">dup_task_struct (kernel/fork.c)</p>
+<p>task_structのメモリ確保はkmem_cache_alloc_nodeで確保している。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">kmem_cache_alloc_node (include/kernel/slab.h)</p>
+<p>カーネル空間のメモリを確保する関数。メモリの種類がいろいろ選べるらしい。</p>
+<p><a class="reference external" href="http://www.mech.tohoku-gakuin.ac.jp/rde/contents/linux/drivers/tips1.html">http://www.mech.tohoku-gakuin.ac.jp/rde/contents/linux/drivers/tips1.html</a></p>
+<p>kmem_cache_alloc_node の node は tsk_fork_get_node から取ってきている。しかしnodeは無視されてしまう。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">tsk_fork_get_node (kernel/kthread.c)</p>
+<p>どうもNUMAアーキテクチャで気にするものらしい。</p>
+<p>NUMA は Non-Uniform Memory Access の略で、たしかそれぞれのプロセッサでメモリを持っていて、他のプロセッサが持っているメモリにアクセスするときは、そのプロセッサにお願いして読みに行くというアーキテクチャだったと思う。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">RCUとは</p>
+<p>リードコピーアップデート。Wikipedia参照。</p>
+<p>Writerはコピーを持って、Readerがすべて出て行った後に、そのコピーとのスワップを行う。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">get_cpu, put_cpu (include/linux/smp.h)</p>
+<dl class="docutils">
+<dt>get_cpu</dt>
+<dd>CPUの割り込みを禁止し、現在のCPUIDを返す。</dd>
+<dt>put_cpu</dt>
+<dd>CPUの割り込みを有効化。</dd>
+</dl>
+</div>
+<div class="topic">
+<p class="topic-title first">wake_up_new_task (kernel/sched/core.c)</p>
+<p>do_forkの中で呼び出される。スケジューラに実際に登録する？</p>
+</div>
+<div class="topic">
+<p class="topic-title first">do_execve (fs/exec.c)</p>
+<p>これは次回で。</p>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <a href="./2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html"><h1>Introduction to Domain TheoryのLecture1を読む</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2012/03/20</span>
@@ -181,51 +280,6 @@ git remote add origin &lt;自分のGitHubリポジトリでコピーしてきた
     </div>
 
 
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href="./2012/02/06/235454.html"><h1>HomebrewでクロスコンパイルできるGCCをビルドする</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2012/02/06</span>
-    <a href="./category/Articles.html" class="label label-info">Articles</a>
-</div>
-        </div>
-
-        <div><p>Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。</p>
-<div class="section" id="id1">
-<h2>結論</h2>
-<p><a class="reference external" href="https://gist.github.com/1751385">https://gist.github.com/1751385</a>のようなFormulaをつくればできます。このFormulaは<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html">http://pdos.csail.mit.edu/6.828/2011/xv6.html</a>をビルドするために、<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html">http://pdos.csail.mit.edu/6.828/2011/tools.html</a>の設定を参考にして書きました。</p>
-</div>
-<div class="section" id="id2">
-<h2>クロスコンパイラ……ぐぬぬ……</h2>
-<p>クロスコンパイラは、以前自分が某研究室で作っているMIPSライクなCPUを使ったマシンで動くアセンブラを書いたときにもビルドしたのですが、なぜか動かなかったりします。なんか検索してみると、動かない動かないと言っている人も結構いたりするので失敗しやすいのでしょう。今回は無事動くところまでこぎ着けました。</p>
-</div>
-<div class="section" id="homebrew">
-<h2>Homebrewでビルドするときの問題点</h2>
-<p>Homebrewは既にパッケージとして用意してくれているものについてはビルドしない方針なので、GCCをビルドしたりするFormulaはありません。なので適当にでっち上げる必要があります。いろいろな人が既にGCCのFormulaを書いているので、それを参考に書けば良いのですが、適当にクロスコンパイラのFormulaを書くと失敗します。</p>
-<p>GCCはコンパイルをした後に、binutilsを使ってバイナリをはき出します。なので、クロスコンパイルができるGCCをビルドするには、そのターゲットとなるプラットフォーム用のbinutilsが必要です。そのbinutilsのツールを探すのに、GCCはいろいろな場所をみてくれます。どこを探すかは<a class="reference external" href="http://gcc.gnu.org/install/configure.html#with-as">http://gcc.gnu.org/install/configure.html#with-as</a>に書いてあって、どうも
-i386-foo-bar-asというのをPATHをみて探してくれるようです。適当にbinutilsとGCCで同じTargetを指定すれば良さそうなかんじ。</p>
-<p>が、駄目。動きません。GCCのビルドは成功するのですが、そのGCCでなんかコンパイルしようとすると、どうもアセンブラがエラーを吐いているようです。実行されているコマンドを見てみると、システム組み込みのasを使っているようです。そりゃ駄目だ。</p>
-<p>こんなの絶対おかしいよ。ということで、GCCのソースを見てみることに。いろいろかけずり回った結果、<tt class="docutils literal">gcc/gcc.c</tt>の<tt class="docutils literal">find_a_file()</tt>あたりでファイルを探しているようなのですが、なんかi386-foo-barみたいなマシンターゲットをつけているようには見えないぞ。あやしい。ちなみにldのほうは<tt class="docutils literal">gcc/collect2.c</tt>の<tt class="docutils literal">main</tt>でそういうプレフィックスをつけていて、ファイルを探すのもasとは別のコードで行っている模様。</p>
-<p>どうも、ldについてはインストールマニュアルに書かれている通りに探してくれているみたいですが、asについてはなんか違うようです。</p>
-</div>
-<div class="section" id="id3">
-<h2>解決</h2>
-<p>GCCが正しいアセンブラを探してくれない。仕方がないので手動でアセンブラを指定することになります。ということで、<a class="reference external" href="https://gist.github.com/1751385#file_gcc_xv6.rb">https://gist.github.com/1751385#file_gcc_xv6.rb</a>のように汚い感じですが、アセンブラのパスを手動で指定してあげるようにします。このようにすると、うまくコンパイルができました。(ということは、ldについてはきちんと探してくれたようです……)</p>
-<p>もし、Xv6をコンパイルして動かしたい。しかも、Homebrewで必要なものをいれたい。ということであれば、次のようにすることでうまくインストールすることができます。
-QEMUはuse-gccを使わないとうまく動きませんでした:</p>
-<div class="highlight"><pre>brew install https://raw.github.com/gist/1751385/binutils_xv6.rb
-brew install https://raw.github.com/gist/1751385/gcc_xv6.rb
-brew install https://raw.github.com/gist/1751385/gdb_xv6.rb
-brew install qemu --use-gcc
-</pre></div>
-</div>
-</div>
-        <hr />
-    </div>
-
-
  
     <div class="pagination">
 <ul>
@@ -241,6 +295,8 @@ brew install qemu --use-gcc
     <li class=""><a href="./index3.html">3</a></li>
 
     <li class=""><a href="./index4.html">4</a></li>
+
+    <li class=""><a href="./index5.html">5</a></li>
 
 
 

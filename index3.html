@@ -28,6 +28,36 @@
 
     <div class='article'>
         <div class="content-title">
+            <a href="./2012/01/01/182705.html"><h1>配列はCovariantなので使ってはいけない</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/01/01</span>
+    <a href="./category/Java.html" class="label label-info">Java</a>
+</div>
+        </div>
+
+        <div><div class="section" id="id1">
+<h2>結論</h2>
+<p>配列はアレなので使ってはいけない。</p>
+</div>
+<div class="section" id="java">
+<h2>Javaの配列とは</h2>
+<p>Javaの配列はcovariantです。<tt class="docutils literal">Integer</tt>は<tt class="docutils literal">Number</tt>のサブクラスなんだから、<tt class="docutils literal">Integer[]</tt>も<tt class="docutils literal">Number[]</tt>のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。</p>
+<img alt="images/20120101171202.png" src="static/images/20120101171202.png" />
+<p>見た目の型は<tt class="docutils literal">Number</tt>の配列なのに、代入できる要素は<tt class="docutils literal">Integerの</tt>要素のみという配列が作れます。ここで、<tt class="docutils literal">Integer</tt>以外の要素を代入しようとすると、同じ<tt class="docutils literal">Number</tt>を継承している<tt class="docutils literal">Long</tt>でも実行時エラーになります。このときの<tt class="docutils literal">Number</tt>の配列の実体は、<tt class="docutils literal">Integer</tt>の配列ですから。</p>
+</div>
+<div class="section" id="id2">
+<h2>配列は使ってはいけない</h2>
+<p><a class="reference external" href="http://draftcode.github.com/2012/01/01/182300.html">先の記事</a>とあわせて、配列は使ってはいけない。</p>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <a href="./2011/12/29/145918.html"><h1>CPython2.7.2のWindowsでのmultiprocessingの動作</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2011/12/29</span>
@@ -112,138 +142,6 @@
     </div>
 
 
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href="./2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html"><h1>Writing Adblock Plus filters -- 日本語訳</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2011/03/22</span>
-    <a href="./category/Articles.html" class="label label-info">Articles</a>
-</div>
-        </div>
-
-        <div><p><a class="reference external" href="http://adblockplus.org/en/filters">Writing Adblock Plus filters</a>の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．</p>
-<p>あと，どうもURLとかフィルタルールが入っている関係で，レイアウトがすごくぐちゃぐちゃになります．それに加えて訳がいまいちなので，さらに読みづらい．超訳でもすればよかった……</p>
-<p>Adblock Plusの新しいバージョンでは，さまざまなほうほうでフィルタを「いじる」ことができるようになっています．ここでは，その方法と使い方について説明しています．</p>
-<p>免責事項: 例としてあげられているフィルタは，すべて単なる例として挙げており，使われることを意図しておりません．</p>
-<div class="section" id="introduction-to-adblock-plus-filters">
-<h2>Introduction to Adblock Plus filters</h2>
-<p>この章では，ときどきフィルタを書くようなユーザーにとって十分な方法を説明します．</p>
-<div class="section" id="basic-filter-rules">
-<h3>Basic filter rules</h3>
-<p>一番平凡なフィルタはブロックしたいバナーのアドレスを定義することでしょう．しかしながら，こういったアドレスはページを開く度に変わってしまうのがしばしばです．たとえば，<tt class="docutils literal"><span class="pre">http://example.com/ads/banner123.gif</span></tt>というアドレスで，<tt class="docutils literal">123</tt>の部分がランダムな数字であるようなものを考えてみましょう．このアドレスをそのままブロックするのでは，あまり役に立ちません．もっと一般的な形のフィルタ，<tt class="docutils literal"><span class="pre">http://example.com/ads/banner*.gif</span></tt>や<tt class="docutils literal"><span class="pre">http://example.com/ads/*</span></tt>のようなものが必要でしょう．</p>
-<p>Note: ワイルドカードを使うことで，ブロックしすぎないように注意してください．<tt class="docutils literal"><span class="pre">http://example.com/*</span></tt>というフィルタはすべてのバナーをブロックできるかもしれませんが，同時に，見たいものまでブロックしてしまうかもしれません．</p>
-</div>
-<div class="section" id="defining-exception-rules">
-<h3>Defining exception rules</h3>
-<p>だいたいの場合は非常によくブロックできるようなフィルタが，いくつかの場合ではブロックするべきでないものもブロックしてしまうことに気づくことがあるでしょう．そんなときは，そのフィルタを外したくはないですが，他方でそのいくつかの場合に対しては，マッチさせたくないと思うでしょう．</p>
-<p>その場合は例外ルール(exception rules)が最適です．これはフィルタを適用するべきでないケースを定義することができます．たとえば，<tt class="docutils literal">adv</tt>というフィルタが<tt class="docutils literal"><span class="pre">&quot;http://example.com/advice.html</span></tt>というアドレスもブロックしてしまうことが気に入らないとき，<tt class="docutils literal">&#64;&#64;advice</tt>という例外ルールを定義することによってそのアドレスがブロックされないようにすることができます．例外ルールは通常のルールと同じように記述でき，ワイルドカードや正規表現を使うことができます．定義する場合には<tt class="docutils literal">&#64;&#64;</tt>を先頭につけるだけで，そのルールは例外ルールになります．</p>
-<p>例外ルールは他の使い方もできます．もし例外ルールが&quot;<tt class="docutils literal"><span class="pre">http://</span></tt>や<tt class="docutils literal"><span class="pre">https://</span></tt>で始まっている場合(さらにその前にパイプ(<tt class="docutils literal">|</tt>)があってもかまいません)，そのルールはページ全体を例外とすることができます．たとえば，<tt class="docutils literal"><span class="pre">&#64;&#64;|http://example.com</span></tt>という例外ルールがあった場合，<tt class="docutils literal">example.com</tt>のすべてのページでAdblock Plusは無効化され，何もブロックされなくなります．</p>
-</div>
-<div class="section" id="matching-at-beginning-end-of-an-address">
-<h3>Matching at beginning/end of an address</h3>
-<p>通常の場合，Adblock Plusはすべてのフィルタを，最初と最後にワイルドカードがあるものとして扱います．つまり，<tt class="docutils literal">ad</tt>と<tt class="docutils literal">*ad*</tt>という二つのフィルタには違いがないということです．だいたいの場合はこの動作が問題を起こすことはないですが，ときどき，フィルタがアドレスの最初または最後にのみマッチしてほしい場合があるでしょう．たとえば，すべてのFlashコンテンツをブロックしたいとして，<tt class="docutils literal">swf</tt>のようなフィルタを追加した場合，<tt class="docutils literal"><span class="pre">http://example.com/swf/index.html</span></tt>というアドレスもブロックされてしまいます．</p>
-<p>この問題はフィルタにパイプ(<tt class="docutils literal">|</tt>)をつけることで解決できます．たとえば<tt class="docutils literal">swf|</tt>というフィルタは，<tt class="docutils literal"><span class="pre">http://example.com/annoyingflash.swf</span></tt>というアドレスはブロックしますが，<tt class="docutils literal"><span class="pre">http://example.com/swf/index.html</span></tt>というアドレスはブロックしません．また，<tt class="docutils literal"><span class="pre">|http://baddomain.example/</span></tt>というフィルタは，<tt class="docutils literal"><span class="pre">http://baddomain.example/banner.gif</span></tt>はブロックしますが，<tt class="docutils literal"><span class="pre">http://gooddomain.example/analyze?http://baddomain.example</span></tt>はブロックしません．</p>
-<p>ときには<tt class="docutils literal"><span class="pre">http://example.com/banner.gif</span></tt>や<tt class="docutils literal"><span class="pre">https://example.com/banner.gif</span></tt>，<tt class="docutils literal"><span class="pre">http://www.example.com/banner.gif</span></tt>というようなアドレスをブロックしたいこともあるでしょう．これには二つのパイプをフィルタの先頭につけることで達成できます．このようにすることにより，ドメイン名の先頭からマッチするように指定することができます．<tt class="docutils literal">||example.com/banner.gif</tt>というフィルタは先の3つのアドレスすべてをブロックすると同時に，<tt class="docutils literal"><span class="pre">http://badexample.com/banner.gif</span></tt>や<tt class="docutils literal"><span class="pre">http://gooddomain.example/analyze?http://example.com/banner.gif</span></tt>といったアドレスはブロックしません．(Adblock Plus 1.1以上のバージョンが必要です．)</p>
-</div>
-<div class="section" id="marking-separator-characters">
-<h3>Marking separator characters</h3>
-<p>しばしばフィルタの中で分割文字(separator character)を含めなければならない場合があります．たとえば，<tt class="docutils literal"><span class="pre">http://example.com/</span></tt>と<tt class="docutils literal"><span class="pre">http://example.com:8000/</span></tt>はブロックしたいが，<tt class="docutils literal"><span class="pre">http://example.com.ar/</span></tt>はブロックしたくないとしましょう．この場合は記号<tt class="docutils literal">^</tt>を分割文字のプレースホルダーとして用いることができます．この場合フィルタは<tt class="docutils literal"><span class="pre">http://example.com^</span></tt>のようになります．</p>
-<p>分割文字は英数字と<tt class="docutils literal">_</tt>，<tt class="docutils literal">-</tt>，<tt class="docutils literal">-</tt>，<tt class="docutils literal">%</tt>以外の文字すべてです．アドレスの最後も分割文字としてマッチします．分割文字をハイライトすると，<tt class="docutils literal"><span class="pre">http:**//**example.com**:**8000**/**foo.bar**?**a**=**12**&amp;**b**=**%D1%82%D0%B5%D1%81%D1%82</span></tt>のようになります．このアドレスをブロックするならば，<tt class="docutils literal">^example.com^</tt>や，<tt class="docutils literal">^%D1%82%D0%B5%D1%81%D1%82^</tt>，<tt class="docutils literal">foo.bar</tt>のようなフィルタが有効です．</p>
-</div>
-<div class="section" id="comments">
-<h3>Comments</h3>
-<p>エクスクラメーションマークで始まるルールはコメントとして扱われます．コメントはフィルタリストの中で，黒でなくグレーで表示されます．Adblock Plusはこのルールを無視するので，ここには何を書いても大丈夫です．フィルタの上に，そのフィルタが何をするかの説明を書いたり，フィルタリストの先頭にそれを作った作者について書くことができます．(多くのフィルタリストの作者はそうしています．)</p>
-</div>
-<div class="section" id="advanced-features">
-<h3>Advanced features</h3>
-<p>この節で説明している機能は，通常はパワーユーザーやフィルタリストの作成者にしか使われないので，スキップされてもかまいません．</p>
-<div class="section" id="specifying-filter-options">
-<h4>Specifying filter options</h4>
-<p>Adblock Plusはフィルタの動作を変える，多くのオプションを指定することができます．これらのオプションを指定するときは，フィルタの最後に<tt class="docutils literal">$</tt>をつけて，カンマ区切りで並べます．たとえば<tt class="docutils literal"><span class="pre">*/ads/*$script,match-case</span></tt>のようになります．このとき，<tt class="docutils literal">*/ads/*</tt>がフィルタで，<tt class="docutils literal">script</tt>と<tt class="docutils literal"><span class="pre">match-case</span></tt>がそのオプションになります．現在は次のようなオプションがサポートされています:</p>
-<ul class="simple">
-<li>Type options: そのフィルタがどんな種類の要素をブロックするか(または，例外ルールの場合はホワイトリストに追加するか)を指定します．複数の種類を指定すると，指定した種類すべてにそのフィルタが適用されます．指定できる値は次の通りです．<ul>
-<li><tt class="docutils literal">script</tt>-- HTMLのスクリプトタグによって読み込まれる外部スクリプト</li>
-<li><tt class="docutils literal">image</tt>-- HTMLのimgタグによって読み込まれるような普通の画像</li>
-<li><tt class="docutils literal">background</tt>-- CSSで指定されるような背景画像</li>
-<li><tt class="docutils literal">stylesheet</tt>-- 外部のCSSファイル</li>
-<li><tt class="docutils literal">object</tt>-- FlashやJavaアプレットのようなブラウザのプラグインによるコンテンツ</li>
-<li><tt class="docutils literal">xbl</tt>-- XBLによるバインド(通常，CSSの<tt class="docutils literal"><span class="pre">-moz-binding</span></tt>によって読み込まれる)</li>
-<li><tt class="docutils literal">ping</tt>--<a class="reference external" href="http://weblogs.mozillazine.org/darin/archives/009594.html">link pings</a></li>
-<li><tt class="docutils literal">xmlhttprequest</tt>--<a class="reference external" href="http://www.w3.org/TR/XMLHttpRequest/">XMLHttpRequest</a>オブジェクトによるリクエスト</li>
-<li><tt class="docutils literal"><span class="pre">object-subrequest</span></tt>-- Flashのようなプラグインによるリクエスト</li>
-<li><tt class="docutils literal">dtd</tt>-- XML文章によって読み込まれるDTDファイル</li>
-<li><tt class="docutils literal">subdocument</tt>-- HTMLのフレームによって読み込まれる埋め込みページ</li>
-<li><tt class="docutils literal">document</tt>-- ページ自身(例外ルールのみがページに適用されます)</li>
-<li><tt class="docutils literal">elemhide</tt>--<tt class="docutils literal">document</tt>と似ていますがページ内の要素除去ルール
-(element hiding rules)のみ無効になります(このオプションを指定できるのは例外ルールのみ)(Adblock Plus 1.2以上のバージョンが必要です)</li>
-<li><cite>other</cite>-- このリストで挙げられているもの以外すべて</li>
-</ul>
-</li>
-<li>Inverse type options: フィルタが適用されるべきでない要素の種類を指定します．指定できる値は次の通りです．<tt class="docutils literal">~script</tt>，<tt class="docutils literal">~image</tt>，<tt class="docutils literal">~background</tt>，<tt class="docutils literal">~stylesheet</tt>，<tt class="docutils literal">~object</tt>，<tt class="docutils literal">~xbl</tt>，<tt class="docutils literal">~ping</tt>，<tt class="docutils literal">~xmlhttprequest</tt>，<tt class="docutils literal"><span class="pre">~object-subrequest</span></tt>，<tt class="docutils literal">~dtd</tt>，<tt class="docutils literal">~subdocument</tt>，<tt class="docutils literal">~document</tt>，<tt class="docutils literal">~elemhide</tt>，<tt class="docutils literal">~other</tt>．</li>
-<li>Restriction to third-party/first-party requests:<tt class="docutils literal"><span class="pre">third-party</span></tt>オプションが指定されている場合，現在見ているページと違うところの要素にのみ，そのフィルタが適用されます．同様に，<tt class="docutils literal"><span class="pre">~third-party</span></tt>オプションが指定されていた場合は，現  在見ているページと同じところの要素にのみ，そのフィルタが適用されます．(訳注:  たぶん同じところ(origin)って同じドメインとかだと思うんですが，よくわかりません．)</li>
-<li>Domain restrictions:<tt class="docutils literal">domain=example.com</tt>のようなオプションが指定されている場合，そのフィルタは<tt class="docutils literal">example.com</tt>のドメインのページにのみ適用されます．<tt class="docutils literal">domain=example.com|example.net</tt>のように，パイプを区切り文字にして複数のドメインを指定することができます．この場合は，<tt class="docutils literal">example.com</tt>と<tt class="docutils literal">example.net</tt>のページに適用されます．ドメイン名が<tt class="docutils literal">~</tt>で始まっている場合，そのドメインでは適用されないようになります．たとえば，<tt class="docutils literal"><span class="pre">domain=~example.com</span></tt>は，<tt class="docutils literal">example.com</tt>以外のドメインのページで適用するという意味になります．<tt class="docutils literal"><span class="pre">domain=example.com|~foo.example.com</span></tt>は，<tt class="docutils literal">example.com</tt>のドメインのページで適用するが，サブドメイン<tt class="docutils literal">foo.example.com</tt>は例外として適用しないということになります．</li>
-<li><tt class="docutils literal"><span class="pre">match-case</span></tt>-- フィルタが大文字と小文字を区別するようになります．たとえば，<tt class="docutils literal"><span class="pre">*/BannerAd.gif$match-case</span></tt>というフィルタは，<tt class="docutils literal"><span class="pre">http://example.com/BannerAd.gif</span></tt>はブロックしますが，<tt class="docutils literal"><span class="pre">http://example.com/bannerad.gif</span></tt>はブロックしません．</li>
-<li><tt class="docutils literal">collapse</tt>-- このオプションは，全体の<tt class="docutils literal">Collapse blocked elements</tt>を上書きし，フィルタがブロックした要素を折りたたむようにします．同様に，<tt class="docutils literal">~collapse</tt>は要素が折りたたまれないようにします．</li>
-</ul>
-</div>
-<div class="section" id="using-regular-expressions">
-<h4>Using regular expressions</h4>
-<p>フィルタがマッチする，しないについて，より細かい制御をしたい場合は，正規表現を使うことができます．たとえば，<tt class="docutils literal">/banner\d+</tt>というフィルタは<tt class="docutils literal">banner123</tt>や<tt class="docutils literal">banner321</tt>にはマッチしますが，<tt class="docutils literal">banner</tt>にはマッチしません．正規表現の書き方については<cite>正規表現についてのドキュメント</cite>を参照してください．</p>
-<p>Note: パフォーマンス上の理由から，正規表現を使わなくてもよいなら使わないことをおすすめします．</p>
-</div>
-</div>
-</div>
-<div class="section" id="element-hiding">
-<h2>Element hiding</h2>
-<div class="section" id="basic-rules">
-<h3>Basic rules</h3>
-<p>広告がウェブページの中に，テキストとして埋め込まれているために，ブロックできないことがあるでしょう．そういったページのソースコードを見ると，次のようになっています:</p>
-<div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;textad&quot;</span><span class="nt">&gt;</span>
-Cheapest tofu, only here and now!
-<span class="nt">&lt;/div&gt;</span>
-
-<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;sponsorad&quot;</span><span class="nt">&gt;</span>
-Really cheap tofu, click here!
-<span class="nt">&lt;/div&gt;</span>
-
-<span class="nt">&lt;textad&gt;</span>
-Only here you get the best tofu!
-<span class="nt">&lt;/textad&gt;</span>
-</pre></div>
-<p>ウェブページを読み込むと一緒に広告まで読み込まれてしまいます．こういったときには，広告を隠すことしかできません．そのために，要素を隠すことが必要になります．</p>
-<p>上の例の最初の広告は，<tt class="docutils literal">textad</tt>というクラスの<tt class="docutils literal">div</tt>要素の中に入っています．このような広告は<tt class="docutils literal">##div.textad</tt>のようなルールで隠すことができます．この<tt class="docutils literal">##</tt>というマークは要素除去ルールであることを示していて，それいがいは隠すべき要素を指定するセレクタになっています．要素は<tt class="docutils literal">id</tt>を使うことによっても隠すことができます．<tt class="docutils literal">##div#sponsorad</tt>は二番目のような広告を隠すことができます．要素名は指定しなくてもかまいません．<tt class="docutils literal"><span class="pre">##*#sponsorad</span></tt>というルールも同じように働きます．また，要素名のみ指定することもできます．<tt class="docutils literal">##textad</tt>というルールは三番目のような広告を隠します．</p>
-<p><a class="reference external" href="http://adblockplus.org/en/elemhidehelper">Element Hiding Helper extension</a>は適切な要素を選び出し，対応したルールを書くことを，ソースコードを見ることなしにできるよう手助けをしてくれます．とは言っても，基本的なHTMLについての知識はあったほうがよいでしょう．</p>
-<p>Note: 要素除去は通常のフィルタとは全く違った動きをします．要素除去ルールではワイルドカードが使えないことに注意してください．</p>
-</div>
-<div class="section" id="limiting-rules-to-certain-domains">
-<h3>Limiting rules to certain domains</h3>
-<p>たいていの場合，要素除去ルールは特定のサイトのみに適用して，それ以外のサイトでは適用されないようにしたいでしょう．たとえば<tt class="docutils literal"><span class="pre">##*.sponsor</span></tt>というルールはいくつかのサイトでは広告ではない要素も隠してしまうかもしれません．これを<tt class="docutils literal"><span class="pre">example.com##*.sponsor</span></tt>というように変えることで，このルールが<tt class="docutils literal"><span class="pre">http://example.com/</span></tt>や<tt class="docutils literal"><span class="pre">http://something.example.com/</span></tt>で適用されるようになり，同時に<tt class="docutils literal"><span class="pre">http://example.org/</span></tt>では適用されないようになります．ドメインはカンマで区切ることで複数指定することができます．<tt class="docutils literal"><span class="pre">domain1.example.com,domain2.example,domain3.example##*.sponsor</span></tt></p>
-<p>ドメイン名が<tt class="docutils literal">~</tt>で始まっている場合，そのルールはそのドメイン上のページでは適用されなくなります．(Adblock Plus 1.1以上のバージョンが必要です．)たとえば，<tt class="docutils literal"><span class="pre">~example.com##*.sponsor</span></tt>は<tt class="docutils literal">example.com</tt>以外のドメインすべてで適用されるようになり，<tt class="docutils literal"><span class="pre">example.com,~foo.example.com##*.sponsor</span></tt>は<tt class="docutils literal">foo.example.com</tt>を除いた<tt class="docutils literal">example.com</tt>上で適用されるようになります．</p>
-<p>Note: 要素除去の実装方法の関係で，フルドメイン名しか指定することができません．つまり，<tt class="docutils literal">domain</tt>という指定によって，<tt class="docutils literal">domain.example</tt>や<tt class="docutils literal">domain.test</tt>のようなドメインを対象にすることはできません．</p>
-<p>Note: ドメイン指定をした要素除去ルールは，ブラウザのユーザーインターフェースにも使うことができます．たとえば，<tt class="docutils literal"><span class="pre">browser##menuitem#javascriptConsole</span></tt>は
-FirefoxのToolメニューにあるJavascript Consoleを隠します．</p>
-</div>
-<div class="section" id="attribute-selectors">
-<h3>Attribute selectors</h3>
-<p><tt class="docutils literal">id</tt>や<tt class="docutils literal">class</tt>も無いような要素は除去するのが難しいかもしれません．このときは他の属性を指定することができます．たとえば，<tt class="docutils literal"><span class="pre">##table[width=&quot;80%&quot;]</span></tt>というルールは<tt class="docutils literal">width</tt>が<tt class="docutils literal">80%</tt>に指定されているようなテーブルを隠します．属性の値を完全に指定しなくてもかまいません．<tt class="docutils literal"><span class="pre">##div[title*=&quot;adv&quot;]</span></tt>というルールは<tt class="docutils literal">title</tt>の中に<tt class="docutils literal">adv</tt>という文字列が入っているような<tt class="docutils literal">div</tt>要素を隠します．属性の値は先頭や末尾にもマッチさせることができます．<tt class="docutils literal"><span class="pre">##div[title^=&quot;adv&quot;][title$=&quot;ert&quot;]</span></tt>といったフィルタは，<tt class="docutils literal">title</tt>が<tt class="docutils literal">adv</tt>で始まり<tt class="docutils literal">ert</tt>で終わるような<tt class="docutils literal">div</tt>要素を隠します．また，このように複数の条件を使うことができます．<tt class="docutils literal"><span class="pre">table[width=&quot;80%&quot;][bgcolor=&quot;white&quot;]</span></tt>は，<tt class="docutils literal">width</tt>が<tt class="docutils literal">80%</tt>かつ，<tt class="docutils literal">bgcolor</tt>が<tt class="docutils literal">white</tt>であるようなテーブルを隠します．</p>
-</div>
-<div class="section" id="advanced-selectors">
-<h3>Advanced selectors</h3>
-<p>FirefoxでサポートされているCSSセレクタは要素除去ルールでも使うことができます．<tt class="docutils literal">##div.adheader + *</tt>というルールは<tt class="docutils literal">adheader</tt>クラスの<tt class="docutils literal">div</tt>要素に続く，すべての要素を隠します．CSSセレクタのすべてのリストは，<a class="reference external" href="http://www.w3.org/TR/css3-selectors/">W3C CSS
-specification</a>で見ることができます．(すべてのセレクタがFirefoxでサポートされているわけではないことに注意してください)</p>
-</div>
-<div class="section" id="simplified-element-hiding-syntax">
-<h3>Simplified element hiding syntax</h3>
-<p>Adblock Plusでは，後方互換性のために，<tt class="docutils literal">#div(id=foo)</tt>のような単純な要素除去ルールをサポートしています．このような書き方は推奨しておらず，CSSセレクタによる方法を推奨しています．この書き方は将来のどこかのタイミングで無効になる予定です．</p>
-</div>
-</div>
-</div>
-        <hr />
-    </div>
-
-
  
     <div class="pagination">
 <ul>
@@ -260,6 +158,8 @@ specification</a>で見ることができます．(すべてのセレクタがFi
     <li class="active"><a href="./index3.html">3</a></li>
 
     <li class=""><a href="./index4.html">4</a></li>
+
+    <li class=""><a href="./index5.html">5</a></li>
 
 
 
