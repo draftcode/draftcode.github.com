@@ -63,7 +63,9 @@
 &lt;div class="topic"&gt;
 &lt;p class="topic-title first"&gt;RCUとは&lt;/p&gt;
 &lt;p&gt;リードコピーアップデート。Wikipedia参照。&lt;/p&gt;
-&lt;p&gt;Writerはコピーを持って、Readerがすべて出て行った後に、そのコピーとのスワップを行う。&lt;/p&gt;
+&lt;p&gt;どうも、Writerが入るときに、コピーを作ってそっちの方を指すようにする。で、
+Readerは読み終わったら上手いことやって、さっきまで見ていた複製元が既に不要になっていたら破棄するようにするものらしい。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://togetter.com/li/153033"&gt;http://togetter.com/li/153033&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="topic"&gt;
 &lt;p class="topic-title first"&gt;get_cpu, put_cpu (include/linux/smp.h)&lt;/p&gt;
