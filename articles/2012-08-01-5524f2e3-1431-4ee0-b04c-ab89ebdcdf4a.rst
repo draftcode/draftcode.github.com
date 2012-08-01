@@ -8,6 +8,8 @@
 `第(1+1)回 六本木 Linux カーネル読書会`_ に行ってきたので、そのときのメモ。あ
 まりメモがとれていない。今回はforkとかcloneあたり。
 
+後で調べたこともいくつか追加している。
+
 .. _`第(1+1)回 六本木 Linux カーネル読書会`: http://connpass.com/event/824/
 
 .. topic:: do_fork (kernel/fork.c)
@@ -109,4 +111,27 @@
 .. topic:: do_execve (fs/exec.c)
 
     これは次回で。
+
+.. topic:: Buddy memory allocation と Slab allocator
+
+    kmem_cache_alloc_node が定義されているのはslab.hなので、slabとは何か調べ
+    た。
+
+    Buddy memory allocationというメモリアロケーションメカニズムがあって、詳し
+    くはわからないけれど、ページ*2^n単位でメモリを確保していくようなものらし
+    い。これで切り取れるのはページ数単位なので、小さいオブジェクトを確保するの
+    には向いていない。なので間にSlab allocatorというものが入って、小さいオブ
+    ジェクトを切り出していきましょうという仕組みらしい。mallocと変わらない？
+    いくつかの最適化もされるらしい。
+
+    * http://en.wikipedia.org/wiki/Buddy_memory_system
+    * http://wiki.bit-hive.com/linuxkernelmemo/pg/%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF
+
+    そもそもスラブというものが何かというと、同じサイズのオブジェクトを切り出す
+    ためのメモリのことらしい。
+
+    http://wiki.bit-hive.com/north/pg/kmalloc(%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF)
+
+    スラブの割り当て状況みたいなのは/proc/slabinfoで参照できるらしく、さらに
+    topみたいなslabtopというコマンドもある。
 
