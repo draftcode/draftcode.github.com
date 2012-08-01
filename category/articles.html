@@ -36,6 +36,7 @@
         </div>
 
         <div><p><a class="reference external" href="http://connpass.com/event/824/">第(1+1)回 六本木 Linux カーネル読書会</a>に行ってきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあたり。</p>
+<p>後で調べたこともいくつか追加している。</p>
 <div class="topic">
 <p class="topic-title first">do_fork (kernel/fork.c)</p>
 <p>do_forkはsys_cloneやsys_vfork、sys_forkから呼ばれる。</p>
@@ -119,6 +120,19 @@ Readerは読み終わったら上手いことやって、さっきまで見て�
 <div class="topic">
 <p class="topic-title first">do_execve (fs/exec.c)</p>
 <p>これは次回で。</p>
+</div>
+<div class="topic">
+<p class="topic-title first">Buddy memory allocation と Slab allocator</p>
+<p>kmem_cache_alloc_node が定義されているのはslab.hなので、slabとは何か調べた。</p>
+<p>Buddy memory allocationというメモリアロケーションメカニズムがあって、詳しくはわからないけれど、ページ*2^n単位でメモリを確保していくようなものらしい。これで切り取れるのはページ数単位なので、小さいオブジェクトを確保するのには向いていない。なので間にSlab allocatorというものが入って、小さいオブジェクトを切り出していきましょうという仕組みらしい。mallocと変わらない？いくつかの最適化もされるらしい。</p>
+<ul class="simple">
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Buddy_memory_system">http://en.wikipedia.org/wiki/Buddy_memory_system</a></li>
+<li><a class="reference external" href="http://wiki.bit-hive.com/linuxkernelmemo/pg/%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF">http://wiki.bit-hive.com/linuxkernelmemo/pg/%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF</a></li>
+</ul>
+<p>そもそもスラブというものが何かというと、同じサイズのオブジェクトを切り出すためのメモリのことらしい。</p>
+<p><a class="reference external" href="http://wiki.bit-hive.com/north/pg/kmalloc(%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF">http://wiki.bit-hive.com/north/pg/kmalloc(%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF</a>)</p>
+<p>スラブの割り当て状況みたいなのは/proc/slabinfoで参照できるらしく、さらに
+topみたいなslabtopというコマンドもある。</p>
 </div>
 </div>
         <hr />
