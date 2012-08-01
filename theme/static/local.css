@@ -24,6 +24,9 @@ a:hover { color: #191b28; }
 .article .metadata::after { clear: both; }
 .article hr { border: 2px solid #272822; }
 .article pre { padding: 10px; }
+.article dd { margin-left: 25px; }
+.article div.topic > * { padding-left: 30px; }
+.article div.topic > p.topic-title { padding-left: 0px; font-weight: bold; font-size: large; }
 
 /* Styling for Sidebar */
 #social a[href*='activestate.com']:before {content: url('./images/icons/activestate.png'); margin-right: 2px; vertical-align: -3px;}

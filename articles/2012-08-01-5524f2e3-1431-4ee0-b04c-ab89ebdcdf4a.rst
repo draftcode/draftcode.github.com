@@ -1,0 +1,109 @@
+==============================================
+第(1+1)回 六本木 Linux カーネル読書会 参加メモ
+==============================================
+:Author: draftcode
+:Date:   2012-08-01 19:58:25
+:Slug:   5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a
+
+`第(1+1)回 六本木 Linux カーネル読書会`_ に行ってきたので、そのときのメモ。あ
+まりメモがとれていない。今回はforkとかcloneあたり。
+
+.. _`第(1+1)回 六本木 Linux カーネル読書会`: http://connpass.com/event/824/
+
+.. topic:: do_fork (kernel/fork.c)
+
+    do_forkはsys_cloneやsys_vfork、sys_forkから呼ばれる。
+
+    sys_clone
+      arch/x86/kernel/process.c
+    sys_vfork
+      arch/x86/kernel/process.c
+    sys_fork
+      arch/x86/kernel/process.c
+    task_struct
+      include/linux/sched.h
+
+.. topic:: vfork
+
+    古いBSDでfork & execを効率的に行うための仕組み。現在では使われていない。
+
+    古いBSDだと、メモリ空間がCopy on Writeではなくて、fork時にコピーするように
+    なっているらしい。このため、fork & execをやろうとすると、無駄にメモリ空間
+    のコピーが走ってしまう。これを防ぐために、vforkというものが生まれた。vfork
+    は子プロセスが親プロセスのメモリ空間を使って動く。このままだと、親プロセス
+    と子プロセスのスタックも共有してしまうので、まず、親プロセスを停止し、次に
+    子プロセスを動かす。子プロセスがexecveを呼ぶかexitするまで、親プロセスは停
+    止する。親プロセスのメモリ空間を利用するため、子プロセスの動きが大きく制約
+    される。
+
+    http://surf.ml.seikei.ac.jp/~nakano/JMwww/html/LDP_man-pages/man2/vfork.2.html
+
+    現代的なプログラムではvforkは使ってはいけない。
+
+    http://www.jpcert.or.jp/sc-rules/c-pos33-c.html
+
+.. topic:: メモリ空間
+
+    カーネル空間とユーザー空間に分かれている。
+
+    __user
+      include/linux/compiler.h
+    __kernel
+      include/linux/compiler.h
+
+    それぞれでメモリ管理をしているので仮想メモリ空間を指すことになる。
+
+.. topic:: copy_process (kernel/fork.c)
+
+    親プロセスのtask_structをコピーしている。
+
+    * dup_task_structを呼んでる。
+    * sched_forkを呼んでる。
+
+.. topic:: sched_fork (kernel/sched/core.c)
+
+    プロセスが実行される前のスケジューラ周りのセットアップを行うみたい。
+
+.. topic:: dup_task_struct (kernel/fork.c)
+
+    task_structのメモリ確保はkmem_cache_alloc_nodeで確保している。
+
+.. topic:: kmem_cache_alloc_node (include/kernel/slab.h)
+
+    カーネル空間のメモリを確保する関数。メモリの種類がいろいろ選べるらしい。
+
+    http://www.mech.tohoku-gakuin.ac.jp/rde/contents/linux/drivers/tips1.html
+
+    kmem_cache_alloc_node の node は tsk_fork_get_node から取ってきている。
+    しかしnodeは無視されてしまう。
+
+.. topic:: tsk_fork_get_node (kernel/kthread.c)
+
+    どうもNUMAアーキテクチャで気にするものらしい。
+
+    NUMA は Non-Uniform Memory Access の略で、たしかそれぞれのプロセッサでメモ
+    リを持っていて、他のプロセッサが持っているメモリにアクセスするときは、その
+    プロセッサにお願いして読みに行くというアーキテクチャだったと思う。
+
+.. topic:: RCUとは
+
+    リードコピーアップデート。Wikipedia参照。
+
+    Writerはコピーを持って、Readerがすべて出て行った後に、そのコピーとのスワッ
+    プを行う。
+
+.. topic:: get_cpu, put_cpu (include/linux/smp.h)
+
+    get_cpu
+      CPUの割り込みを禁止し、現在のCPUIDを返す。
+    put_cpu
+      CPUの割り込みを有効化。
+
+.. topic:: wake_up_new_task (kernel/sched/core.c)
+
+    do_forkの中で呼び出される。スケジューラに実際に登録する？
+
+.. topic:: do_execve (fs/exec.c)
+
+    これは次回で。
+
