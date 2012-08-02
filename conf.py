@@ -17,7 +17,7 @@ DEFAULT_PAGINATION = 3
 ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}.html'
 ARTICLE_SAVE_AS = ARTICLE_URL
 
-FEED = "atom.xml"
+FEED_ATOM = "atom.xml"
 FEED_DOMAIN = "http://draftcode.github.com/"
 
 DEFAULT_LANG = 'ja'
