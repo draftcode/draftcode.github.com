@@ -28,6 +28,67 @@
 
     <div class='article'>
         <div class="content-title">
+            <a href="./2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html"><h1>RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/09/23</span>
+    <a href="./category/Android.html" class="label label-info">Android</a>
+</div>
+        </div>
+
+        <div><p>RoboGuiceのInjectなんとか系は記述量が減ってテストもしやすくなって便利ですが、残念ながらInjectExtraだけはイマイチと言わざるを得ません。使っているバーションは、RoboGuice 1.1.2とGuice 2.0 no-aopで、Robolectricでテストを書いたりしています。もしかしたら、RoboGuice 2.0で解消されているのかも知れません。</p>
+<div class="section" id="id1">
+<h2>問題背景</h2>
+<p>まず、実機で動くコードでは、<tt class="docutils literal">RoboActivity.onCreate()</tt>の中でInjectionが行われます。このとき、<tt class="docutils literal">InjectView</tt>以外のフィールドがInjectされます。その中には当然<tt class="docutils literal">InjectExtra</tt>も入っていますので、ここでそのInjectionのContextである
+ActivityからIntentがとり出されて、Extraが入ります:</p>
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">SOME_EXTRA_ID</span> <span class="o">=</span> <span class="s">&quot;SOME_EXTRA_ID&quot;</span><span class="o">;</span>
+<span class="nd">@InjectExtra</span><span class="o">(</span><span class="n">SOME_EXTRA_ID</span><span class="o">)</span>
+<span class="kt">int</span> <span class="n">someExtra</span><span class="o">;</span>
+</pre></div>
+<p>次に、テストコードの中で、クラス中にテスト対象のActivityをInjectしているとします。このとき、Activityに<tt class="docutils literal">InjectExtra</tt>が入っているとInjectionに失敗してしまいます。失敗する理由としては、次の2つが挙げられます。</p>
+<ol class="arabic simple">
+<li>Injectionを行うActivityにIntentがセットされていないこと。</li>
+<li>Injectionを行うScopeが<tt class="docutils literal">ContextScope</tt>ではないこと。特に、Activityの<tt class="docutils literal">ContextScope</tt>ではないこと。</li>
+</ol>
+</div>
+<div class="section" id="id2">
+<h2>解決策</h2>
+<p>この2つを回避するために、それなりに現実的な方法で対処をしてみようと試みましたが、根本的に実際に実機で動くときのコードとテスト中のコードでInjectionタイミングが違うことが問題なので、上手く行きませんでした。Activityはどこかほかのオブジェクトの中でInjectされることを、あまり想定していないのです。</p>
+<p>大掛かりな解決策としては、<tt class="docutils literal">ExtrasListener</tt>と<tt class="docutils literal">ContextScope</tt>を変更して、<tt class="docutils literal">InjectExtra</tt>が処理されるタイミングを変更するというものがありますが、そこまでして<tt class="docutils literal">InjectExtra</tt>を使いたくありません。</p>
+<p>大掛かりな解決策を取らずに<tt class="docutils literal">InjectExtra</tt>を利用したActivityに対してテストを書くのであれば、ActivityはテストコードでのInjecされないようにして、<tt class="docutils literal">setUp</tt>の中で手動Injectするしかありません。その手動Injectを行う場合には、自分でそのActivityの<tt class="docutils literal">ContextScope</tt>を生成して、その中で<tt class="docutils literal">injectMembers</tt>を行う必要があります。この方法を取ると、一見、テストコード中の<tt class="docutils literal">InjectView</tt>が効かなくなりそうですが、どうやら<tt class="docutils literal">ContextScope</tt>のスタックがきちんとしているのか、そのActivityが<tt class="docutils literal">setContentView</tt>をしたときに、きちんとInjectionされます:</p>
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">TEST_EXTRA</span> <span class="o">=</span> <span class="mi">42</span><span class="o">;</span>
+
+<span class="nd">@Inject</span>
+<span class="n">Injector</span> <span class="n">injector</span><span class="o">;</span>
+<span class="nd">@InjectView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">myButton</span><span class="o">)</span>
+<span class="n">Button</span> <span class="n">myButton</span><span class="o">;</span>
+
+<span class="kd">private</span> <span class="n">MyActivity</span> <span class="n">activity</span><span class="o">;</span>
+
+<span class="nd">@Before</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="n">activity</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyActivity</span><span class="o">();</span>
+    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">();</span>
+    <span class="n">intent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="n">MyActivity</span><span class="o">.</span><span class="na">SOME_EXTRA_ID</span><span class="o">,</span> <span class="n">TEST_EXTRA</span><span class="o">);</span>
+    <span class="n">activity</span><span class="o">.</span><span class="na">setIntent</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+
+    <span class="n">ContextScope</span> <span class="n">scope</span> <span class="o">=</span> <span class="n">injector</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="n">ContextScope</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="n">scope</span><span class="o">.</span><span class="na">enter</span><span class="o">(</span><span class="n">activity</span><span class="o">);</span>
+    <span class="n">injector</span><span class="o">.</span><span class="na">injectMembers</span><span class="o">(</span><span class="n">activity</span><span class="o">);</span>
+    <span class="n">scope</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="n">activity</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+<p><tt class="docutils literal">ContextScope</tt>周りは、RoboGuice 2.0では多少改善されているのは確認できました。<tt class="docutils literal">RoboGuice.injectMembers(Context, T)</tt>というメソッドが存在するのが確認できました。</p>
+<p>もうひとつの解決策は、もう<tt class="docutils literal">InjectExtra</tt>を使わないという方法で、自分はもうこっちの方法でいいかなと思っています。</p>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <a href="./2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html"><h1>第(1+1)回 六本木 Linux カーネル読書会 参加メモ</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2012/08/01</span>
@@ -241,61 +302,6 @@ F(N, M) =   1 (if M = 1)
     </div>
 
 
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href="./2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html"><h1>PelicanとGitHub Pagesを使う</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2012/03/16</span>
-    <a href="./category/Articles.html" class="label label-info">Articles</a>
-</div>
-        </div>
-
-        <div><p>reStructuredTextが使いたかったので、Pythonで書かれてる<a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html">Pelican</a>という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。</p>
-<div class="section" id="id1">
-<h2>Pelican</h2>
-<p>最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
-Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みのやつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので気に入って使っています。</p>
-<p>自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。開発中のバージョンを使うにはこれだけでOK:</p>
-<div class="highlight"><pre>git clone https://github.com/ametaireau/pelican.git
-cd pelican
-python setup.py develop
-</pre></div>
-<p>こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになります。</p>
-</div>
-<div class="section" id="github-pages">
-<h2>GitHub Pages</h2>
-<p>なんかGitHubには<a class="reference external" href="http://pages.github.com/">GitHub Pages</a>っていうPushすると中のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしました。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
-Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次のようなブランチ構成にしてみました:</p>
-<div class="highlight"><pre>source   -&gt; origin/source
-gh-pages -&gt; origin/master
-</pre></div>
-<p>こういう風にするには、たぶん次のようにすればいいはず:</p>
-<div class="highlight"><pre>git init .
-git branch -m master source
-git remote add origin &lt;自分のGitHubリポジトリでコピーしてきたなにか&gt;
-</pre></div>
-<p>gh-pagesはなんかよしなに作ってくれる<a class="reference external" href="https://github.com/davisp/ghp-import">ghp-import</a>があるので、それを導入しました:</p>
-<div class="highlight"><pre>pip install ghp-import
-</pre></div>
-</div>
-<div class="section" id="conf-py">
-<h2>conf.pyを書く</h2>
-<p><a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source/conf.py">conf.py</a>みたいに書いています。なんか下の方で怪しいことしてますが。ディレクトリ構成は<a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source">draftcode/draftcode.github.com</a>みたいになってます。</p>
-</div>
-<div class="section" id="post-commit">
-<h2>post-commitを仕込む</h2>
-<p>次のような内容のファイルを、<tt class="docutils literal"><span class="pre">.git/hooks/post-commit</span></tt>に仕込んでおきます:</p>
-<div class="highlight"><pre>pelican -s conf.py &amp;&amp; ghp-import output &amp;&amp; git push origin gh-pages:master source:source
-</pre></div>
-<p>これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!</p>
-</div>
-</div>
-        <hr />
-    </div>
-
-
  
     <div class="pagination">
 <ul>
@@ -351,6 +357,7 @@ git remote add origin &lt;自分のGitHubリポジトリでコピーしてきた
         <ul class="nav nav-list">
             <li class="nav-header">Categories</li>
             
+            <li><a href="./category/android.html">Android</a></li>
             <li><a href="./category/articles.html">Articles</a></li>
             <li><a href="./category/java.html">Java</a></li>
             <li><a href="./category/python.html">Python</a></li>
