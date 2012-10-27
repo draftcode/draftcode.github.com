@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com/" rel="alternate"></link><link href="http://draftcode.github.com//feeds/Articles.atom.xml" rel="self"></link><id>http://draftcode.github.com/</id><updated>2012-08-01T19:58:25+09:00</updated><entry><title>第(1+1)回 六本木 Linux カーネル読書会 参加メモ</title><link href="http://draftcode.github.com/2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html" rel="alternate"></link><updated>2012-08-01T19:58:25+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-08-01:2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://connpass.com/event/824/"&gt;第(1+1)回 六本木 Linux カーネル読書会&lt;/a&gt;に行ってきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあたり。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com/" rel="alternate"></link><link href="http://draftcode.github.com//feeds/Articles.atom.xml" rel="self"></link><id>http://draftcode.github.com/</id><updated>2012-10-17T10:03:49+09:00</updated><entry><title>RoboGuice2とRobolectricを組み合わせてテストを書く</title><link href="http://draftcode.github.com/2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html" rel="alternate"></link><updated>2012-10-17T10:03:49+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-10-17:2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html"&gt;RoboGuiceのInjectExtraを使うとテストがしにくくなる件について&lt;/a&gt;でActivityの
+InjectionタイミングがずれることによりInjectExtraが利用できないことについて述べました。これをRoboGuice2にすることによって回避することができました。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;問題背景&lt;/h2&gt;
+&lt;p&gt;実機で動く場合は&lt;tt class="docutils literal"&gt;RoboActivity.onCreate()&lt;/tt&gt;でInjectionが行われますが、
+RoboGuice1だと、ActivityをテストにInjectする場合、次のようになってエラーが起きます:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;InjectするActivityのIntent付きのオブジェクトをアプリケーションの初めのほうでbindする。&lt;/li&gt;
+&lt;li&gt;bindするオブジェクトは、更にInjectionが走る。&lt;/li&gt;
+&lt;li&gt;InjectExtraはContextScopeで走らせないといけない。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;また、ActivityをテストにInjectしない場合は、RoboGuice1の場合、まともそうな方法でActivityをテストに渡す方法が無さそうです。staticにして渡してしまうのは、ちょっとアレですよね。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="roboguice2"&gt;
+&lt;h2&gt;RoboGuice2でなぜ解決されるのか&lt;/h2&gt;
+&lt;p&gt;RoboGuice1では、Applicationを継承して自分が必要なbindingを追加していました。しかしRoboGuice2ではApplicationを継承する必要がなくなり、適当なタイミングでbindingを追加できます。これを利用して、テストクラスの中でbindingを追加するようにすれば上記の問題が解決できます。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;サンプルコード&lt;/h2&gt;
+&lt;script src="https://gist.github.com/3963845.js"&gt; &lt;/script&gt;&lt;/div&gt;
+</summary></entry><entry><title>第(1+1)回 六本木 Linux カーネル読書会 参加メモ</title><link href="http://draftcode.github.com/2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html" rel="alternate"></link><updated>2012-08-01T19:58:25+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-08-01:2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://connpass.com/event/824/"&gt;第(1+1)回 六本木 Linux カーネル読書会&lt;/a&gt;に行ってきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあたり。&lt;/p&gt;
 &lt;p&gt;後で調べたこともいくつか追加している。&lt;/p&gt;
 &lt;div class="topic"&gt;
 &lt;p class="topic-title first"&gt;do_fork (kernel/fork.c)&lt;/p&gt;

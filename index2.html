@@ -29,6 +29,108 @@
 
     <div class='article'>
         <div class="content-title">
+            <a href="./2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html"><h1>Introduction to Domain TheoryのLecture1を読む</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/03/20</span>
+    <a href="./category/Articles.html" class="label label-info">Articles</a>
+</div>
+        </div>
+
+        <div><p>Graham Hutton先生の<a class="reference external" href="http://www.cs.nott.ac.uk/~gmh/domains.html">Introduction to Domain Theory</a>を読んだメモです。</p>
+<div class="section" id="denotational-semantics">
+<h2>Denotational Semantics</h2>
+<p>BNFを使って形式的にAbstract syntaxが定義されたプログラミング言語Pを考えたときに、そのPのDenotational semanticsは次の二つから構成されるんだよーという話。</p>
+<ol class="arabic">
+<li><p class="first">a semantic domain for each syntactic category</p>
+<p>ここでいうカテゴリーは、expressionとかcommandとか。</p>
+</li>
+<li><p class="first">a valuation function for each syntactic category</p>
+<p>で、このvaluation functionっていうのはシンタックスの各フレーズに対して、
+semantic domainの中の意味を割り当てるものですよー。</p>
+</li>
+</ol>
+<p>で、なんかvaluation functionはhomomorphismじゃないといけないとしている。この
+homomorphismであるということは、各フレーズの意味を割り当てるときは、そのフレーズの中のさらに小さいフレーズの意味から構成されるようなことらしい。で、一般的にはこういう性質のことを、compositionalityと言うらしい。</p>
+</div>
+<div class="section" id="foundational-problems">
+<h2>Foundational Problems</h2>
+<p>で、そもそもこのDomain Theoryがなんで生まれたのかというと、Denotational
+semanticsがuntyped lambda-calculusに適切な意味を与えられなかったから、生まれたらしい。</p>
+<p>で、じゃあ、なんで与えられなかったのか、というところについて、とりあえず単純に集合を使って、semantic domainを与えてみようじゃないかということをしてみる。その与えられなかった理由については、主に二つの理由があって:</p>
+<ol class="arabic simple">
+<li>recursively defined programs</li>
+<li>recursively defined semantic domains</li>
+</ol>
+<p>についての問題らしい。</p>
+<div class="section" id="recursively-defined-programs">
+<h3>1. Recursively Defined Programs</h3>
+<p>なんか直感的には無限ループになるようなプログラムを、ある集合上の関数として対応づけようとすると、そんな関数はネェってなったり、どんな関数でもそのプログラムに対応することになってしまったりして、困るという話。</p>
+<p>この問題を扱うには「終了しない」ということをsemanticsのレベルで表す必要があるよね、とも言っている。</p>
+</div>
+<div class="section" id="recursively-defined-semantic-domains">
+<h3>2. Recursively Defined Semantic Domains</h3>
+<p>次は、関数とか手続きというものを値として扱えるようになったときに、じゃあ、そういった値ってどういう集合なんでしょうねー、関数って言うのは関数から関数への関数も関数なので、これじゃあ関数の集合っていうのが考えられないですよねーというお話。</p>
+<p>で、関数の集合と同型な集合があればいいかなーとしてみても、やっぱり駄目で、ちょっと関数の集合の部分集合を考えてみても、濃度的に段違いなんですねー。あー、可算濃度とか対角線論法とか学部1年のときにやったなー。</p>
+</div>
+</div>
+<div class="section" id="a-first-step-to-scott-domains-lifted-sets">
+<h2>A First Step To Scott-Domains : Lifted Sets</h2>
+<p>ということで、やっぱり集合をsemantic domainにするのは無理っぽいので、一つだけ、なんかエラーとか計算が終了しないとか未定義だとか、そういう値を導入しようということを、どえらい人は考えたんDA!</p>
+<p>そういった値である、bottomというものを単純に一つ加えた集合をflat domainとか
+lifted setとか呼ぶらしい。で、そういった集合では、bottomとそうじゃない値の間に、information orderingという関係が定義できるNE!と、言っている。で、このbottomを含んだ集合をsemantic domainとすると、さっきの1. Recursively Defined
+Programsで問題にしていた、終了しないプログラムに意味が与えられるらしい。</p>
+</div>
+<div class="section" id="partial-orderings">
+<h2>Partial Orderings</h2>
+<p>じゃあ、もうちょっと複雑にして、いくつかの値をとるような関数というものを考えてみよう、という話。とりあえず、2引数の関数はそれぞれの引数の集合の直積を引数にとる関数と考えられる。</p>
+<p>このとき、それぞれの引数の集合が、flat domainだったら、その直積上にも
+information orderingを考えることができる。で、こういう直積はflat setsではなくてpartially ordered sets(posets)になるね。posetsだから、反射律、対称律、推移律が成り立つ。もっというと、bottomというものはbasepointというものらしいので、こういった直積が入ったりすることを考えると、semantic domainsはpointed posetsということができるらしい。</p>
+</div>
+<div class="section" id="monotonic-functions">
+<h2>Monotonic Functions</h2>
+<p>ということで、semantic domainsを(pointed) posetsにするとすると、プログラムは、そういったposets上の関数としてモデル化できるはず。でも、そういった関数すべてがプログラムのモデルとしてふさわしいわけじゃない。</p>
+<p>ここからがよくわからなかったんだけれども、入力と出力で、information orderingが保存されることを要求されるらしい。で、こういった関数のことを、monotonicと呼ぶらしい。</p>
+<p>なんかこの、計算可能な関数はmonotonicであるとか、情報がたくさんあった方が結果の情報もたくさんあるというのがよくわからない。じゃあ、逆にmonotonicじゃないと何がまずいのか、とかもよくわからない。</p>
+</div>
+<div class="section" id="excercises">
+<h2>Excercises</h2>
+<ul>
+<li><pre class="first literal-block">
+E[[proc C]]sigma = proc C
+E[[I]]sigma =  C[[C]]sigma (if I = proc C)
+             | sigma(I) (otherwise)
+</pre>
+</li>
+<li><p class="first">3-&gt;3 を書き下すとたぶん10個</p>
+</li>
+<li><p class="first">N-&gt;M の数は:</p>
+<pre class="literal-block">
+F(N, M) =   1 (if M = 1)
+          | M (if N = 1)
+          | F(N, M-1) + F(N-1, M)
+</pre>
+</li>
+</ul>
+<p>最後の問題は、chainの元のN個のポイントのうち、一番下のポイントが、M個のポイントのどこに写されるのかで場合分けする。</p>
+<ol class="arabic">
+<li><p class="first">一番下のポイントが先のM個のポイントのうち、一番下以外に写される。</p>
+<p>その数は<tt class="docutils literal">F(N, <span class="pre">M-1)</span></tt>と等しい。</p>
+</li>
+<li><p class="first">一番下のポイントが先のM個のポイントのうち、一番下に写される。</p>
+<p>このとき、別に残りのN-1個のポイントがどう写されようと、その対応関係が、
+(N-1)-&gt;Mのmonotonic functionであれば、N-1個のポイントの一番下にもう一個付け加えて、それがM個のポイントの一番下に写されたものもmonotonic functionになる。つまり、この場合は(N-1)-&gt;Mのすべてのmonotonic functionの一番下に割り当てを追加してあげれば良いだけ。ということは、その数は<tt class="docutils literal"><span class="pre">F(N-1,</span> M)</tt>と等しいということになる。</p>
+</li>
+</ol>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <a href="./2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html"><h1>PelicanとGitHub Pagesを使う</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2012/03/16</span>
@@ -120,34 +222,6 @@ brew install https://raw.github.com/gist/1751385/gdb_xv6.rb
 brew install qemu --use-gcc
 </pre></div>
 </div>
-</div>
-        <hr />
-    </div>
-
-
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href="./2012/01/22/005216.html"><h1>「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2012/01/22</span>
-    <a href="./category/Python.html" class="label label-info">Python</a>
-</div>
-        </div>
-
-        <div><p>※酔って書いているのでアレです</p>
-<p>久しぶりの勉強会。今まで出たのがVimの勉強会とかだったので、言語の勉強会は初めてかもしれないですね。あ、Haskellのやつに出たか。となりの研究室の先輩と参加。
-JITってどうなってるの、とかPyPyってどういう構成なのとか、PyPyでは内部でこんな事をしてるよという感じの発表で、非常に興味深く聞かせていただきました。</p>
-<p>事前にPyPyのソースコードはダウンロードしていたので、その中を検索しながら聞いていました。最初はshomah4aさんのPyPyの概要の発表で、Python処理系としてのPyPyと言語処理系をつくるためのライブラリとしてのPyPy、という二つの側面があるらしいです。見たところ、それに対応してディレクトリも分かれているようです(pypyの方がそうだったかな)。</p>
-<p>次のcocoatomoさんの発表は静的解析についての話でした。型理論は、研究分野がプログラミング言語理論になるので(研究室でやってることがばらばらなので、これぐらいしか言えない)、割と発表内容的には近いところでした。Types and Programming
-Languagesとか輪講で読んでいましたし。ちなみに、アルバイトでVBScriptをがしがし書いていたときは、型が無いのが本当に嫌で、VBScriptの静的解析器を書こうと思っていた時期もありました。</p>
-<p>最後のchlereさんの発表はJITコンパイラについての話で、JITコンパイラがどうやって高速化するべきところを見つけていくのかという話でした。特に、ヒントメカニズムを与えるとこんなに速くなる、というのは驚きました。あと実行時にどうやって実行可能なコードを出力するのかというのに興味があるので、機会があったら聞いてみたいです。</p>
-<p>勉強会が終わった後の懇親会にも参加しました。懇親会だと、いろいろな会社のいろいろな職業の人の話を聞けるので、学生の自分にとっては貴重な機会なんですよ。(と、懇親会に出る度に思います。)</p>
-<p>特に、お向かいの席だったransuiさんのお話がおもしろくて、スピードが命なので、こういうレベルまでチューニングしたりしてますよという話とか、高校生のときにこういう俺俺言語を作ったという話を聞いたりしました。ただ、最近はそういう事をしたいという人があまりいなくて採用が大変みたいです……自分も趣味でアセンブラ作ってみたり、授業でですがFPGAを使った計算機やシミュレータ上でのメモリキャッシュアルゴリズムの実装をしてみたりとか、割と低レベルな話も好きなので、そういう仕事もおもしろそうですね。カーネルの中身とかはまだ見たことが無いので、もっと勉強しないと。</p>
-<p>あと、アリエルのCTOの井上さんとも少しお話をしまして、最近は上流の方にも興味があるんですよと言ったら、若いうちはもっとガシガシ実装して欲しいという言葉をいただきました。ぐぬぬ。ただ、自分の主張を通すために、いろんな立場の人の考え方、ものの見方、背景とかを知っておきたい。そうしないと、下回しが出来ずに主張が通らないというのが嫌なので、プロジェクトのマネジメントをする人たちや、もっと上の経営に関わる人たちが、どういう見方をするのかを知っておきたい。このために事業戦略やプロジェクトマネジメントあたりの本を読んでいたりするので、そこら辺はさじ加減なのかなと思っています。</p>
-<p>というところで、お開きになりました。後で見てみると、cocoatomoさんはCPython
-Readingというのを書いていたりするみたいなので、積極的に話に行けば良かった。あと型システムとかが停止するとか安全であるとか、そういうのも聞いてみたかったと、少し後悔しつつ、次の日の「(第15回)Python mini Hack-a-thon」に参加しました。</p>
 </div>
         <hr />
     </div>

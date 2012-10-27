@@ -29,6 +29,61 @@
 
     <div class='article'>
         <div class="content-title">
+            <a href=".././2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html"><h1>PelicanとGitHub Pagesを使う</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/03/16</span>
+    <a href=".././category/Articles.html" class="label label-info">Articles</a>
+</div>
+        </div>
+
+        <div><p>reStructuredTextが使いたかったので、Pythonで書かれてる<a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html">Pelican</a>という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。</p>
+<div class="section" id="id1">
+<h2>Pelican</h2>
+<p>最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
+Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みのやつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので気に入って使っています。</p>
+<p>自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。開発中のバージョンを使うにはこれだけでOK:</p>
+<div class="highlight"><pre>git clone https://github.com/ametaireau/pelican.git
+cd pelican
+python setup.py develop
+</pre></div>
+<p>こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになります。</p>
+</div>
+<div class="section" id="github-pages">
+<h2>GitHub Pages</h2>
+<p>なんかGitHubには<a class="reference external" href="http://pages.github.com/">GitHub Pages</a>っていうPushすると中のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしました。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
+Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次のようなブランチ構成にしてみました:</p>
+<div class="highlight"><pre>source   -&gt; origin/source
+gh-pages -&gt; origin/master
+</pre></div>
+<p>こういう風にするには、たぶん次のようにすればいいはず:</p>
+<div class="highlight"><pre>git init .
+git branch -m master source
+git remote add origin &lt;自分のGitHubリポジトリでコピーしてきたなにか&gt;
+</pre></div>
+<p>gh-pagesはなんかよしなに作ってくれる<a class="reference external" href="https://github.com/davisp/ghp-import">ghp-import</a>があるので、それを導入しました:</p>
+<div class="highlight"><pre>pip install ghp-import
+</pre></div>
+</div>
+<div class="section" id="conf-py">
+<h2>conf.pyを書く</h2>
+<p><a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source/conf.py">conf.py</a>みたいに書いています。なんか下の方で怪しいことしてますが。ディレクトリ構成は<a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source">draftcode/draftcode.github.com</a>みたいになってます。</p>
+</div>
+<div class="section" id="post-commit">
+<h2>post-commitを仕込む</h2>
+<p>次のような内容のファイルを、<tt class="docutils literal"><span class="pre">.git/hooks/post-commit</span></tt>に仕込んでおきます:</p>
+<div class="highlight"><pre>pelican -s conf.py &amp;&amp; ghp-import output &amp;&amp; git push origin gh-pages:master source:source
+</pre></div>
+<p>これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!</p>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <a href=".././2012/02/06/235454.html"><h1>HomebrewでクロスコンパイルできるGCCをビルドする</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2012/02/06</span>
@@ -196,40 +251,6 @@ specification</a>で見ることができます．(すべてのセレクタがFi
 <h3>Simplified element hiding syntax</h3>
 <p>Adblock Plusでは，後方互換性のために，<tt class="docutils literal">#div(id=foo)</tt>のような単純な要素除去ルールをサポートしています．このような書き方は推奨しておらず，CSSセレクタによる方法を推奨しています．この書き方は将来のどこかのタイミングで無効になる予定です．</p>
 </div>
-</div>
-</div>
-        <hr />
-    </div>
-
-
-
-
-    <div class='article'>
-        <div class="content-title">
-            <a href=".././2011/03/14/42aa3a98-4e10-11e0-bcea-d8a25efffee9.html"><h1>Macを大きいディスプレイにつなげるときはMini DisplayPort &lt;-&gt; DisplayPort変換ケーブルを使う</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2011/03/14</span>
-    <a href=".././category/Articles.html" class="label label-info">Articles</a>
-</div>
-        </div>
-
-        <div><p>Macbook Proを修理に出したときに，どうしてもレポートを書かなければいけない感じだったので，Mac miniを購入しました．Macbook Proは3年ぐらい前のモデルだったので，大きいDVIポートがあり，DELLのU2711のような大きいディスプレイでも直接接続して最適な解像度が出せたのですが，今のMacについているようなMini DisplayPortだと，DVIとの変換ケーブルを使っても，フルHD程度までしか出力することができません．これはDVIのシングルリンクとかデュアルリンクとかの問題らしいんですが，それを解決するためにはAppleの高いデュアルリンク対応の変換アダプタを購入しなければいけません．</p>
-<p>もっとシンプルな解決方法を目指します．最近のディスプレイはDisplayPortがついているようなので，それに変換すれば良いのです．実際自分はMini DisplayPortとDisplayPortの変換ケーブルを使って，大きい解像度の出力ができるようになっています．</p>
-<p>残念ながら，このような変換ケーブルはあまり製造されていないようです．自分は<a class="reference external" href="http://store.shopping.yahoo.co.jp/ats/0203.html">ATS Direct</a>というサイトで購入しました．</p>
-<p>またDisplayPortは音声出力も対応しているので，U2711の音声出力から音を出すこともできています．しかしながらU2711側では音量調節ができないので，音量調節ができるようなもの(スピーカーなど)でないと，音が大きすぎて耳がつぶれます．ヘッドホンとかは難しいです．ちなみに出力切り替えはSoundflowerを使うと便利です．</p>
-<div class="section" id="id1">
-<h2>追記 (2011-06-22)</h2>
-<p>どうも探し方が悪かったようで，他にもいくつか見つかりました．</p>
-<ul class="simple">
-<li><a class="reference external" href="http://www.amazon.co.jp/dp/B004KB5HM6/">http://www.amazon.co.jp/dp/B004KB5HM6/</a></li>
-<li><a class="reference external" href="http://www.amazon.co.jp/dp/B004GCHNP8/">http://www.amazon.co.jp/dp/B004GCHNP8/</a></li>
-<li><a class="reference external" href="http://direct.eizo.co.jp/shop/g/gPM200-BK/">http://direct.eizo.co.jp/shop/g/gPM200-BK/</a></li>
-</ul>
-<p>ただ，ものによっては映らないものもあるみたいですね．</p>
-</div>
-<div class="section" id="id2">
-<h2>追記 (2012-03-11)</h2>
-<p>音声出力の切り替えはOptionキーを押しながらメニューバーの音量調節アイコンをクリックすると、出力装置の切り替えができるので、これが便利です。最近はU2711に別のスピーカーをつけて、そのスピーカーについている音声出力端子にヘッドホンをつけたりしています。</p>
 </div>
 </div>
         <hr />
