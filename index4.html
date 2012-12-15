@@ -24,17 +24,13 @@
 <div id="content">
 
 
-
-
-
     <div class='article'>
         <div class="content-title">
             <a href="./2011/12/29/145918.html"><h1>CPython2.7.2のWindowsでのmultiprocessingの動作</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2011/12/29</span>
     <a href="./category/Python.html" class="label label-info">Python</a>
-</div>
-        </div>
+</div>        </div>
 
         <div><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
 <p>Windowsにおける<tt class="docutils literal">multiprocessing</tt>モジュールの動きは次のようなものになります:</p>
@@ -52,15 +48,13 @@
 
 
 
-
     <div class='article'>
         <div class="content-title">
             <a href="./2011/12/29/153703.html"><h1>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2011/12/29</span>
     <a href="./category/Python.html" class="label label-info">Python</a>
-</div>
-        </div>
+</div>        </div>
 
         <div><p>ドキュメンテーションにも書いてあるとおり、<tt class="docutils literal">csv</tt>モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。<tt class="docutils literal">csv</tt>モジュールのコアの部分はCで書かれており、<tt class="docutils literal">_csv.c</tt>というファイルに記述されています。</p>
 <p><tt class="docutils literal">csv.Reader</tt>は与えられたfile-likeオブジェクトから<tt class="docutils literal">PyString_AsString</tt>をつかって<tt class="docutils literal">char *</tt>を得ようとします。:</p>
@@ -114,15 +108,13 @@
 
 
 
-
     <div class='article'>
         <div class="content-title">
             <a href="./2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html"><h1>Writing Adblock Plus filters -- 日本語訳</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2011/03/22</span>
     <a href="./category/Articles.html" class="label label-info">Articles</a>
-</div>
-        </div>
+</div>        </div>
 
         <div><p><a class="reference external" href="http://adblockplus.org/en/filters">Writing Adblock Plus filters</a>の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．</p>
 <p>あと，どうもURLとかフィルタルールが入っている関係で，レイアウトがすごくぐちゃぐちゃになります．それに加えて訳がいまいちなので，さらに読みづらい．超訳でもすればよかった……</p>
@@ -245,35 +237,20 @@ specification</a>で見ることができます．(すべてのセレクタがFi
     </div>
 
 
- 
-    <div class="pagination">
+     <div class="pagination">
 <ul>
-
-
     <li class="prev"><a href="./index3.html">&larr; Previous</a></li>
 
-
-
     <li class=""><a href="./index.html">1</a></li>
-
     <li class=""><a href="./index2.html">2</a></li>
-
     <li class=""><a href="./index3.html">3</a></li>
-
     <li class="active"><a href="./index4.html">4</a></li>
-
     <li class=""><a href="./index5.html">5</a></li>
-
-
 
     <li class="next"><a href="./index5.html">Next &rarr;</a></li>
 
-
 </ul>
-</div>
- 
-
-
+</div> 
 </div>
 
 <div id="footer">
@@ -300,22 +277,13 @@ specification</a>で見ることができます．(すべてのセレクタがFi
     <div id="category">
         <ul class="nav nav-list">
             <li class="nav-header">Categories</li>
-            
-            <li><a href="./category/android.html">Android</a></li>
-            <li><a href="./category/articles.html">Articles</a></li>
-            <li><a href="./category/java.html">Java</a></li>
-            <li><a href="./category/python.html">Python</a></li>
-        </ul>
+                        <li><a href="./category/android.html">Android</a></li>            <li><a href="./category/articles.html">Articles</a></li>            <li><a href="./category/java.html">Java</a></li>            <li><a href="./category/python.html">Python</a></li>        </ul>
     </div>
 
     <div id="social">
         <ul class="nav nav-list">
             <li class="nav-header">Social</li>
-            
-            <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>
-            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>
-            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>
-        </ul>
+                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>        </ul>
     </div>
 </div>
 

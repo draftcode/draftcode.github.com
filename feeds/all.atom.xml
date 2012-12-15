@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com/" rel="alternate"></link><link href="http://draftcode.github.com//feeds/all.atom.xml" rel="self"></link><id>http://draftcode.github.com/</id><updated>2012-10-17T10:03:49+09:00</updated><entry><title>RoboGuice2とRobolectricを組み合わせてテストを書く</title><link href="http://draftcode.github.com/2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html" rel="alternate"></link><updated>2012-10-17T10:03:49+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-10-17:2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html"&gt;RoboGuiceのInjectExtraを使うとテストがしにくくなる件について&lt;/a&gt;でActivityの
+InjectionタイミングがずれることによりInjectExtraが利用できないことについて述べました。これをRoboGuice2にすることによって回避することができました。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;問題背景&lt;/h2&gt;
+&lt;p&gt;実機で動く場合は&lt;tt class="docutils literal"&gt;RoboActivity.onCreate()&lt;/tt&gt;でInjectionが行われますが、
+RoboGuice1だと、ActivityをテストにInjectする場合、次のようになってエラーが起きます:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;InjectするActivityのIntent付きのオブジェクトをアプリケーションの初めのほうでbindする。&lt;/li&gt;
+&lt;li&gt;bindするオブジェクトは、更にInjectionが走る。&lt;/li&gt;
+&lt;li&gt;InjectExtraはContextScopeで走らせないといけない。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;また、ActivityをテストにInjectしない場合は、RoboGuice1の場合、まともそうな方法でActivityをテストに渡す方法が無さそうです。staticにして渡してしまうのは、ちょっとアレですよね。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="roboguice2"&gt;
+&lt;h2&gt;RoboGuice2でなぜ解決されるのか&lt;/h2&gt;
+&lt;p&gt;RoboGuice1では、Applicationを継承して自分が必要なbindingを追加していました。しかしRoboGuice2ではApplicationを継承する必要がなくなり、適当なタイミングでbindingを追加できます。これを利用して、テストクラスの中でbindingを追加するようにすれば上記の問題が解決できます。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;サンプルコード&lt;/h2&gt;
+&lt;script src="https://gist.github.com/3963845.js"&gt; &lt;/script&gt;&lt;/div&gt;
+</summary></entry><entry><title>RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</title><link href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html" rel="alternate"></link><updated>2012-09-23T23:58:12+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-09-23:2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html</id><summary type="html">&lt;p&gt;RoboGuiceのInjectなんとか系は記述量が減ってテストもしやすくなって便利ですが、残念ながらInjectExtraだけはイマイチと言わざるを得ません。使っているバーションは、RoboGuice 1.1.2とGuice 2.0 no-aopで、Robolectricでテストを書いたりしています。もしかしたら、RoboGuice 2.0で解消されているのかも知れません。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;問題背景&lt;/h2&gt;
+&lt;p&gt;まず、実機で動くコードでは、&lt;tt class="docutils literal"&gt;RoboActivity.onCreate()&lt;/tt&gt;の中でInjectionが行われます。このとき、&lt;tt class="docutils literal"&gt;InjectView&lt;/tt&gt;以外のフィールドがInjectされます。その中には当然&lt;tt class="docutils literal"&gt;InjectExtra&lt;/tt&gt;も入っていますので、ここでそのInjectionのContextである
+ActivityからIntentがとり出されて、Extraが入ります:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;SOME_EXTRA_ID&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;SOME_EXTRA_ID&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="nd"&gt;@InjectExtra&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SOME_EXTRA_ID&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;someExtra&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;次に、テストコードの中で、クラス中にテスト対象のActivityをInjectしているとします。このとき、Activityに&lt;tt class="docutils literal"&gt;InjectExtra&lt;/tt&gt;が入っているとInjectionに失敗してしまいます。失敗する理由としては、次の2つが挙げられます。&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Injectionを行うActivityにIntentがセットされていないこと。&lt;/li&gt;
+&lt;li&gt;Injectionを行うScopeが&lt;tt class="docutils literal"&gt;ContextScope&lt;/tt&gt;ではないこと。特に、Activityの&lt;tt class="docutils literal"&gt;ContextScope&lt;/tt&gt;ではないこと。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;解決策&lt;/h2&gt;
+&lt;p&gt;この2つを回避するために、それなりに現実的な方法で対処をしてみようと試みましたが、根本的に実際に実機で動くときのコードとテスト中のコードでInjectionタイミングが違うことが問題なので、上手く行きませんでした。Activityはどこかほかのオブジェクトの中でInjectされることを、あまり想定していないのです。&lt;/p&gt;
+&lt;p&gt;大掛かりな解決策としては、&lt;tt class="docutils literal"&gt;ExtrasListener&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;ContextScope&lt;/tt&gt;を変更して、&lt;tt class="docutils literal"&gt;InjectExtra&lt;/tt&gt;が処理されるタイミングを変更するというものがありますが、そこまでして&lt;tt class="docutils literal"&gt;InjectExtra&lt;/tt&gt;を使いたくありません。&lt;/p&gt;
+&lt;p&gt;大掛かりな解決策を取らずに&lt;tt class="docutils literal"&gt;InjectExtra&lt;/tt&gt;を利用したActivityに対してテストを書くのであれば、ActivityはテストコードでのInjecされないようにして、&lt;tt class="docutils literal"&gt;setUp&lt;/tt&gt;の中で手動Injectするしかありません。その手動Injectを行う場合には、自分でそのActivityの&lt;tt class="docutils literal"&gt;ContextScope&lt;/tt&gt;を生成して、その中で&lt;tt class="docutils literal"&gt;injectMembers&lt;/tt&gt;を行う必要があります。この方法を取ると、一見、テストコード中の&lt;tt class="docutils literal"&gt;InjectView&lt;/tt&gt;が効かなくなりそうですが、どうやら&lt;tt class="docutils literal"&gt;ContextScope&lt;/tt&gt;のスタックがきちんとしているのか、そのActivityが&lt;tt class="docutils literal"&gt;setContentView&lt;/tt&gt;をしたときに、きちんとInjectionされます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;TEST_EXTRA&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;42&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="nd"&gt;@Inject&lt;/span&gt;
+&lt;span class="n"&gt;Injector&lt;/span&gt; &lt;span class="n"&gt;injector&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="nd"&gt;@InjectView&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;id&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;myButton&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;Button&lt;/span&gt; &lt;span class="n"&gt;myButton&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;MyActivity&lt;/span&gt; &lt;span class="n"&gt;activity&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="nd"&gt;@Before&lt;/span&gt;
+&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;setUp&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="kd"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;Exception&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;activity&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;MyActivity&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+    &lt;span class="n"&gt;Intent&lt;/span&gt; &lt;span class="n"&gt;intent&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;Intent&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+    &lt;span class="n"&gt;intent&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;putExtra&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;MyActivity&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;SOME_EXTRA_ID&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;TEST_EXTRA&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;activity&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;setIntent&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;intent&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+
+    &lt;span class="n"&gt;ContextScope&lt;/span&gt; &lt;span class="n"&gt;scope&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;injector&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getInstance&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ContextScope&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;enter&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;activity&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;injector&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;injectMembers&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;activity&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;exit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;activity&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;ContextScope&lt;/tt&gt;周りは、RoboGuice 2.0では多少改善されているのは確認できました。&lt;tt class="docutils literal"&gt;RoboGuice.injectMembers(Context, T)&lt;/tt&gt;というメソッドが存在するのが確認できました。&lt;/p&gt;
+&lt;p&gt;もうひとつの解決策は、もう&lt;tt class="docutils literal"&gt;InjectExtra&lt;/tt&gt;を使わないという方法で、自分はもうこっちの方法でいいかなと思っています。&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>第(1+1)回 六本木 Linux カーネル読書会 参加メモ</title><link href="http://draftcode.github.com/2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html" rel="alternate"></link><updated>2012-08-01T19:58:25+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-08-01:2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://connpass.com/event/824/"&gt;第(1+1)回 六本木 Linux カーネル読書会&lt;/a&gt;に行ってきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあたり。&lt;/p&gt;
+&lt;p&gt;後で調べたこともいくつか追加している。&lt;/p&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;do_fork (kernel/fork.c)&lt;/p&gt;
+&lt;p&gt;do_forkはsys_cloneやsys_vfork、sys_forkから呼ばれる。&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;sys_clone&lt;/dt&gt;
+&lt;dd&gt;arch/x86/kernel/process.c&lt;/dd&gt;
+&lt;dt&gt;sys_vfork&lt;/dt&gt;
+&lt;dd&gt;arch/x86/kernel/process.c&lt;/dd&gt;
+&lt;dt&gt;sys_fork&lt;/dt&gt;
+&lt;dd&gt;arch/x86/kernel/process.c&lt;/dd&gt;
+&lt;dt&gt;task_struct&lt;/dt&gt;
+&lt;dd&gt;include/linux/sched.h&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;vfork&lt;/p&gt;
+&lt;p&gt;古いBSDでfork &amp;amp; execを効率的に行うための仕組み。現在では使われていない。&lt;/p&gt;
+&lt;p&gt;古いBSDだと、メモリ空間がCopy on Writeではなくて、fork時にコピーするようになっているらしい。このため、fork &amp;amp; execをやろうとすると、無駄にメモリ空間のコピーが走ってしまう。これを防ぐために、vforkというものが生まれた。vforkは子プロセスが親プロセスのメモリ空間を使って動く。このままだと、親プロセスと子プロセスのスタックも共有してしまうので、まず、親プロセスを停止し、次に子プロセスを動かす。子プロセスがexecveを呼ぶかexitするまで、親プロセスは停止する。親プロセスのメモリ空間を利用するため、子プロセスの動きが大きく制約される。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://surf.ml.seikei.ac.jp/~nakano/JMwww/html/LDP_man-pages/man2/vfork.2.html"&gt;http://surf.ml.seikei.ac.jp/~nakano/JMwww/html/LDP_man-pages/man2/vfork.2.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;現代的なプログラムではvforkは使ってはいけない。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.jpcert.or.jp/sc-rules/c-pos33-c.html"&gt;http://www.jpcert.or.jp/sc-rules/c-pos33-c.html&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;メモリ空間&lt;/p&gt;
+&lt;p&gt;カーネル空間とユーザー空間に分かれている。&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;__user&lt;/dt&gt;
+&lt;dd&gt;include/linux/compiler.h&lt;/dd&gt;
+&lt;dt&gt;__kernel&lt;/dt&gt;
+&lt;dd&gt;include/linux/compiler.h&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;それぞれでメモリ管理をしているので仮想メモリ空間を指すことになる。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;copy_process (kernel/fork.c)&lt;/p&gt;
+&lt;p&gt;親プロセスのtask_structをコピーしている。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;dup_task_structを呼んでる。&lt;/li&gt;
+&lt;li&gt;sched_forkを呼んでる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;sched_fork (kernel/sched/core.c)&lt;/p&gt;
+&lt;p&gt;プロセスが実行される前のスケジューラ周りのセットアップを行うみたい。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;dup_task_struct (kernel/fork.c)&lt;/p&gt;
+&lt;p&gt;task_structのメモリ確保はkmem_cache_alloc_nodeで確保している。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;kmem_cache_alloc_node (include/kernel/slab.h)&lt;/p&gt;
+&lt;p&gt;カーネル空間のメモリを確保する関数。メモリの種類がいろいろ選べるらしい。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.mech.tohoku-gakuin.ac.jp/rde/contents/linux/drivers/tips1.html"&gt;http://www.mech.tohoku-gakuin.ac.jp/rde/contents/linux/drivers/tips1.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;kmem_cache_alloc_node の node は tsk_fork_get_node から取ってきている。しかしnodeは無視されてしまう。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;tsk_fork_get_node (kernel/kthread.c)&lt;/p&gt;
+&lt;p&gt;どうもNUMAアーキテクチャで気にするものらしい。&lt;/p&gt;
+&lt;p&gt;NUMA は Non-Uniform Memory Access の略で、たしかそれぞれのプロセッサでメモリを持っていて、他のプロセッサが持っているメモリにアクセスするときは、そのプロセッサにお願いして読みに行くというアーキテクチャだったと思う。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;RCUとは&lt;/p&gt;
+&lt;p&gt;リードコピーアップデート。Wikipedia参照。&lt;/p&gt;
+&lt;p&gt;どうも、Writerが入るときに、コピーを作ってそっちの方を指すようにする。で、
+Readerは読み終わったら上手いことやって、さっきまで見ていた複製元が既に不要になっていたら破棄するようにするものらしい。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://togetter.com/li/153033"&gt;http://togetter.com/li/153033&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;get_cpu, put_cpu (include/linux/smp.h)&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;get_cpu&lt;/dt&gt;
+&lt;dd&gt;CPUの割り込みを禁止し、現在のCPUIDを返す。&lt;/dd&gt;
+&lt;dt&gt;put_cpu&lt;/dt&gt;
+&lt;dd&gt;CPUの割り込みを有効化。&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;wake_up_new_task (kernel/sched/core.c)&lt;/p&gt;
+&lt;p&gt;do_forkの中で呼び出される。スケジューラに実際に登録する？&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;do_execve (fs/exec.c)&lt;/p&gt;
+&lt;p&gt;これは次回で。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="topic"&gt;
+&lt;p class="topic-title first"&gt;Buddy memory allocation と Slab allocator&lt;/p&gt;
+&lt;p&gt;kmem_cache_alloc_node が定義されているのはslab.hなので、slabとは何か調べた。&lt;/p&gt;
+&lt;p&gt;Buddy memory allocationというメモリアロケーションメカニズムがあって、詳しくはわからないけれど、ページ*2^n単位でメモリを確保していくようなものらしい。これで切り取れるのはページ数単位なので、小さいオブジェクトを確保するのには向いていない。なので間にSlab allocatorというものが入って、小さいオブジェクトを切り出していきましょうという仕組みらしい。mallocと変わらない？いくつかの最適化もされるらしい。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://en.wikipedia.org/wiki/Buddy_memory_system"&gt;http://en.wikipedia.org/wiki/Buddy_memory_system&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://wiki.bit-hive.com/linuxkernelmemo/pg/%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF"&gt;http://wiki.bit-hive.com/linuxkernelmemo/pg/%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;そもそもスラブというものが何かというと、同じサイズのオブジェクトを切り出すためのメモリのことらしい。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://wiki.bit-hive.com/north/pg/kmalloc(%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF"&gt;http://wiki.bit-hive.com/north/pg/kmalloc(%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;スラブの割り当て状況みたいなのは/proc/slabinfoで参照できるらしく、さらに
+topみたいなslabtopというコマンドもある。&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>Introduction to Domain TheoryのLecture1を読む</title><link href="http://draftcode.github.com/2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html" rel="alternate"></link><updated>2012-03-20T21:19:12+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-03-20:2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html</id><summary type="html">&lt;p&gt;Graham Hutton先生の&lt;a class="reference external" href="http://www.cs.nott.ac.uk/~gmh/domains.html"&gt;Introduction to Domain Theory&lt;/a&gt;を読んだメモです。&lt;/p&gt;
+&lt;div class="section" id="denotational-semantics"&gt;
+&lt;h2&gt;Denotational Semantics&lt;/h2&gt;
+&lt;p&gt;BNFを使って形式的にAbstract syntaxが定義されたプログラミング言語Pを考えたときに、そのPのDenotational semanticsは次の二つから構成されるんだよーという話。&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;a semantic domain for each syntactic category&lt;/p&gt;
+&lt;p&gt;ここでいうカテゴリーは、expressionとかcommandとか。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;a valuation function for each syntactic category&lt;/p&gt;
+&lt;p&gt;で、このvaluation functionっていうのはシンタックスの各フレーズに対して、
+semantic domainの中の意味を割り当てるものですよー。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;で、なんかvaluation functionはhomomorphismじゃないといけないとしている。この
+homomorphismであるということは、各フレーズの意味を割り当てるときは、そのフレーズの中のさらに小さいフレーズの意味から構成されるようなことらしい。で、一般的にはこういう性質のことを、compositionalityと言うらしい。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="foundational-problems"&gt;
+&lt;h2&gt;Foundational Problems&lt;/h2&gt;
+&lt;p&gt;で、そもそもこのDomain Theoryがなんで生まれたのかというと、Denotational
+semanticsがuntyped lambda-calculusに適切な意味を与えられなかったから、生まれたらしい。&lt;/p&gt;
+&lt;p&gt;で、じゃあ、なんで与えられなかったのか、というところについて、とりあえず単純に集合を使って、semantic domainを与えてみようじゃないかということをしてみる。その与えられなかった理由については、主に二つの理由があって:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;recursively defined programs&lt;/li&gt;
+&lt;li&gt;recursively defined semantic domains&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;についての問題らしい。&lt;/p&gt;
+&lt;div class="section" id="recursively-defined-programs"&gt;
+&lt;h3&gt;1. Recursively Defined Programs&lt;/h3&gt;
+&lt;p&gt;なんか直感的には無限ループになるようなプログラムを、ある集合上の関数として対応づけようとすると、そんな関数はネェってなったり、どんな関数でもそのプログラムに対応することになってしまったりして、困るという話。&lt;/p&gt;
+&lt;p&gt;この問題を扱うには「終了しない」ということをsemanticsのレベルで表す必要があるよね、とも言っている。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="recursively-defined-semantic-domains"&gt;
+&lt;h3&gt;2. Recursively Defined Semantic Domains&lt;/h3&gt;
+&lt;p&gt;次は、関数とか手続きというものを値として扱えるようになったときに、じゃあ、そういった値ってどういう集合なんでしょうねー、関数って言うのは関数から関数への関数も関数なので、これじゃあ関数の集合っていうのが考えられないですよねーというお話。&lt;/p&gt;
+&lt;p&gt;で、関数の集合と同型な集合があればいいかなーとしてみても、やっぱり駄目で、ちょっと関数の集合の部分集合を考えてみても、濃度的に段違いなんですねー。あー、可算濃度とか対角線論法とか学部1年のときにやったなー。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-first-step-to-scott-domains-lifted-sets"&gt;
+&lt;h2&gt;A First Step To Scott-Domains : Lifted Sets&lt;/h2&gt;
+&lt;p&gt;ということで、やっぱり集合をsemantic domainにするのは無理っぽいので、一つだけ、なんかエラーとか計算が終了しないとか未定義だとか、そういう値を導入しようということを、どえらい人は考えたんDA!&lt;/p&gt;
+&lt;p&gt;そういった値である、bottomというものを単純に一つ加えた集合をflat domainとか
+lifted setとか呼ぶらしい。で、そういった集合では、bottomとそうじゃない値の間に、information orderingという関係が定義できるNE!と、言っている。で、このbottomを含んだ集合をsemantic domainとすると、さっきの1. Recursively Defined
+Programsで問題にしていた、終了しないプログラムに意味が与えられるらしい。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="partial-orderings"&gt;
+&lt;h2&gt;Partial Orderings&lt;/h2&gt;
+&lt;p&gt;じゃあ、もうちょっと複雑にして、いくつかの値をとるような関数というものを考えてみよう、という話。とりあえず、2引数の関数はそれぞれの引数の集合の直積を引数にとる関数と考えられる。&lt;/p&gt;
+&lt;p&gt;このとき、それぞれの引数の集合が、flat domainだったら、その直積上にも
+information orderingを考えることができる。で、こういう直積はflat setsではなくてpartially ordered sets(posets)になるね。posetsだから、反射律、対称律、推移律が成り立つ。もっというと、bottomというものはbasepointというものらしいので、こういった直積が入ったりすることを考えると、semantic domainsはpointed posetsということができるらしい。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="monotonic-functions"&gt;
+&lt;h2&gt;Monotonic Functions&lt;/h2&gt;
+&lt;p&gt;ということで、semantic domainsを(pointed) posetsにするとすると、プログラムは、そういったposets上の関数としてモデル化できるはず。でも、そういった関数すべてがプログラムのモデルとしてふさわしいわけじゃない。&lt;/p&gt;
+&lt;p&gt;ここからがよくわからなかったんだけれども、入力と出力で、information orderingが保存されることを要求されるらしい。で、こういった関数のことを、monotonicと呼ぶらしい。&lt;/p&gt;
+&lt;p&gt;なんかこの、計算可能な関数はmonotonicであるとか、情報がたくさんあった方が結果の情報もたくさんあるというのがよくわからない。じゃあ、逆にmonotonicじゃないと何がまずいのか、とかもよくわからない。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="excercises"&gt;
+&lt;h2&gt;Excercises&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;pre class="first literal-block"&gt;
+E[[proc C]]sigma = proc C
+E[[I]]sigma =  C[[C]]sigma (if I = proc C)
+             | sigma(I) (otherwise)
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;3-&amp;gt;3 を書き下すとたぶん10個&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;N-&amp;gt;M の数は:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+F(N, M) =   1 (if M = 1)
+          | M (if N = 1)
+          | F(N, M-1) + F(N-1, M)
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;最後の問題は、chainの元のN個のポイントのうち、一番下のポイントが、M個のポイントのどこに写されるのかで場合分けする。&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;一番下のポイントが先のM個のポイントのうち、一番下以外に写される。&lt;/p&gt;
+&lt;p&gt;その数は&lt;tt class="docutils literal"&gt;F(N, &lt;span class="pre"&gt;M-1)&lt;/span&gt;&lt;/tt&gt;と等しい。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;一番下のポイントが先のM個のポイントのうち、一番下に写される。&lt;/p&gt;
+&lt;p&gt;このとき、別に残りのN-1個のポイントがどう写されようと、その対応関係が、
+(N-1)-&amp;gt;Mのmonotonic functionであれば、N-1個のポイントの一番下にもう一個付け加えて、それがM個のポイントの一番下に写されたものもmonotonic functionになる。つまり、この場合は(N-1)-&amp;gt;Mのすべてのmonotonic functionの一番下に割り当てを追加してあげれば良いだけ。ということは、その数は&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;F(N-1,&lt;/span&gt; M)&lt;/tt&gt;と等しいということになる。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>PelicanとGitHub Pagesを使う</title><link href="http://draftcode.github.com/2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html" rel="alternate"></link><updated>2012-03-16T20:07:46+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-03-16:2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html</id><summary type="html">&lt;p&gt;reStructuredTextが使いたかったので、Pythonで書かれてる&lt;a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html"&gt;Pelican&lt;/a&gt;という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;Pelican&lt;/h2&gt;
+&lt;p&gt;最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
+Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みのやつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので気に入って使っています。&lt;/p&gt;
+&lt;p&gt;自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。開発中のバージョンを使うにはこれだけでOK:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git clone https://github.com/ametaireau/pelican.git
+cd pelican
+python setup.py develop
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになります。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="github-pages"&gt;
+&lt;h2&gt;GitHub Pages&lt;/h2&gt;
+&lt;p&gt;なんかGitHubには&lt;a class="reference external" href="http://pages.github.com/"&gt;GitHub Pages&lt;/a&gt;っていうPushすると中のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしました。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
+Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次のようなブランチ構成にしてみました:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;source   -&amp;gt; origin/source
+gh-pages -&amp;gt; origin/master
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;こういう風にするには、たぶん次のようにすればいいはず:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git init .
+git branch -m master source
+git remote add origin &amp;lt;自分のGitHubリポジトリでコピーしてきたなにか&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;gh-pagesはなんかよしなに作ってくれる&lt;a class="reference external" href="https://github.com/davisp/ghp-import"&gt;ghp-import&lt;/a&gt;があるので、それを導入しました:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;pip install ghp-import
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conf-py"&gt;
+&lt;h2&gt;conf.pyを書く&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source/conf.py"&gt;conf.py&lt;/a&gt;みたいに書いています。なんか下の方で怪しいことしてますが。ディレクトリ構成は&lt;a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source"&gt;draftcode/draftcode.github.com&lt;/a&gt;みたいになってます。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="post-commit"&gt;
+&lt;h2&gt;post-commitを仕込む&lt;/h2&gt;
+&lt;p&gt;次のような内容のファイルを、&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;.git/hooks/post-commit&lt;/span&gt;&lt;/tt&gt;に仕込んでおきます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;pelican -s conf.py &amp;amp;&amp;amp; ghp-import output &amp;amp;&amp;amp; git push origin gh-pages:master source:source
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>HomebrewでクロスコンパイルできるGCCをビルドする</title><link href="http://draftcode.github.com/2012/02/06/235454.html" rel="alternate"></link><updated>2012-02-06T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-02-06:2012/02/06/235454.html</id><summary type="html">&lt;p&gt;Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://gist.github.com/1751385"&gt;https://gist.github.com/1751385&lt;/a&gt;のようなFormulaをつくればできます。このFormulaは&lt;a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html"&gt;http://pdos.csail.mit.edu/6.828/2011/xv6.html&lt;/a&gt;をビルドするために、&lt;a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html"&gt;http://pdos.csail.mit.edu/6.828/2011/tools.html&lt;/a&gt;の設定を参考にして書きました。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;クロスコンパイラ……ぐぬぬ……&lt;/h2&gt;
+&lt;p&gt;クロスコンパイラは、以前自分が某研究室で作っているMIPSライクなCPUを使ったマシンで動くアセンブラを書いたときにもビルドしたのですが、なぜか動かなかったりします。なんか検索してみると、動かない動かないと言っている人も結構いたりするので失敗しやすいのでしょう。今回は無事動くところまでこぎ着けました。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="homebrew"&gt;
+&lt;h2&gt;Homebrewでビルドするときの問題点&lt;/h2&gt;
+&lt;p&gt;Homebrewは既にパッケージとして用意してくれているものについてはビルドしない方針なので、GCCをビルドしたりするFormulaはありません。なので適当にでっち上げる必要があります。いろいろな人が既にGCCのFormulaを書いているので、それを参考に書けば良いのですが、適当にクロスコンパイラのFormulaを書くと失敗します。&lt;/p&gt;
+&lt;p&gt;GCCはコンパイルをした後に、binutilsを使ってバイナリをはき出します。なので、クロスコンパイルができるGCCをビルドするには、そのターゲットとなるプラットフォーム用のbinutilsが必要です。そのbinutilsのツールを探すのに、GCCはいろいろな場所をみてくれます。どこを探すかは&lt;a class="reference external" href="http://gcc.gnu.org/install/configure.html#with-as"&gt;http://gcc.gnu.org/install/configure.html#with-as&lt;/a&gt;に書いてあって、どうも
+i386-foo-bar-asというのをPATHをみて探してくれるようです。適当にbinutilsとGCCで同じTargetを指定すれば良さそうなかんじ。&lt;/p&gt;
+&lt;p&gt;が、駄目。動きません。GCCのビルドは成功するのですが、そのGCCでなんかコンパイルしようとすると、どうもアセンブラがエラーを吐いているようです。実行されているコマンドを見てみると、システム組み込みのasを使っているようです。そりゃ駄目だ。&lt;/p&gt;
+&lt;p&gt;こんなの絶対おかしいよ。ということで、GCCのソースを見てみることに。いろいろかけずり回った結果、&lt;tt class="docutils literal"&gt;gcc/gcc.c&lt;/tt&gt;の&lt;tt class="docutils literal"&gt;find_a_file()&lt;/tt&gt;あたりでファイルを探しているようなのですが、なんかi386-foo-barみたいなマシンターゲットをつけているようには見えないぞ。あやしい。ちなみにldのほうは&lt;tt class="docutils literal"&gt;gcc/collect2.c&lt;/tt&gt;の&lt;tt class="docutils literal"&gt;main&lt;/tt&gt;でそういうプレフィックスをつけていて、ファイルを探すのもasとは別のコードで行っている模様。&lt;/p&gt;
+&lt;p&gt;どうも、ldについてはインストールマニュアルに書かれている通りに探してくれているみたいですが、asについてはなんか違うようです。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;解決&lt;/h2&gt;
+&lt;p&gt;GCCが正しいアセンブラを探してくれない。仕方がないので手動でアセンブラを指定することになります。ということで、&lt;a class="reference external" href="https://gist.github.com/1751385#file_gcc_xv6.rb"&gt;https://gist.github.com/1751385#file_gcc_xv6.rb&lt;/a&gt;のように汚い感じですが、アセンブラのパスを手動で指定してあげるようにします。このようにすると、うまくコンパイルができました。(ということは、ldについてはきちんと探してくれたようです……)&lt;/p&gt;
+&lt;p&gt;もし、Xv6をコンパイルして動かしたい。しかも、Homebrewで必要なものをいれたい。ということであれば、次のようにすることでうまくインストールすることができます。
+QEMUはuse-gccを使わないとうまく動きませんでした:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;brew install https://raw.github.com/gist/1751385/binutils_xv6.rb
+brew install https://raw.github.com/gist/1751385/gcc_xv6.rb
+brew install https://raw.github.com/gist/1751385/gdb_xv6.rb
+brew install qemu --use-gcc
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</title><link href="http://draftcode.github.com/2012/01/22/005216.html" rel="alternate"></link><updated>2012-01-22T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-01-22:2012/01/22/005216.html</id><summary type="html">&lt;p&gt;※酔って書いているのでアレです&lt;/p&gt;
+&lt;p&gt;久しぶりの勉強会。今まで出たのがVimの勉強会とかだったので、言語の勉強会は初めてかもしれないですね。あ、Haskellのやつに出たか。となりの研究室の先輩と参加。
+JITってどうなってるの、とかPyPyってどういう構成なのとか、PyPyでは内部でこんな事をしてるよという感じの発表で、非常に興味深く聞かせていただきました。&lt;/p&gt;
+&lt;p&gt;事前にPyPyのソースコードはダウンロードしていたので、その中を検索しながら聞いていました。最初はshomah4aさんのPyPyの概要の発表で、Python処理系としてのPyPyと言語処理系をつくるためのライブラリとしてのPyPy、という二つの側面があるらしいです。見たところ、それに対応してディレクトリも分かれているようです(pypyの方がそうだったかな)。&lt;/p&gt;
+&lt;p&gt;次のcocoatomoさんの発表は静的解析についての話でした。型理論は、研究分野がプログラミング言語理論になるので(研究室でやってることがばらばらなので、これぐらいしか言えない)、割と発表内容的には近いところでした。Types and Programming
+Languagesとか輪講で読んでいましたし。ちなみに、アルバイトでVBScriptをがしがし書いていたときは、型が無いのが本当に嫌で、VBScriptの静的解析器を書こうと思っていた時期もありました。&lt;/p&gt;
+&lt;p&gt;最後のchlereさんの発表はJITコンパイラについての話で、JITコンパイラがどうやって高速化するべきところを見つけていくのかという話でした。特に、ヒントメカニズムを与えるとこんなに速くなる、というのは驚きました。あと実行時にどうやって実行可能なコードを出力するのかというのに興味があるので、機会があったら聞いてみたいです。&lt;/p&gt;
+&lt;p&gt;勉強会が終わった後の懇親会にも参加しました。懇親会だと、いろいろな会社のいろいろな職業の人の話を聞けるので、学生の自分にとっては貴重な機会なんですよ。(と、懇親会に出る度に思います。)&lt;/p&gt;
+&lt;p&gt;特に、お向かいの席だったransuiさんのお話がおもしろくて、スピードが命なので、こういうレベルまでチューニングしたりしてますよという話とか、高校生のときにこういう俺俺言語を作ったという話を聞いたりしました。ただ、最近はそういう事をしたいという人があまりいなくて採用が大変みたいです……自分も趣味でアセンブラ作ってみたり、授業でですがFPGAを使った計算機やシミュレータ上でのメモリキャッシュアルゴリズムの実装をしてみたりとか、割と低レベルな話も好きなので、そういう仕事もおもしろそうですね。カーネルの中身とかはまだ見たことが無いので、もっと勉強しないと。&lt;/p&gt;
+&lt;p&gt;あと、アリエルのCTOの井上さんとも少しお話をしまして、最近は上流の方にも興味があるんですよと言ったら、若いうちはもっとガシガシ実装して欲しいという言葉をいただきました。ぐぬぬ。ただ、自分の主張を通すために、いろんな立場の人の考え方、ものの見方、背景とかを知っておきたい。そうしないと、下回しが出来ずに主張が通らないというのが嫌なので、プロジェクトのマネジメントをする人たちや、もっと上の経営に関わる人たちが、どういう見方をするのかを知っておきたい。このために事業戦略やプロジェクトマネジメントあたりの本を読んでいたりするので、そこら辺はさじ加減なのかなと思っています。&lt;/p&gt;
+&lt;p&gt;というところで、お開きになりました。後で見てみると、cocoatomoさんはCPython
+Readingというのを書いていたりするみたいなので、積極的に話に行けば良かった。あと型システムとかが停止するとか安全であるとか、そういうのも聞いてみたかったと、少し後悔しつつ、次の日の「(第15回)Python mini Hack-a-thon」に参加しました。&lt;/p&gt;
+</summary></entry><entry><title>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</title><link href="http://draftcode.github.com/2012/01/01/182300.html" rel="alternate"></link><updated>2012-01-01T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-01-01:2012/01/01/182300.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
+&lt;p&gt;配列はアレなので使ってはいけない&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="javagenerics"&gt;
+&lt;h2&gt;JavaのGenericsとは&lt;/h2&gt;
+&lt;p&gt;JavaのGenericsでは、型パラメーターは最終的にバイトコードになったら消えて&lt;tt class="docutils literal"&gt;Object&lt;/tt&gt;になってしまって、Generic型からその型パラメーターで示された型を実際に使う側がキャストして使うというものなんですね。だからこのようなコードに対して:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.List&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.ArrayList&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Main&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;l&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;();&lt;/span&gt;
+    &lt;span class="n"&gt;l&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;Integer&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;l&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+  &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このようなバイトコードが出力されます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;Compiled from &amp;quot;Main.java&amp;quot;
+class Main extends java.lang.Object{
+Main();
+  Code:
+   0:   aload_0
+   1:   invokespecial   #1; //Method java/lang/Object.&amp;quot;&amp;lt;init&amp;gt;&amp;quot;:()V
+   4:   return
+
+public static void main(java.lang.String[]);
+  Code:
+   0:   new     #2; //class java/util/ArrayList
+   3:   dup
+   4:   invokespecial   #3; //Method java/util/ArrayList.&amp;quot;&amp;lt;init&amp;gt;&amp;quot;:()V
+   7:   astore_1
+   8:   aload_1
+   9:   iconst_1
+   10:  invokestatic    #4; //Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+   13:  invokeinterface #5,  2; //InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+   18:  pop
+   19:  aload_1
+   20:  iconst_0
+   21:  invokeinterface #6,  2; //InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+   26:  checkcast       #7; //class java/lang/Integer
+   29:  astore_2
+   30:  return
+
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;ArrayList&lt;/tt&gt;の型パラメーターが消えていて、要素を取り出すときに&lt;tt class="docutils literal"&gt;checkcast&lt;/tt&gt;でキャストしてますね。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;総称配列を作るときのエラー・警告&lt;/h2&gt;
+&lt;p&gt;例えば次のようなコードはgeneric array createionエラーになります:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これは配列をアロケートするときに、バイトコードの中で型情報が必要になるのに、&lt;tt class="docutils literal"&gt;ArrayList&amp;lt;Integer&amp;gt;&lt;/tt&gt;は(バイトコードレベルでは)実際は存在せず、&lt;tt class="docutils literal"&gt;ArrayList&lt;/tt&gt;が存在しているからです。&lt;/p&gt;
+&lt;p&gt;なので次のようなコードを書きます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;?&amp;gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、&lt;tt class="docutils literal"&gt;ArrayList&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;ArrayList&amp;lt;Integer&amp;gt;&lt;/tt&gt;は違う型ですから。&lt;/p&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h3&gt;追記&lt;/h3&gt;
+&lt;p&gt;generic array creationがなぜ禁止なのかきちんと理解してなかった。&lt;/p&gt;
+&lt;p&gt;Generic型の配列が作れると仮定しましょう。次のコードはエラー・警告なしでコンパイル出来ます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Some String&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;Integer&lt;/span&gt; &lt;span class="n"&gt;intObj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// ClassCastException occur!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;一方でGeneric型以外の配列の場合は、次のようになります:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;Number&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Double&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;valueOf&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// ArrayStoreException occur!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Generic型以外の配列の場合、型の違うオブジェクトの参照を配列に代入しようとすると、&lt;tt class="docutils literal"&gt;ArrayStoreException&lt;/tt&gt;が発生しますが、Generic型の配列の場合はその例外は発生せずに、値を取り出したときに&lt;tt class="docutils literal"&gt;ClassCastException&lt;/tt&gt;が発生するようになります。これがGeneric型の配列が作れない理由のようです。&lt;/p&gt;
+&lt;p&gt;また、総称配列が作れなくても、上のコードは次のように書き換えると、unchecked
+conversion warningが出るけれども、&lt;tt class="docutils literal"&gt;ClassCastException&lt;/tt&gt;が発生するように実行することが出来ます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Some String&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt; &lt;span class="c1"&gt;// unchecked conversion warning&lt;/span&gt;
+&lt;span class="n"&gt;Integer&lt;/span&gt; &lt;span class="n"&gt;intObj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// ClassCastException occur!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;次のように書き換えると、今度はきちんと&lt;tt class="docutils literal"&gt;list[0] = stringArray&lt;/tt&gt;のところで型エラーを起こしてくれます:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;[]&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt; &lt;span class="c1"&gt;// unchecked conversion warning&lt;/span&gt;
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Some String&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;stringArray&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// Incompatible types error&lt;/span&gt;
+
+&lt;span class="n"&gt;ArrayList&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Integer&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;Integer&lt;/span&gt; &lt;span class="n"&gt;intObj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;intArray&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;配列は使ってはいけない&lt;/h2&gt;
+&lt;p&gt;総称配列のエラー・警告はJavaレベルの型とJVMレベルの型が一致していないことが原因に見えますが、実は配列を使わなければこのような問題は回避されるようです。(僕はGenericsによってJavaとJVMの型が一致しなくなったこともなんかアレな気がするんですが)&lt;/p&gt;
+&lt;p&gt;また、配列がcovariantなのもまた変なエラーの原因となるので、配列さえ使わなければ……というのがかなり前から言われているようです。&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>配列はCovariantなので使ってはいけない</title><link href="http://draftcode.github.com/2012/01/01/182705.html" rel="alternate"></link><updated>2012-01-01T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2012-01-01:2012/01/01/182705.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
+&lt;p&gt;配列はアレなので使ってはいけない。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="java"&gt;
+&lt;h2&gt;Javaの配列とは&lt;/h2&gt;
+&lt;p&gt;Javaの配列はcovariantです。&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;は&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;のサブクラスなんだから、&lt;tt class="docutils literal"&gt;Integer[]&lt;/tt&gt;も&lt;tt class="docutils literal"&gt;Number[]&lt;/tt&gt;のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。&lt;/p&gt;
+&lt;img alt="images/20120101171202.png" src="images/20120101171202.png" /&gt;
+&lt;p&gt;見た目の型は&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;の配列なのに、代入できる要素は&lt;tt class="docutils literal"&gt;Integerの&lt;/tt&gt;要素のみという配列が作れます。ここで、&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;以外の要素を代入しようとすると、同じ&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;を継承している&lt;tt class="docutils literal"&gt;Long&lt;/tt&gt;でも実行時エラーになります。このときの&lt;tt class="docutils literal"&gt;Number&lt;/tt&gt;の配列の実体は、&lt;tt class="docutils literal"&gt;Integer&lt;/tt&gt;の配列ですから。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;配列は使ってはいけない&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://draftcode.github.com/2012/01/01/182300.html"&gt;先の記事&lt;/a&gt;とあわせて、配列は使ってはいけない。&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>CPython2.7.2のWindowsでのmultiprocessingの動作</title><link href="http://draftcode.github.com/2011/12/29/145918.html" rel="alternate"></link><updated>2011-12-29T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2011-12-29:2011/12/29/145918.html</id><summary type="html">&lt;p&gt;フォークが出来るOSであれば、単純にフォークをしてそのあとに&lt;tt class="docutils literal"&gt;Process._bootstrap&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;Process.run&lt;/tt&gt;を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。&lt;/p&gt;
+&lt;p&gt;Windowsにおける&lt;tt class="docutils literal"&gt;multiprocessing&lt;/tt&gt;モジュールの動きは次のようなものになります:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;pipeを作っておく。&lt;/li&gt;
+&lt;li&gt;現在の実行ファイルに&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--multiprocessing-fork&lt;/span&gt;&lt;/tt&gt;というコマンドラインオプションと先ほどのpipeの読み出し側をつけて&lt;tt class="docutils literal"&gt;CreateProcess&lt;/tt&gt;する。&lt;/li&gt;
+&lt;li&gt;親プロセスはpipeを通じて、&lt;tt class="docutils literal"&gt;Process&lt;/tt&gt;オブジェクトを&lt;tt class="docutils literal"&gt;pickle&lt;/tt&gt;で直列化して子プロセスに送る。&lt;/li&gt;
+&lt;li&gt;子プロセスは&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--multiprocessing-fork&lt;/span&gt;&lt;/tt&gt;をフラグとして認識して、pipeから&lt;tt class="docutils literal"&gt;Process&lt;/tt&gt;オブジェクトを読み出す。&lt;/li&gt;
+&lt;li&gt;子プロセスが&lt;tt class="docutils literal"&gt;Process._bootstrap&lt;/tt&gt;を呼び出す。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Freezeされていない場合は、過程2のところでは、実行ファイルが&lt;tt class="docutils literal"&gt;python.exe&lt;/tt&gt;になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、&lt;tt class="docutils literal"&gt;multiprocessing.freeze_support&lt;/tt&gt;がそのような役割を果たします。これがFreezeされている場合に&lt;tt class="docutils literal"&gt;multiprocessing.freeze_support&lt;/tt&gt;が必要になる理由です。&lt;/p&gt;
+</summary></entry><entry><title>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</title><link href="http://draftcode.github.com/2011/12/29/153703.html" rel="alternate"></link><updated>2011-12-29T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2011-12-29:2011/12/29/153703.html</id><summary type="html">&lt;p&gt;ドキュメンテーションにも書いてあるとおり、&lt;tt class="docutils literal"&gt;csv&lt;/tt&gt;モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。&lt;tt class="docutils literal"&gt;csv&lt;/tt&gt;モジュールのコアの部分はCで書かれており、&lt;tt class="docutils literal"&gt;_csv.c&lt;/tt&gt;というファイルに記述されています。&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;は与えられたfile-likeオブジェクトから&lt;tt class="docutils literal"&gt;PyString_AsString&lt;/tt&gt;をつかって&lt;tt class="docutils literal"&gt;char *&lt;/tt&gt;を得ようとします。:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="nf"&gt;Reader_iternext&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ReaderObj&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;lineobj&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fields&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+
+    &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;lineobj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyIter_Next&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;self&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;input_iter&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+        &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyString_AsString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lineobj&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;この関数は&lt;tt class="docutils literal"&gt;char *&lt;/tt&gt;を得るために使われるオブジェクトが&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;か&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;かで動作が変わります。&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;であった場合は直接そのオブジェクトのバッファが返されるのですが、&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;であった場合は、&lt;tt class="docutils literal"&gt;_PyUnicode_AsDefaultEncodedString&lt;/tt&gt;によって、デフォルトエンコーディングに変換された文字列を返す動作になっています。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cm"&gt;/*const*/&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="nf"&gt;PyString_AsString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;PyString_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;string_getbuffer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;PyStringObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;op&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;ob_sval&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt;
+&lt;span class="nf"&gt;PyString_AsStringAndSize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="k"&gt;register&lt;/span&gt; &lt;span class="n"&gt;Py_ssize_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;len&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;PyString_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="cp"&gt;#ifdef Py_USING_UNICODE&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PyUnicode_Check&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_PyUnicode_AsDefaultEncodedString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+            &lt;span class="p"&gt;...&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もしデフォルトエンコーディングが変更されていた場合は、&lt;tt class="docutils literal"&gt;codecs.open&lt;/tt&gt;を使った場合や&lt;tt class="docutils literal"&gt;open&lt;/tt&gt;を使った場合とでおもしろい?結果が得られるかもしれません。&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;が返す結果は、&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;ではなく、ファイルのエンコーディングでエンコードされたそのままの&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;の配列や辞書になっています。よって、それがきちんと&lt;tt class="docutils literal"&gt;unicode&lt;/tt&gt;なのか、なにかのエンコーディングでエンコードされた&lt;tt class="docutils literal"&gt;str&lt;/tt&gt;なのかを意識しないと、あるはずのキーがないというような現象に出くわしたりします。これを意識するのは面倒くさいので、適切な&lt;tt class="docutils literal"&gt;csv.Reader&lt;/tt&gt;のラッパーを用意して使うようにした方がよいです。&lt;/p&gt;
+</summary></entry><entry><title>Writing Adblock Plus filters -- 日本語訳</title><link href="http://draftcode.github.com/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html" rel="alternate"></link><updated>2011-03-22T19:14:54+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2011-03-22:2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="http://adblockplus.org/en/filters"&gt;Writing Adblock Plus filters&lt;/a&gt;の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．&lt;/p&gt;
+&lt;p&gt;あと，どうもURLとかフィルタルールが入っている関係で，レイアウトがすごくぐちゃぐちゃになります．それに加えて訳がいまいちなので，さらに読みづらい．超訳でもすればよかった……&lt;/p&gt;
+&lt;p&gt;Adblock Plusの新しいバージョンでは，さまざまなほうほうでフィルタを「いじる」ことができるようになっています．ここでは，その方法と使い方について説明しています．&lt;/p&gt;
+&lt;p&gt;免責事項: 例としてあげられているフィルタは，すべて単なる例として挙げており，使われることを意図しておりません．&lt;/p&gt;
+&lt;div class="section" id="introduction-to-adblock-plus-filters"&gt;
+&lt;h2&gt;Introduction to Adblock Plus filters&lt;/h2&gt;
+&lt;p&gt;この章では，ときどきフィルタを書くようなユーザーにとって十分な方法を説明します．&lt;/p&gt;
+&lt;div class="section" id="basic-filter-rules"&gt;
+&lt;h3&gt;Basic filter rules&lt;/h3&gt;
+&lt;p&gt;一番平凡なフィルタはブロックしたいバナーのアドレスを定義することでしょう．しかしながら，こういったアドレスはページを開く度に変わってしまうのがしばしばです．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/ads/banner123.gif&lt;/span&gt;&lt;/tt&gt;というアドレスで，&lt;tt class="docutils literal"&gt;123&lt;/tt&gt;の部分がランダムな数字であるようなものを考えてみましょう．このアドレスをそのままブロックするのでは，あまり役に立ちません．もっと一般的な形のフィルタ，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/ads/banner*.gif&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/ads/*&lt;/span&gt;&lt;/tt&gt;のようなものが必要でしょう．&lt;/p&gt;
+&lt;p&gt;Note: ワイルドカードを使うことで，ブロックしすぎないように注意してください．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/*&lt;/span&gt;&lt;/tt&gt;というフィルタはすべてのバナーをブロックできるかもしれませんが，同時に，見たいものまでブロックしてしまうかもしれません．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="defining-exception-rules"&gt;
+&lt;h3&gt;Defining exception rules&lt;/h3&gt;
+&lt;p&gt;だいたいの場合は非常によくブロックできるようなフィルタが，いくつかの場合ではブロックするべきでないものもブロックしてしまうことに気づくことがあるでしょう．そんなときは，そのフィルタを外したくはないですが，他方でそのいくつかの場合に対しては，マッチさせたくないと思うでしょう．&lt;/p&gt;
+&lt;p&gt;その場合は例外ルール(exception rules)が最適です．これはフィルタを適用するべきでないケースを定義することができます．たとえば，&lt;tt class="docutils literal"&gt;adv&lt;/tt&gt;というフィルタが&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;quot;http://example.com/advice.html&lt;/span&gt;&lt;/tt&gt;というアドレスもブロックしてしまうことが気に入らないとき，&lt;tt class="docutils literal"&gt;&amp;#64;&amp;#64;advice&lt;/tt&gt;という例外ルールを定義することによってそのアドレスがブロックされないようにすることができます．例外ルールは通常のルールと同じように記述でき，ワイルドカードや正規表現を使うことができます．定義する場合には&lt;tt class="docutils literal"&gt;&amp;#64;&amp;#64;&lt;/tt&gt;を先頭につけるだけで，そのルールは例外ルールになります．&lt;/p&gt;
+&lt;p&gt;例外ルールは他の使い方もできます．もし例外ルールが&amp;quot;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;https://&lt;/span&gt;&lt;/tt&gt;で始まっている場合(さらにその前にパイプ(&lt;tt class="docutils literal"&gt;|&lt;/tt&gt;)があってもかまいません)，そのルールはページ全体を例外とすることができます．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;&amp;#64;|http://example.com&lt;/span&gt;&lt;/tt&gt;という例外ルールがあった場合，&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;のすべてのページでAdblock Plusは無効化され，何もブロックされなくなります．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="matching-at-beginning-end-of-an-address"&gt;
+&lt;h3&gt;Matching at beginning/end of an address&lt;/h3&gt;
+&lt;p&gt;通常の場合，Adblock Plusはすべてのフィルタを，最初と最後にワイルドカードがあるものとして扱います．つまり，&lt;tt class="docutils literal"&gt;ad&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;*ad*&lt;/tt&gt;という二つのフィルタには違いがないということです．だいたいの場合はこの動作が問題を起こすことはないですが，ときどき，フィルタがアドレスの最初または最後にのみマッチしてほしい場合があるでしょう．たとえば，すべてのFlashコンテンツをブロックしたいとして，&lt;tt class="docutils literal"&gt;swf&lt;/tt&gt;のようなフィルタを追加した場合，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/swf/index.html&lt;/span&gt;&lt;/tt&gt;というアドレスもブロックされてしまいます．&lt;/p&gt;
+&lt;p&gt;この問題はフィルタにパイプ(&lt;tt class="docutils literal"&gt;|&lt;/tt&gt;)をつけることで解決できます．たとえば&lt;tt class="docutils literal"&gt;swf|&lt;/tt&gt;というフィルタは，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/annoyingflash.swf&lt;/span&gt;&lt;/tt&gt;というアドレスはブロックしますが，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/swf/index.html&lt;/span&gt;&lt;/tt&gt;というアドレスはブロックしません．また，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;|http://baddomain.example/&lt;/span&gt;&lt;/tt&gt;というフィルタは，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://baddomain.example/banner.gif&lt;/span&gt;&lt;/tt&gt;はブロックしますが，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://gooddomain.example/analyze?http://baddomain.example&lt;/span&gt;&lt;/tt&gt;はブロックしません．&lt;/p&gt;
+&lt;p&gt;ときには&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/banner.gif&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;https://example.com/banner.gif&lt;/span&gt;&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://www.example.com/banner.gif&lt;/span&gt;&lt;/tt&gt;というようなアドレスをブロックしたいこともあるでしょう．これには二つのパイプをフィルタの先頭につけることで達成できます．このようにすることにより，ドメイン名の先頭からマッチするように指定することができます．&lt;tt class="docutils literal"&gt;||example.com/banner.gif&lt;/tt&gt;というフィルタは先の3つのアドレスすべてをブロックすると同時に，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://badexample.com/banner.gif&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://gooddomain.example/analyze?http://example.com/banner.gif&lt;/span&gt;&lt;/tt&gt;といったアドレスはブロックしません．(Adblock Plus 1.1以上のバージョンが必要です．)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="marking-separator-characters"&gt;
+&lt;h3&gt;Marking separator characters&lt;/h3&gt;
+&lt;p&gt;しばしばフィルタの中で分割文字(separator character)を含めなければならない場合があります．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/&lt;/span&gt;&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com:8000/&lt;/span&gt;&lt;/tt&gt;はブロックしたいが，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com.ar/&lt;/span&gt;&lt;/tt&gt;はブロックしたくないとしましょう．この場合は記号&lt;tt class="docutils literal"&gt;^&lt;/tt&gt;を分割文字のプレースホルダーとして用いることができます．この場合フィルタは&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com^&lt;/span&gt;&lt;/tt&gt;のようになります．&lt;/p&gt;
+&lt;p&gt;分割文字は英数字と&lt;tt class="docutils literal"&gt;_&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;-&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;-&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;%&lt;/tt&gt;以外の文字すべてです．アドレスの最後も分割文字としてマッチします．分割文字をハイライトすると，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http:**//**example.com**:**8000**/**foo.bar**?**a**=**12**&amp;amp;**b**=**%D1%82%D0%B5%D1%81%D1%82&lt;/span&gt;&lt;/tt&gt;のようになります．このアドレスをブロックするならば，&lt;tt class="docutils literal"&gt;^example.com^&lt;/tt&gt;や，&lt;tt class="docutils literal"&gt;^%D1%82%D0%B5%D1%81%D1%82^&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;foo.bar&lt;/tt&gt;のようなフィルタが有効です．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comments"&gt;
+&lt;h3&gt;Comments&lt;/h3&gt;
+&lt;p&gt;エクスクラメーションマークで始まるルールはコメントとして扱われます．コメントはフィルタリストの中で，黒でなくグレーで表示されます．Adblock Plusはこのルールを無視するので，ここには何を書いても大丈夫です．フィルタの上に，そのフィルタが何をするかの説明を書いたり，フィルタリストの先頭にそれを作った作者について書くことができます．(多くのフィルタリストの作者はそうしています．)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="advanced-features"&gt;
+&lt;h3&gt;Advanced features&lt;/h3&gt;
+&lt;p&gt;この節で説明している機能は，通常はパワーユーザーやフィルタリストの作成者にしか使われないので，スキップされてもかまいません．&lt;/p&gt;
+&lt;div class="section" id="specifying-filter-options"&gt;
+&lt;h4&gt;Specifying filter options&lt;/h4&gt;
+&lt;p&gt;Adblock Plusはフィルタの動作を変える，多くのオプションを指定することができます．これらのオプションを指定するときは，フィルタの最後に&lt;tt class="docutils literal"&gt;$&lt;/tt&gt;をつけて，カンマ区切りで並べます．たとえば&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;*/ads/*$script,match-case&lt;/span&gt;&lt;/tt&gt;のようになります．このとき，&lt;tt class="docutils literal"&gt;*/ads/*&lt;/tt&gt;がフィルタで，&lt;tt class="docutils literal"&gt;script&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;match-case&lt;/span&gt;&lt;/tt&gt;がそのオプションになります．現在は次のようなオプションがサポートされています:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Type options: そのフィルタがどんな種類の要素をブロックするか(または，例外ルールの場合はホワイトリストに追加するか)を指定します．複数の種類を指定すると，指定した種類すべてにそのフィルタが適用されます．指定できる値は次の通りです．&lt;ul&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;script&lt;/tt&gt;-- HTMLのスクリプトタグによって読み込まれる外部スクリプト&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;image&lt;/tt&gt;-- HTMLのimgタグによって読み込まれるような普通の画像&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;background&lt;/tt&gt;-- CSSで指定されるような背景画像&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;stylesheet&lt;/tt&gt;-- 外部のCSSファイル&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;object&lt;/tt&gt;-- FlashやJavaアプレットのようなブラウザのプラグインによるコンテンツ&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;xbl&lt;/tt&gt;-- XBLによるバインド(通常，CSSの&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-moz-binding&lt;/span&gt;&lt;/tt&gt;によって読み込まれる)&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;ping&lt;/tt&gt;--&lt;a class="reference external" href="http://weblogs.mozillazine.org/darin/archives/009594.html"&gt;link pings&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;xmlhttprequest&lt;/tt&gt;--&lt;a class="reference external" href="http://www.w3.org/TR/XMLHttpRequest/"&gt;XMLHttpRequest&lt;/a&gt;オブジェクトによるリクエスト&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;object-subrequest&lt;/span&gt;&lt;/tt&gt;-- Flashのようなプラグインによるリクエスト&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;dtd&lt;/tt&gt;-- XML文章によって読み込まれるDTDファイル&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;subdocument&lt;/tt&gt;-- HTMLのフレームによって読み込まれる埋め込みページ&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;document&lt;/tt&gt;-- ページ自身(例外ルールのみがページに適用されます)&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;elemhide&lt;/tt&gt;--&lt;tt class="docutils literal"&gt;document&lt;/tt&gt;と似ていますがページ内の要素除去ルール
+(element hiding rules)のみ無効になります(このオプションを指定できるのは例外ルールのみ)(Adblock Plus 1.2以上のバージョンが必要です)&lt;/li&gt;
+&lt;li&gt;&lt;cite&gt;other&lt;/cite&gt;-- このリストで挙げられているもの以外すべて&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Inverse type options: フィルタが適用されるべきでない要素の種類を指定します．指定できる値は次の通りです．&lt;tt class="docutils literal"&gt;~script&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~image&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~background&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~stylesheet&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~object&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~xbl&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~ping&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~xmlhttprequest&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~object-subrequest&lt;/span&gt;&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~dtd&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~subdocument&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~document&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~elemhide&lt;/tt&gt;，&lt;tt class="docutils literal"&gt;~other&lt;/tt&gt;．&lt;/li&gt;
+&lt;li&gt;Restriction to third-party/first-party requests:&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;third-party&lt;/span&gt;&lt;/tt&gt;オプションが指定されている場合，現在見ているページと違うところの要素にのみ，そのフィルタが適用されます．同様に，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~third-party&lt;/span&gt;&lt;/tt&gt;オプションが指定されていた場合は，現  在見ているページと同じところの要素にのみ，そのフィルタが適用されます．(訳注:  たぶん同じところ(origin)って同じドメインとかだと思うんですが，よくわかりません．)&lt;/li&gt;
+&lt;li&gt;Domain restrictions:&lt;tt class="docutils literal"&gt;domain=example.com&lt;/tt&gt;のようなオプションが指定されている場合，そのフィルタは&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;のドメインのページにのみ適用されます．&lt;tt class="docutils literal"&gt;domain=example.com|example.net&lt;/tt&gt;のように，パイプを区切り文字にして複数のドメインを指定することができます．この場合は，&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;example.net&lt;/tt&gt;のページに適用されます．ドメイン名が&lt;tt class="docutils literal"&gt;~&lt;/tt&gt;で始まっている場合，そのドメインでは適用されないようになります．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;domain=~example.com&lt;/span&gt;&lt;/tt&gt;は，&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;以外のドメインのページで適用するという意味になります．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;domain=example.com|~foo.example.com&lt;/span&gt;&lt;/tt&gt;は，&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;のドメインのページで適用するが，サブドメイン&lt;tt class="docutils literal"&gt;foo.example.com&lt;/tt&gt;は例外として適用しないということになります．&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;match-case&lt;/span&gt;&lt;/tt&gt;-- フィルタが大文字と小文字を区別するようになります．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;*/BannerAd.gif$match-case&lt;/span&gt;&lt;/tt&gt;というフィルタは，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/BannerAd.gif&lt;/span&gt;&lt;/tt&gt;はブロックしますが，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/bannerad.gif&lt;/span&gt;&lt;/tt&gt;はブロックしません．&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;collapse&lt;/tt&gt;-- このオプションは，全体の&lt;tt class="docutils literal"&gt;Collapse blocked elements&lt;/tt&gt;を上書きし，フィルタがブロックした要素を折りたたむようにします．同様に，&lt;tt class="docutils literal"&gt;~collapse&lt;/tt&gt;は要素が折りたたまれないようにします．&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-regular-expressions"&gt;
+&lt;h4&gt;Using regular expressions&lt;/h4&gt;
+&lt;p&gt;フィルタがマッチする，しないについて，より細かい制御をしたい場合は，正規表現を使うことができます．たとえば，&lt;tt class="docutils literal"&gt;/banner\d+&lt;/tt&gt;というフィルタは&lt;tt class="docutils literal"&gt;banner123&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;banner321&lt;/tt&gt;にはマッチしますが，&lt;tt class="docutils literal"&gt;banner&lt;/tt&gt;にはマッチしません．正規表現の書き方については&lt;cite&gt;正規表現についてのドキュメント&lt;/cite&gt;を参照してください．&lt;/p&gt;
+&lt;p&gt;Note: パフォーマンス上の理由から，正規表現を使わなくてもよいなら使わないことをおすすめします．&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="element-hiding"&gt;
+&lt;h2&gt;Element hiding&lt;/h2&gt;
+&lt;div class="section" id="basic-rules"&gt;
+&lt;h3&gt;Basic rules&lt;/h3&gt;
+&lt;p&gt;広告がウェブページの中に，テキストとして埋め込まれているために，ブロックできないことがあるでしょう．そういったページのソースコードを見ると，次のようになっています:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;textad&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+Cheapest tofu, only here and now!
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+
+&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;sponsorad&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+Really cheap tofu, click here!
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+
+&lt;span class="nt"&gt;&amp;lt;textad&amp;gt;&lt;/span&gt;
+Only here you get the best tofu!
+&lt;span class="nt"&gt;&amp;lt;/textad&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ウェブページを読み込むと一緒に広告まで読み込まれてしまいます．こういったときには，広告を隠すことしかできません．そのために，要素を隠すことが必要になります．&lt;/p&gt;
+&lt;p&gt;上の例の最初の広告は，&lt;tt class="docutils literal"&gt;textad&lt;/tt&gt;というクラスの&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;要素の中に入っています．このような広告は&lt;tt class="docutils literal"&gt;##div.textad&lt;/tt&gt;のようなルールで隠すことができます．この&lt;tt class="docutils literal"&gt;##&lt;/tt&gt;というマークは要素除去ルールであることを示していて，それいがいは隠すべき要素を指定するセレクタになっています．要素は&lt;tt class="docutils literal"&gt;id&lt;/tt&gt;を使うことによっても隠すことができます．&lt;tt class="docutils literal"&gt;##div#sponsorad&lt;/tt&gt;は二番目のような広告を隠すことができます．要素名は指定しなくてもかまいません．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##*#sponsorad&lt;/span&gt;&lt;/tt&gt;というルールも同じように働きます．また，要素名のみ指定することもできます．&lt;tt class="docutils literal"&gt;##textad&lt;/tt&gt;というルールは三番目のような広告を隠します．&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://adblockplus.org/en/elemhidehelper"&gt;Element Hiding Helper extension&lt;/a&gt;は適切な要素を選び出し，対応したルールを書くことを，ソースコードを見ることなしにできるよう手助けをしてくれます．とは言っても，基本的なHTMLについての知識はあったほうがよいでしょう．&lt;/p&gt;
+&lt;p&gt;Note: 要素除去は通常のフィルタとは全く違った動きをします．要素除去ルールではワイルドカードが使えないことに注意してください．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="limiting-rules-to-certain-domains"&gt;
+&lt;h3&gt;Limiting rules to certain domains&lt;/h3&gt;
+&lt;p&gt;たいていの場合，要素除去ルールは特定のサイトのみに適用して，それ以外のサイトでは適用されないようにしたいでしょう．たとえば&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##*.sponsor&lt;/span&gt;&lt;/tt&gt;というルールはいくつかのサイトでは広告ではない要素も隠してしまうかもしれません．これを&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;example.com##*.sponsor&lt;/span&gt;&lt;/tt&gt;というように変えることで，このルールが&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.com/&lt;/span&gt;&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://something.example.com/&lt;/span&gt;&lt;/tt&gt;で適用されるようになり，同時に&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://example.org/&lt;/span&gt;&lt;/tt&gt;では適用されないようになります．ドメインはカンマで区切ることで複数指定することができます．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;domain1.example.com,domain2.example,domain3.example##*.sponsor&lt;/span&gt;&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;ドメイン名が&lt;tt class="docutils literal"&gt;~&lt;/tt&gt;で始まっている場合，そのルールはそのドメイン上のページでは適用されなくなります．(Adblock Plus 1.1以上のバージョンが必要です．)たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~example.com##*.sponsor&lt;/span&gt;&lt;/tt&gt;は&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;以外のドメインすべてで適用されるようになり，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;example.com,~foo.example.com##*.sponsor&lt;/span&gt;&lt;/tt&gt;は&lt;tt class="docutils literal"&gt;foo.example.com&lt;/tt&gt;を除いた&lt;tt class="docutils literal"&gt;example.com&lt;/tt&gt;上で適用されるようになります．&lt;/p&gt;
+&lt;p&gt;Note: 要素除去の実装方法の関係で，フルドメイン名しか指定することができません．つまり，&lt;tt class="docutils literal"&gt;domain&lt;/tt&gt;という指定によって，&lt;tt class="docutils literal"&gt;domain.example&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;domain.test&lt;/tt&gt;のようなドメインを対象にすることはできません．&lt;/p&gt;
+&lt;p&gt;Note: ドメイン指定をした要素除去ルールは，ブラウザのユーザーインターフェースにも使うことができます．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;browser##menuitem#javascriptConsole&lt;/span&gt;&lt;/tt&gt;は
+FirefoxのToolメニューにあるJavascript Consoleを隠します．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="attribute-selectors"&gt;
+&lt;h3&gt;Attribute selectors&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;id&lt;/tt&gt;や&lt;tt class="docutils literal"&gt;class&lt;/tt&gt;も無いような要素は除去するのが難しいかもしれません．このときは他の属性を指定することができます．たとえば，&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##table[width=&amp;quot;80%&amp;quot;]&lt;/span&gt;&lt;/tt&gt;というルールは&lt;tt class="docutils literal"&gt;width&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;80%&lt;/tt&gt;に指定されているようなテーブルを隠します．属性の値を完全に指定しなくてもかまいません．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##div[title*=&amp;quot;adv&amp;quot;]&lt;/span&gt;&lt;/tt&gt;というルールは&lt;tt class="docutils literal"&gt;title&lt;/tt&gt;の中に&lt;tt class="docutils literal"&gt;adv&lt;/tt&gt;という文字列が入っているような&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;要素を隠します．属性の値は先頭や末尾にもマッチさせることができます．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;##div[title^=&amp;quot;adv&amp;quot;][title$=&amp;quot;ert&amp;quot;]&lt;/span&gt;&lt;/tt&gt;といったフィルタは，&lt;tt class="docutils literal"&gt;title&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;adv&lt;/tt&gt;で始まり&lt;tt class="docutils literal"&gt;ert&lt;/tt&gt;で終わるような&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;要素を隠します．また，このように複数の条件を使うことができます．&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;table[width=&amp;quot;80%&amp;quot;][bgcolor=&amp;quot;white&amp;quot;]&lt;/span&gt;&lt;/tt&gt;は，&lt;tt class="docutils literal"&gt;width&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;80%&lt;/tt&gt;かつ，&lt;tt class="docutils literal"&gt;bgcolor&lt;/tt&gt;が&lt;tt class="docutils literal"&gt;white&lt;/tt&gt;であるようなテーブルを隠します．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="advanced-selectors"&gt;
+&lt;h3&gt;Advanced selectors&lt;/h3&gt;
+&lt;p&gt;FirefoxでサポートされているCSSセレクタは要素除去ルールでも使うことができます．&lt;tt class="docutils literal"&gt;##div.adheader + *&lt;/tt&gt;というルールは&lt;tt class="docutils literal"&gt;adheader&lt;/tt&gt;クラスの&lt;tt class="docutils literal"&gt;div&lt;/tt&gt;要素に続く，すべての要素を隠します．CSSセレクタのすべてのリストは，&lt;a class="reference external" href="http://www.w3.org/TR/css3-selectors/"&gt;W3C CSS
+specification&lt;/a&gt;で見ることができます．(すべてのセレクタがFirefoxでサポートされているわけではないことに注意してください)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="simplified-element-hiding-syntax"&gt;
+&lt;h3&gt;Simplified element hiding syntax&lt;/h3&gt;
+&lt;p&gt;Adblock Plusでは，後方互換性のために，&lt;tt class="docutils literal"&gt;#div(id=foo)&lt;/tt&gt;のような単純な要素除去ルールをサポートしています．このような書き方は推奨しておらず，CSSセレクタによる方法を推奨しています．この書き方は将来のどこかのタイミングで無効になる予定です．&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>Macを大きいディスプレイにつなげるときはMini DisplayPort &lt;-&gt; DisplayPort変換ケーブルを使う</title><link href="http://draftcode.github.com/2011/03/14/42aa3a98-4e10-11e0-bcea-d8a25efffee9.html" rel="alternate"></link><updated>2011-03-14T16:54:16+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2011-03-14:2011/03/14/42aa3a98-4e10-11e0-bcea-d8a25efffee9.html</id><summary type="html">&lt;p&gt;Macbook Proを修理に出したときに，どうしてもレポートを書かなければいけない感じだったので，Mac miniを購入しました．Macbook Proは3年ぐらい前のモデルだったので，大きいDVIポートがあり，DELLのU2711のような大きいディスプレイでも直接接続して最適な解像度が出せたのですが，今のMacについているようなMini DisplayPortだと，DVIとの変換ケーブルを使っても，フルHD程度までしか出力することができません．これはDVIのシングルリンクとかデュアルリンクとかの問題らしいんですが，それを解決するためにはAppleの高いデュアルリンク対応の変換アダプタを購入しなければいけません．&lt;/p&gt;
+&lt;p&gt;もっとシンプルな解決方法を目指します．最近のディスプレイはDisplayPortがついているようなので，それに変換すれば良いのです．実際自分はMini DisplayPortとDisplayPortの変換ケーブルを使って，大きい解像度の出力ができるようになっています．&lt;/p&gt;
+&lt;p&gt;残念ながら，このような変換ケーブルはあまり製造されていないようです．自分は&lt;a class="reference external" href="http://store.shopping.yahoo.co.jp/ats/0203.html"&gt;ATS Direct&lt;/a&gt;というサイトで購入しました．&lt;/p&gt;
+&lt;p&gt;またDisplayPortは音声出力も対応しているので，U2711の音声出力から音を出すこともできています．しかしながらU2711側では音量調節ができないので，音量調節ができるようなもの(スピーカーなど)でないと，音が大きすぎて耳がつぶれます．ヘッドホンとかは難しいです．ちなみに出力切り替えはSoundflowerを使うと便利です．&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;追記 (2011-06-22)&lt;/h2&gt;
+&lt;p&gt;どうも探し方が悪かったようで，他にもいくつか見つかりました．&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://www.amazon.co.jp/dp/B004KB5HM6/"&gt;http://www.amazon.co.jp/dp/B004KB5HM6/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://www.amazon.co.jp/dp/B004GCHNP8/"&gt;http://www.amazon.co.jp/dp/B004GCHNP8/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://direct.eizo.co.jp/shop/g/gPM200-BK/"&gt;http://direct.eizo.co.jp/shop/g/gPM200-BK/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ただ，ものによっては映らないものもあるみたいですね．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;追記 (2012-03-11)&lt;/h2&gt;
+&lt;p&gt;音声出力の切り替えはOptionキーを押しながらメニューバーの音量調節アイコンをクリックすると、出力装置の切り替えができるので、これが便利です。最近はU2711に別のスピーカーをつけて、そのスピーカーについている音声出力端子にヘッドホンをつけたりしています。&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>アキュムレータについて</title><link href="http://draftcode.github.com/2010/08/15/accumulator_programming.html" rel="alternate"></link><updated>2010-08-15T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2010-08-15:2010/08/15/accumulator_programming.html</id><summary type="html">&lt;p&gt;コンピュータプログラミングの概念・技法・モデルの中で，アキュムレータという概念が出てきました．たぶん，いろいろなところで使ってきた手法を，一般化して名前をつけたため，違うモノのように見えるだけだと思うのですが，混乱しているので整理します．&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;再帰計算と反復計算&lt;/h2&gt;
+&lt;p&gt;宣言的プログラミングにおいては，単純に再帰関数を書いてしまうと効率が悪いことが多いので，現実的には再帰計算の特殊な場合である，反復計算になるようにプログラムを書きます．再帰的データ構造を扱う再帰計算を反復計算にするにあたっては，問題を状態変換の列に作り直す必要がありました．&lt;/p&gt;
+&lt;p&gt;通常の場合，再帰形を書かずにに反復形を書くことが多いです．その場合に用いられる形式として，アキュムレータプログラミングという形式があります．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;反復計算におけるアキュムレータ&lt;/h2&gt;
+&lt;p&gt;反復計算は次のような制御抽象として表現できました:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;proc {Iterate S IsDone Transform ?R}
+    if {IsDone S} then R = S
+    else S1 in
+        S1 = {Transform S}
+        {Iterate S1 IsDone Transform R}
+    end
+end
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;アキュムレータは入力と出力の状態の対になります．この場合において，&lt;tt class="docutils literal"&gt;S&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;R&lt;/tt&gt;の対がアキュムレータとなっています．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;再帰的データ構造を扱う場合の反復計算&lt;/h2&gt;
+&lt;p&gt;再帰的データ構造を扱う計算をするときに，基本の場合と再帰の場合の二つの場合がありました．それを踏まえて，上述の反復計算を書き直すと次のようになります:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;proc {P X S1 ?Sn}
+    if {BaseCase X} then
+        S1 = Sn
+    else
+        {P1 ．．．S1 S2}
+        ．．．
+        {Pn ．．．Sm Sn}
+    end
+end
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;基本の場合(&lt;tt class="docutils literal"&gt;{BaseCase X} == true&lt;/tt&gt;の場合)は，既に状態変換の列の中で，一番最後の最終状態に居ることになるので，出力状態はそのままになります．&lt;/p&gt;
+&lt;p&gt;再帰の場合はいくつかの状態変換を施した後，再帰関数を呼んでいます．このとき，呼んでいる各関数もアキュムレータスタイルで書かれています．そのため，最後に呼ばれている関数では，その関数の出力状態がそのまま，呼び出し元の関数の出力状態&lt;tt class="docutils literal"&gt;Sn&lt;/tt&gt;になるようになっています．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;考察&lt;/h2&gt;
+&lt;p&gt;最後に再帰関数を呼ぶことによって，末尾再帰最適化がなされる(2章の練習問題で見たように，相互再帰では，自分自身の関数以外を呼んでもスタックが一定以上消費されない)のですが，その前に関数を呼んでしまうと，関数本体で一度しか再帰関数を呼ばないという条件を満たさなくなってしまうので，スタックを一定以上消費しないとは言えないと思います．&lt;/p&gt;
+&lt;p&gt;たぶんアキュムレータスタイルというのは，「再帰計算を反復計算にするときの一般的な形式」ではなく，「再帰計算を反復計算にした場合のスタイルを一般化した形式」として捉えるのが妥当だと思います．アキュムレータスタイルで，再帰の場合の本体で1つだけ相互再帰集合の関数を呼び出しており，かつその関数が本体の末尾に呼ばれているときのみ，スタックを一定以上消費しない反復計算になるのであって，それ以外の場合は「あまりメモリを消費しない」再帰計算にとどまると考えられます．このことについては，アキュムレータスタイルで書かれたマージソートのところでも「メモリ使用量は少ない」と述べられているだけなので，そういうことでしょう．再帰計算を反復計算にできる一般的な形式と思って読むと，なんでこれでスタックを消費しないと言えるの?と疑問に思ったりします．&lt;/p&gt;
+&lt;p&gt;Schemeでは再帰的データ構造としてリストに絞ったアキュムレータを提供していて，次のようになっています．&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;define &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;fold&lt;/span&gt; &lt;span class="nv"&gt;kcons&lt;/span&gt; &lt;span class="nv"&gt;knil&lt;/span&gt; &lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let &lt;/span&gt;&lt;span class="nv"&gt;loop&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nf"&gt;l&lt;/span&gt; &lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;r&lt;/span&gt; &lt;span class="nv"&gt;knil&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null? &lt;/span&gt;&lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;r&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;loop&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr &lt;/span&gt;&lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;kcons&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car &lt;/span&gt;&lt;span class="nv"&gt;l&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nv"&gt;r&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;この場合のアキュムレータは&lt;tt class="docutils literal"&gt;r&lt;/tt&gt;になります．Schemeではすべて関数なので，出力状態を明示的に指定しなくても良く，対になっているように見えませんが，最後にきちんと&lt;tt class="docutils literal"&gt;r&lt;/tt&gt;を返しているので，ここからもアキュムレータが&lt;tt class="docutils literal"&gt;r&lt;/tt&gt;であることを確認できます．逆からたどると，初期状態は&lt;tt class="docutils literal"&gt;knil&lt;/tt&gt;となっていると言えます．&lt;tt class="docutils literal"&gt;l&lt;/tt&gt;はリストなので，&lt;tt class="docutils literal"&gt;BaseCase&lt;/tt&gt;にあたるものは&lt;tt class="docutils literal"&gt;null?&lt;/tt&gt;になっています．また，この場合は末尾で直接再帰になっているので，スタックを消費しません．&lt;/p&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h3&gt;蛇足&lt;/h3&gt;
+&lt;p&gt;Schemeの場合，ある関数を呼び出した後にやるべき計算を取り出せるという機能があって，それは(自分も含めて)多くの人の中で「強力そうなのは知っているが，正直なところそれがどういうもので，何に有効なのかよくわからない『継続』」として知られています．&lt;/p&gt;
+&lt;p&gt;関数型プログラミングは宣言的プログラミングにおける，部分値を扱うことを制限して，完全値のみで計算するようにした計算モデルなので，継続ってある計算をするために必要な完全値が計算ができないという理由により，その値を必要とする計算を取り出しておいて，いったん制御フローを他の部分に移すためのものとしてみれるのではないでしょうか．それ以外にも，今その値は存在しているけれども，それをつかって計算をするよりも先に別の計算をしたい場合のフロー制御としても使えるとは思いますが．&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>情報工学科に所属する前後の学習の道筋</title><link href="http://draftcode.github.com/2010/08/15/learning_path.html" rel="alternate"></link><updated>2010-08-15T00:00:00+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2010-08-15:2010/08/15/learning_path.html</id><summary type="html">&lt;p&gt;自分も現在学習途中であるし，これはこのように勉強しろというようなたいそうなことは言えないのですが，どういうことを思って，どういう勉強を進めてきたかということを書いてみたいと思います．&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;計算機プログラムの構造と解釈を読み始めた&lt;/h2&gt;
+&lt;p&gt;買ったのは浪人をすることに決めたときでした．そこから4月か5月ぐらいまではやっていたような気がしますが，大して進まずに放置しました．実際に割と進んだのはB2のときでした．ちなみに現在も止まったままです．きっと多くの人が有名な本だし読んでおこうと思いつつも止まっているのではないでしょうか．自分もその一人です．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="c"&gt;
+&lt;h2&gt;プログラミング言語Cを読んだ&lt;/h2&gt;
+&lt;p&gt;読み始めたのはB1の5月からでした．以前にもCの特に有用ではなさそうな本を読みましたが，情報工学科を志望しているのだしCぐらいできていてもいいのではないだろうかということでこの本だったと思います．この本については演習を含めてだいたい1ヶ月か2ヶ月ぐらいで読み終えたと思います．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;Cを使うアルバイトを始めた&lt;/h2&gt;
+&lt;p&gt;プログラミング言語Cを読み終えたので，Cを使うアルバイトをはじめました．現在ではそういうバイトは少なくなっているのかもしれないですが，たまたま見つけたのでそこに応募しました．現在も一応続けています．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="mfc"&gt;
+&lt;h2&gt;MFCに触れた&lt;/h2&gt;
+&lt;p&gt;アルバイトの研修の最初の方は基本的なCの演習でしたが，後半の方はMFCを使った
+Windowsアプリケーションの開発でしたので，MFCに触れることになりました．必然的にC++も触れることになっています．MFCを使うにあたってリファレンスを参照するので，
+MSDNをひいていたりしました．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;プログラミング言語C++を読み始めた&lt;/h2&gt;
+&lt;p&gt;MFCはC++のフレームワークですので，C++の知識が必要になると思い，プログラミング言語C++を購入しました．この本に関しては評判はイマイチでしたが，言語をデザインした人が書いた本だからという理由で購入しました．&lt;/p&gt;
+&lt;p&gt;この本はまだ途中までしか読んでいないですし，読んだ部分もほぼ覚えていません．というのも，アルバイトの中で実際に使っているのはC++というよりBetter Cでしたので，C++の様々な機能(と呼んで差し支えないのかわかりませんが)は(幸か不幸か)あまり使用することがなかったのです．&lt;/p&gt;
+&lt;p&gt;同時期にC++のデザインと進化を購入しましたが，まだ読んでいません．&lt;/p&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h3&gt;この頃のコード&lt;/h3&gt;
+&lt;p&gt;C++かぶれになっていたので，STLやテンプレートやクラスを多用するコードでした．前述の通り，バイト先ではほぼBetter Cでしたので，書いたコードを社員さんにレビューしてもらうと，(幸か不幸か)反応がイマイチでした．研修の頃は，実際の業務でいじるコードを見ていないので，なんだろうなぁという感想を抱いていましたが，研修が終わり，実際の業務に入ったときにBetter Cのように書いてあるコードをみて，納得がいきました．(そして自分は周りにあわせてCっぽくC++を使うようになりました．)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="win32api"&gt;
+&lt;h2&gt;Win32APIに触れた&lt;/h2&gt;
+&lt;p&gt;研修ではMFCを使っていたので，Win32APIを直接使うことはありませんでしたが，実業務ではほぼWin32APIをつかったプログラミングでしたので，MSDNを読みながらプログラムを書くということをやっていました．この時期には古い(Windows95あたりの)Win32APIについての本がバイト先にありましたので，それをめくりつつOSが提供する基本的なサービス，つまりメモリ割り当てやメモリマッピング，スレッド・プロセスの概念，プロセス間同期について知ることとなりました．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;エキスパートCプログラミングを読んだ&lt;/h2&gt;
+&lt;p&gt;C++が提供する様々な抽象化は，遊ぶ分には楽しいけれども，適切にそれを使用できる人と一緒ではないと，仕事では使えないという印象を受けたので，C++に関することは中断し，Cについてより詳しく知ることにしました．実際のところプログラミング言語CだけではCについての知識は足りないとは思います．&lt;/p&gt;
+&lt;p&gt;エキスパートCプログラミングは，そのような足りない部分の一部を補ってくれました．特にポインタと配列の違いは，実際のところこの本を読むまで説明できなかったと思いますし，この本を読むことによって，コードを書くときに意識する視点の一つ，コンパイラは何をどう見るのかという視点を獲得することができました．この視点がないと，sizeofが展開される値についての正しい判断をすることができませんでした．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="linkers-loaders"&gt;
+&lt;h2&gt;Linkers &amp;amp; Loadersを読み始めた&lt;/h2&gt;
+&lt;p&gt;エキスパートCプログラミングを読んだあと，コンパイラがはき出すオブジェクトコードについての知識が欲しいと思いました．アセンブラについての知識は後で獲得することになるのですが，コンパイル後のコードについて，リンカやローダが行う作業や，オブジェクトコードそれ自体が含むものがなんなのかということについて知ることになりました．&lt;/p&gt;
+&lt;p&gt;オブジェクトコードが含むものを知ることができたため，コンパイラがどういう視点でソースコードを見ているのかということについて，よりよい推測ができるようになりました．翻訳単位という概念はエキスパートCプログラミングでもありましたが，
+Linkers&amp;amp; Loadersを読むことによって，複数のオブジェクトコード間での参照をするときに，どうやって解決しているかということも推測できるようになりました．&lt;/p&gt;
+&lt;div class="section" id="c-linkers-loaders"&gt;
+&lt;h3&gt;エキスパートCプログラミング と Linkers &amp;amp; Loadersの与えた影響&lt;/h3&gt;
+&lt;p&gt;上記の二冊は，自分のコーディングに対する姿勢に大きく影響を与えています．どんなに高級な言語でも，必ずそれは機械語レベルまで落とされるということを強く意識できるようになりました．例えば，自分はアルバイトでVBScriptを書くアルバイトを(上記の仕事とは別に)やっているのですが，そのときもCOMのVariantに意識を落とし，COMが提供するバイナリ標準についての知識を活用しながら，値渡しと参照渡しが混在する関数の間を行き来しています．&lt;/p&gt;
+&lt;p&gt;また，いかに抽象化されたレイヤで動くプログラムだろうと，それは必ず現実の計算機で実行されているということがはっきりと意識するようになりました．もともと(計算機科学について学習する上で)最初に選んだ本が計算機プログラムの構造と解釈であるのというのもあるかもしれませんが，Lispのようなかなり抽象化のレベルが高い言語が，どうやって計算機の上で動くオブジェクトコードに変換されるのか，ということに関心を寄せるようになりました．&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h2&gt;λ計算について知った&lt;/h2&gt;
+&lt;p&gt;Linkers &amp;amp; Loadersと前後して，チューリング機械や再帰的関数，λ計算についての基本的な知識を得ました．Schemeで出てくるlambdaというものについて知っておきたかったというのもありますし，たまたま大学の授業で計算論の科目があったというのもあります．これらの分野の興味はより進んでいって，サークルで行っている研究室紹介を行うために，関連した研究室へ取材に行くことになりました．&lt;/p&gt;
+&lt;p&gt;訪問した研究室はプログラム意味論について研究しているところでしたので，初学者の自分にはなかなか理解できなかったところもありましたが，なんとか研究室を紹介できるレベルまでもっていくことができました．また，この時期には論理学についての基礎知識も得ることができました．&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h2&gt;現在について&lt;/h2&gt;
+&lt;p&gt;ここまでが情報工学科3年になるまでにたどった学習の道筋です．現在はコンピュータアーキテクチャを学ぶために，パターソン&amp;amp;ヘネシー コンピュータの構成と設計 ハードウエアとソフトウエアのインタフェースを読んでいます．また，アルゴリズムとデータ構造について学ぶために，アルゴリズムイントロダクションを読んでいます．&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry></feed>
