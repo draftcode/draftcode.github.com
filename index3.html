@@ -26,6 +26,49 @@
 
     <div class='article'>
         <div class="content-title">
+            <a href="./2012/02/06/235454.html"><h1>HomebrewでクロスコンパイルできるGCCをビルドする</h1></a>
+            <div class="metadata">
+    <span class="label label-inverse">2012/02/06</span>
+    <a href="./category/Articles.html" class="label label-info">Articles</a>
+</div>        </div>
+
+        <div><p>Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。</p>
+<div class="section" id="id1">
+<h2>結論</h2>
+<p><a class="reference external" href="https://gist.github.com/1751385">https://gist.github.com/1751385</a>のようなFormulaをつくればできます。このFormulaは<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html">http://pdos.csail.mit.edu/6.828/2011/xv6.html</a>をビルドするために、<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html">http://pdos.csail.mit.edu/6.828/2011/tools.html</a>の設定を参考にして書きました。</p>
+</div>
+<div class="section" id="id2">
+<h2>クロスコンパイラ……ぐぬぬ……</h2>
+<p>クロスコンパイラは、以前自分が某研究室で作っているMIPSライクなCPUを使ったマシンで動くアセンブラを書いたときにもビルドしたのですが、なぜか動かなかったりします。なんか検索してみると、動かない動かないと言っている人も結構いたりするので失敗しやすいのでしょう。今回は無事動くところまでこぎ着けました。</p>
+</div>
+<div class="section" id="homebrew">
+<h2>Homebrewでビルドするときの問題点</h2>
+<p>Homebrewは既にパッケージとして用意してくれているものについてはビルドしない方針なので、GCCをビルドしたりするFormulaはありません。なので適当にでっち上げる必要があります。いろいろな人が既にGCCのFormulaを書いているので、それを参考に書けば良いのですが、適当にクロスコンパイラのFormulaを書くと失敗します。</p>
+<p>GCCはコンパイルをした後に、binutilsを使ってバイナリをはき出します。なので、クロスコンパイルができるGCCをビルドするには、そのターゲットとなるプラットフォーム用のbinutilsが必要です。そのbinutilsのツールを探すのに、GCCはいろいろな場所をみてくれます。どこを探すかは<a class="reference external" href="http://gcc.gnu.org/install/configure.html#with-as">http://gcc.gnu.org/install/configure.html#with-as</a>に書いてあって、どうも
+i386-foo-bar-asというのをPATHをみて探してくれるようです。適当にbinutilsとGCCで同じTargetを指定すれば良さそうなかんじ。</p>
+<p>が、駄目。動きません。GCCのビルドは成功するのですが、そのGCCでなんかコンパイルしようとすると、どうもアセンブラがエラーを吐いているようです。実行されているコマンドを見てみると、システム組み込みのasを使っているようです。そりゃ駄目だ。</p>
+<p>こんなの絶対おかしいよ。ということで、GCCのソースを見てみることに。いろいろかけずり回った結果、<tt class="docutils literal">gcc/gcc.c</tt>の<tt class="docutils literal">find_a_file()</tt>あたりでファイルを探しているようなのですが、なんかi386-foo-barみたいなマシンターゲットをつけているようには見えないぞ。あやしい。ちなみにldのほうは<tt class="docutils literal">gcc/collect2.c</tt>の<tt class="docutils literal">main</tt>でそういうプレフィックスをつけていて、ファイルを探すのもasとは別のコードで行っている模様。</p>
+<p>どうも、ldについてはインストールマニュアルに書かれている通りに探してくれているみたいですが、asについてはなんか違うようです。</p>
+</div>
+<div class="section" id="id3">
+<h2>解決</h2>
+<p>GCCが正しいアセンブラを探してくれない。仕方がないので手動でアセンブラを指定することになります。ということで、<a class="reference external" href="https://gist.github.com/1751385#file_gcc_xv6.rb">https://gist.github.com/1751385#file_gcc_xv6.rb</a>のように汚い感じですが、アセンブラのパスを手動で指定してあげるようにします。このようにすると、うまくコンパイルができました。(ということは、ldについてはきちんと探してくれたようです……)</p>
+<p>もし、Xv6をコンパイルして動かしたい。しかも、Homebrewで必要なものをいれたい。ということであれば、次のようにすることでうまくインストールすることができます。
+QEMUはuse-gccを使わないとうまく動きませんでした:</p>
+<div class="highlight"><pre>brew install https://raw.github.com/gist/1751385/binutils_xv6.rb
+brew install https://raw.github.com/gist/1751385/gcc_xv6.rb
+brew install https://raw.github.com/gist/1751385/gdb_xv6.rb
+brew install qemu --use-gcc
+</pre></div>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <a href="./2012/01/22/005216.html"><h1>「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</h1></a>
             <div class="metadata">
     <span class="label label-inverse">2012/01/22</span>
@@ -166,34 +209,6 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
     </div>
 
 
-
-    <div class='article'>
-        <div class="content-title">
-            <a href="./2012/01/01/182705.html"><h1>配列はCovariantなので使ってはいけない</h1></a>
-            <div class="metadata">
-    <span class="label label-inverse">2012/01/01</span>
-    <a href="./category/Java.html" class="label label-info">Java</a>
-</div>        </div>
-
-        <div><div class="section" id="id1">
-<h2>結論</h2>
-<p>配列はアレなので使ってはいけない。</p>
-</div>
-<div class="section" id="java">
-<h2>Javaの配列とは</h2>
-<p>Javaの配列はcovariantです。<tt class="docutils literal">Integer</tt>は<tt class="docutils literal">Number</tt>のサブクラスなんだから、<tt class="docutils literal">Integer[]</tt>も<tt class="docutils literal">Number[]</tt>のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。</p>
-<img alt="images/20120101171202.png" src="images/20120101171202.png" />
-<p>見た目の型は<tt class="docutils literal">Number</tt>の配列なのに、代入できる要素は<tt class="docutils literal">Integerの</tt>要素のみという配列が作れます。ここで、<tt class="docutils literal">Integer</tt>以外の要素を代入しようとすると、同じ<tt class="docutils literal">Number</tt>を継承している<tt class="docutils literal">Long</tt>でも実行時エラーになります。このときの<tt class="docutils literal">Number</tt>の配列の実体は、<tt class="docutils literal">Integer</tt>の配列ですから。</p>
-</div>
-<div class="section" id="id2">
-<h2>配列は使ってはいけない</h2>
-<p><a class="reference external" href="http://draftcode.github.com/2012/01/01/182300.html">先の記事</a>とあわせて、配列は使ってはいけない。</p>
-</div>
-</div>
-        <hr />
-    </div>
-
-
      <div class="pagination">
 <ul>
     <li class="prev"><a href="./index2.html">&larr; Previous</a></li>
@@ -203,6 +218,7 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
     <li class="active"><a href="./index3.html">3</a></li>
     <li class=""><a href="./index4.html">4</a></li>
     <li class=""><a href="./index5.html">5</a></li>
+    <li class=""><a href="./index6.html">6</a></li>
 
     <li class="next"><a href="./index4.html">Next &rarr;</a></li>
 
