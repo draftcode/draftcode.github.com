@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>HomebrewでクロスコンパイルできるGCCをビルドする</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="./theme/css/main.css" type="text/css" />
+                <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="A Pelican Blog Atom Feed" />
+                
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="./css/ie.css"/>
+                <script src="./js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="./css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="./">A Pelican Blog </a></h1>
+                <nav><ul>
+                                                                    <li><a href="./pages/about.html">About</a></li>
+                                                                    <li ><a href="./category/android.html">Android</a></li>
+                                    <li ><a href="./category/java.html">Java</a></li>
+                                    <li ><a href="./category/python.html">Python</a></li>
+                                    <li class="active"><a href="./category/articles.html">articles</a></li>
+                                    <li ><a href="./category/misc.html">misc</a></li>
+                                </ul></nav>
+        </header><!-- /#banner -->
+        <section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="./235454.html" rel="bookmark"
+           title="Permalink to HomebrewでクロスコンパイルできるGCCをビルドする">HomebrewでクロスコンパイルできるGCCをビルドする</a></h1>
+          </header>
+
+    <div class="entry-content">
+      <footer class="post-info">
+        <abbr class="published" title="2012-02-06T00:00:00">
+                Mon 06 February 2012
+        </abbr>
+
+                <address class="vcard author">
+                By <a class="url fn" href="./author/draftcode.html">draftcode</a>
+        </address>
+        <p>In <a href="./category/articles.html">articles</a>. </p>
+
+</footer><!-- /.post-info -->      <p>Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかっ
+てクロスコンパイラをビルドします。</p>
+<div class="section" id="id1">
+<h2>結論</h2>
+<p><a class="reference external" href="https://gist.github.com/1751385">https://gist.github.com/1751385</a> のようなFormulaをつくればできます。このFormula
+は <a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html">http://pdos.csail.mit.edu/6.828/2011/xv6.html</a> をビルドするために、
+<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html">http://pdos.csail.mit.edu/6.828/2011/tools.html</a> の設定を参考にして書きました。</p>
+</div>
+<div class="section" id="id2">
+<h2>クロスコンパイラ……ぐぬぬ……</h2>
+<p>クロスコンパイラは、以前自分が某研究室で作っているMIPSライクなCPUを使ったマシ
+ンで動くアセンブラを書いたときにもビルドしたのですが、なぜか動かなかったりしま
+す。なんか検索してみると、動かない動かないと言っている人も結構いたりするので失
+敗しやすいのでしょう。今回は無事動くところまでこぎ着けました。</p>
+</div>
+<div class="section" id="homebrew">
+<h2>Homebrewでビルドするときの問題点</h2>
+<p>Homebrewは既にパッケージとして用意してくれているものについてはビルドしない方針
+なので、GCCをビルドしたりするFormulaはありません。なので適当にでっち上げる必要
+があります。いろいろな人が既にGCCのFormulaを書いているので、それを参考に書けば
+良いのですが、適当にクロスコンパイラのFormulaを書くと失敗します。</p>
+<p>GCCはコンパイルをした後に、binutilsを使ってバイナリをはき出します。なので、ク
+ロスコンパイルができるGCCをビルドするには、そのターゲットとなるプラットフォー
+ム用のbinutilsが必要です。そのbinutilsのツールを探すのに、GCCはいろいろな場所
+をみてくれます。どこを探すかは
+<a class="reference external" href="http://gcc.gnu.org/install/configure.html#with-as">http://gcc.gnu.org/install/configure.html#with-as</a> に書いてあって、どうも
+i386-foo-bar-asというのをPATHをみて探してくれるようです。適当にbinutilsとGCC
+で同じTargetを指定すれば良さそうなかんじ。</p>
+<p>が、駄目。動きません。GCCのビルドは成功するのですが、そのGCCでなんかコンパイル
+しようとすると、どうもアセンブラがエラーを吐いているようです。実行されているコ
+マンドを見てみると、システム組み込みのasを使っているようです。そりゃ駄目だ。</p>
+<p>こんなの絶対おかしいよ。ということで、GCCのソースを見てみることに。いろいろか
+けずり回った結果、 <tt class="docutils literal">gcc/gcc.c</tt> の <tt class="docutils literal">find_a_file()</tt> あたりでファイルを探して
+いるようなのですが、なんかi386-foo-barみたいなマシンターゲットをつけているよう
+には見えないぞ。あやしい。ちなみにldのほうは <tt class="docutils literal">gcc/collect2.c</tt> の <tt class="docutils literal">main</tt> で
+そういうプレフィックスをつけていて、ファイルを探すのもasとは別のコードで行って
+いる模様。</p>
+<p>どうも、ldについてはインストールマニュアルに書かれている通りに探してくれている
+みたいですが、asについてはなんか違うようです。</p>
+</div>
+<div class="section" id="id3">
+<h2>解決</h2>
+<p>GCCが正しいアセンブラを探してくれない。仕方がないので手動でアセンブラを指定す
+ることになります。ということで、
+<a class="reference external" href="https://gist.github.com/1751385#file_gcc_xv6.rb">https://gist.github.com/1751385#file_gcc_xv6.rb</a> のように汚い感じですが、アセン
+ブラのパスを手動で指定してあげるようにします。このようにすると、うまくコンパイ
+ルができました。(ということは、ldについてはきちんと探してくれたようです……)</p>
+<p>もし、Xv6をコンパイルして動かしたい。しかも、Homebrewで必要なものをいれたい。
+ということであれば、次のようにすることでうまくインストールすることができます。
+QEMUはuse-gccを使わないとうまく動きませんでした:</p>
+<div class="highlight"><pre>brew install https://raw.github.com/gist/1751385/binutils_xv6.rb
+brew install https://raw.github.com/gist/1751385/gcc_xv6.rb
+brew install https://raw.github.com/gist/1751385/gdb_xv6.rb
+brew install qemu --use-gcc
+</pre></div>
+</div>
+
+    </div><!-- /.entry-content -->
+    
+  </article>
+</section>
+        <section id="extras" class="body">
+                        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
