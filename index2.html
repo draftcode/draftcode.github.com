@@ -26,13 +26,13 @@
 
     <div class='article'>
         <div class="content-title">
-            <a href="./2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html"><h1>RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</h1></a>
+            <h1><a href="./2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html">RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2012/09/23</span>
-    <a href="./category/Android.html" class="label label-info">Android</a>
+    <a href="./category/android.html" class="label label-info">Android</a>
 </div>        </div>
 
-        <div><p>RoboGuiceのInjectなんとか系は記述量が減ってテストもしやすくなって便利ですが、残念ながらInjectExtraだけはイマイチと言わざるを得ません。使っているバーションは、RoboGuice 1.1.2とGuice 2.0 no-aopで、Robolectricでテストを書いたりしています。もしかしたら、RoboGuice 2.0で解消されているのかも知れません。</p>
+        <div class="content-body"><p>RoboGuiceのInjectなんとか系は記述量が減ってテストもしやすくなって便利ですが、残念ながらInjectExtraだけはイマイチと言わざるを得ません。使っているバーションは、RoboGuice 1.1.2とGuice 2.0 no-aopで、Robolectricでテストを書いたりしています。もしかしたら、RoboGuice 2.0で解消されているのかも知れません。</p>
 <div class="section" id="id1">
 <h2>問題背景</h2>
 <p>まず、実機で動くコードでは、<tt class="docutils literal">RoboActivity.onCreate()</tt>の中でInjectionが行われます。このとき、<tt class="docutils literal">InjectView</tt>以外のフィールドがInjectされます。その中には当然<tt class="docutils literal">InjectExtra</tt>も入っていますので、ここでそのInjectionのContextである
@@ -85,13 +85,13 @@ ActivityからIntentがとり出されて、Extraが入ります:</p>
 
     <div class='article'>
         <div class="content-title">
-            <a href="./2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html"><h1>第(1+1)回 六本木 Linux カーネル読書会 参加メモ</h1></a>
+            <h1><a href="./2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html">第(1+1)回 六本木 Linux カーネル読書会 参加メモ</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2012/08/01</span>
-    <a href="./category/Articles.html" class="label label-info">Articles</a>
+    <a href="./category/articles.html" class="label label-info">Articles</a>
 </div>        </div>
 
-        <div><p><a class="reference external" href="http://connpass.com/event/824/">第(1+1)回 六本木 Linux カーネル読書会</a>に行ってきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあたり。</p>
+        <div class="content-body"><p><a class="reference external" href="http://connpass.com/event/824/">第(1+1)回 六本木 Linux カーネル読書会</a>に行ってきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあたり。</p>
 <p>後で調べたこともいくつか追加している。</p>
 <div class="topic">
 <p class="topic-title first">do_fork (kernel/fork.c)</p>
@@ -198,13 +198,13 @@ topみたいなslabtopというコマンドもある。</p>
 
     <div class='article'>
         <div class="content-title">
-            <a href="./2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html"><h1>Introduction to Domain TheoryのLecture1を読む</h1></a>
+            <h1><a href="./2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html">Introduction to Domain TheoryのLecture1を読む</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2012/03/20</span>
-    <a href="./category/Articles.html" class="label label-info">Articles</a>
+    <a href="./category/articles.html" class="label label-info">Articles</a>
 </div>        </div>
 
-        <div><p>Graham Hutton先生の<a class="reference external" href="http://www.cs.nott.ac.uk/~gmh/domains.html">Introduction to Domain Theory</a>を読んだメモです。</p>
+        <div class="content-body"><p>Graham Hutton先生の<a class="reference external" href="http://www.cs.nott.ac.uk/~gmh/domains.html">Introduction to Domain Theory</a>を読んだメモです。</p>
 <div class="section" id="denotational-semantics">
 <h2>Denotational Semantics</h2>
 <p>BNFを使って形式的にAbstract syntaxが定義されたプログラミング言語Pを考えたときに、そのPのDenotational semanticsは次の二つから構成されるんだよーという話。</p>

@@ -26,13 +26,13 @@
 
     <div class='article'>
         <div class="content-title">
-            <a href="../2012/01/22/005216.html"><h1>「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</h1></a>
+            <h1><a href="../2012/01/22/005216.html">「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2012/01/22</span>
-    <a href="../category/Python.html" class="label label-info">Python</a>
+    <a href="../category/python.html" class="label label-info">Python</a>
 </div>        </div>
 
-        <div><p>※酔って書いているのでアレです</p>
+        <div class="content-body"><p>※酔って書いているのでアレです</p>
 <p>久しぶりの勉強会。今まで出たのがVimの勉強会とかだったので、言語の勉強会は初めてかもしれないですね。あ、Haskellのやつに出たか。となりの研究室の先輩と参加。
 JITってどうなってるの、とかPyPyってどういう構成なのとか、PyPyでは内部でこんな事をしてるよという感じの発表で、非常に興味深く聞かせていただきました。</p>
 <p>事前にPyPyのソースコードはダウンロードしていたので、その中を検索しながら聞いていました。最初はshomah4aさんのPyPyの概要の発表で、Python処理系としてのPyPyと言語処理系をつくるためのライブラリとしてのPyPy、という二つの側面があるらしいです。見たところ、それに対応してディレクトリも分かれているようです(pypyの方がそうだったかな)。</p>
@@ -52,13 +52,13 @@ Readingというのを書いていたりするみたいなので、積極的に�
 
     <div class='article'>
         <div class="content-title">
-            <a href="../2011/12/29/145918.html"><h1>CPython2.7.2のWindowsでのmultiprocessingの動作</h1></a>
+            <h1><a href="../2011/12/29/145918.html">CPython2.7.2のWindowsでのmultiprocessingの動作</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2011/12/29</span>
-    <a href="../category/Python.html" class="label label-info">Python</a>
+    <a href="../category/python.html" class="label label-info">Python</a>
 </div>        </div>
 
-        <div><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
+        <div class="content-body"><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
 <p>Windowsにおける<tt class="docutils literal">multiprocessing</tt>モジュールの動きは次のようなものになります:</p>
 <ol class="arabic simple">
 <li>pipeを作っておく。</li>
@@ -76,13 +76,13 @@ Readingというのを書いていたりするみたいなので、積極的に�
 
     <div class='article'>
         <div class="content-title">
-            <a href="../2011/12/29/153703.html"><h1>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</h1></a>
+            <h1><a href="../2011/12/29/153703.html">CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2011/12/29</span>
-    <a href="../category/Python.html" class="label label-info">Python</a>
+    <a href="../category/python.html" class="label label-info">Python</a>
 </div>        </div>
 
-        <div><p>ドキュメンテーションにも書いてあるとおり、<tt class="docutils literal">csv</tt>モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。<tt class="docutils literal">csv</tt>モジュールのコアの部分はCで書かれており、<tt class="docutils literal">_csv.c</tt>というファイルに記述されています。</p>
+        <div class="content-body"><p>ドキュメンテーションにも書いてあるとおり、<tt class="docutils literal">csv</tt>モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。<tt class="docutils literal">csv</tt>モジュールのコアの部分はCで書かれており、<tt class="docutils literal">_csv.c</tt>というファイルに記述されています。</p>
 <p><tt class="docutils literal">csv.Reader</tt>は与えられたfile-likeオブジェクトから<tt class="docutils literal">PyString_AsString</tt>をつかって<tt class="docutils literal">char *</tt>を得ようとします。:</p>
 <div class="highlight"><pre><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
 <span class="nf">Reader_iternext</span><span class="p">(</span><span class="n">ReaderObj</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>

@@ -26,13 +26,13 @@
 
     <div class='article'>
         <div class="content-title">
-            <a href="./2012/01/01/182300.html"><h1>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</h1></a>
+            <h1><a href="./2012/01/01/182300.html">Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2012/01/01</span>
-    <a href="./category/Java.html" class="label label-info">Java</a>
+    <a href="./category/java.html" class="label label-info">Java</a>
 </div>        </div>
 
-        <div><div class="section" id="id1">
+        <div class="content-body"><div class="section" id="id1">
 <h2>結論</h2>
 <p>配列はアレなので使ってはいけない</p>
 </div>
@@ -143,13 +143,13 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
 
     <div class='article'>
         <div class="content-title">
-            <a href="./2012/01/01/182705.html"><h1>配列はCovariantなので使ってはいけない</h1></a>
+            <h1><a href="./2012/01/01/182705.html">配列はCovariantなので使ってはいけない</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2012/01/01</span>
-    <a href="./category/Java.html" class="label label-info">Java</a>
+    <a href="./category/java.html" class="label label-info">Java</a>
 </div>        </div>
 
-        <div><div class="section" id="id1">
+        <div class="content-body"><div class="section" id="id1">
 <h2>結論</h2>
 <p>配列はアレなので使ってはいけない。</p>
 </div>
@@ -171,13 +171,13 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
 
     <div class='article'>
         <div class="content-title">
-            <a href="./2011/12/29/145918.html"><h1>CPython2.7.2のWindowsでのmultiprocessingの動作</h1></a>
+            <h1><a href="./2011/12/29/145918.html">CPython2.7.2のWindowsでのmultiprocessingの動作</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2011/12/29</span>
-    <a href="./category/Python.html" class="label label-info">Python</a>
+    <a href="./category/python.html" class="label label-info">Python</a>
 </div>        </div>
 
-        <div><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
+        <div class="content-body"><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
 <p>Windowsにおける<tt class="docutils literal">multiprocessing</tt>モジュールの動きは次のようなものになります:</p>
 <ol class="arabic simple">
 <li>pipeを作っておく。</li>

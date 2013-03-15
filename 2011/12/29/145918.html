@@ -27,10 +27,10 @@
             <h1>CPython2.7.2のWindowsでのmultiprocessingの動作</h1>
             <div class="metadata">
     <span class="label label-inverse">2011/12/29</span>
-    <a href="../../../category/Python.html" class="label label-info">Python</a>
+    <a href="../../../category/python.html" class="label label-info">Python</a>
 </div>        </div>
 
-        <div><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
+        <div class="content-body"><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
 <p>Windowsにおける<tt class="docutils literal">multiprocessing</tt>モジュールの動きは次のようなものになります:</p>
 <ol class="arabic simple">
 <li>pipeを作っておく。</li>
