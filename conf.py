@@ -1,6 +1,8 @@
-#!/usr/bin/python2.7
-# vim: fileencoding=utf-8
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*-
+from __future__ import division, absolute_import, print_function, unicode_literals
+
+import customize.amazon
+import customize.japanese_text_join
 
 AUTHOR = 'draftcode'
 DEFAULT_CATEGORY = "Articles"
@@ -30,39 +32,3 @@ SOCIAL = (('Twitter', 'http://twitter.com/#!/draftcode'),
           ('GitHub', 'http://github.com/draftcode'),
           ('Google+', 'https://plus.google.com/107177890582465029754?rel=author'))
 TWITTER_USERNAME = 'draftcode'
-
-##############################################################################
-
-import unicodedata
-import docutils.nodes
-import docutils.transforms
-
-class JapaneseTextJoin(docutils.transforms.Transform):
-    default_priority = 800
-
-    def apply(self):
-        for text in self.document.traverse(docutils.nodes.Text):
-            if (not isinstance(text.parent, docutils.nodes.literal_block) and
-                not isinstance(text.parent, docutils.nodes.raw)):
-                lines = []
-                prev_category = ''
-                for line in text.astext().splitlines():
-                    line = line.strip()
-                    if len(lines) > 0 and len(line) > 0:
-                        if prev_category == 'Lo' or unicodedata.category(line[0]) == 'Lo':
-                            lines[-1] += line
-                        else:
-                            lines.append(line)
-                        prev_category = unicodedata.category(line[-1])
-                    else:
-                        lines.append(line)
-                joined_text = '\n'.join(lines)
-                text.parent.replace(text, docutils.nodes.Text(joined_text, text.rawsource))
-
-import docutils.parsers.rst
-origparser = docutils.parsers.rst.Parser
-class Parser(origparser):
-    def get_transforms(self):
-        return origparser.get_transforms(self) + [JapaneseTextJoin]
-docutils.parsers.rst.Parser = Parser
-
