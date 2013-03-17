@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>Windows環境でPythonのC拡張をビルドする - draftcode.github.com</title>
+    <meta name="author" content="draftcode">
+    <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
+
+    <!--[if lt IE 9]>
+    <script src="../../../theme/html5.js"></script>
+    <![endif]-->
+
+    <link href="../../../theme/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../theme/local.css" rel="stylesheet">
+    <link href="../../../theme/pygments.css" rel="stylesheet">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="../../../atom.xml">
+    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
+</head>
+
+<body>
+
+<h1 id="site-title"><a href="../../..">draftcode.github.com</a></h1>
+
+<div id="content">
+    <div class='article'>
+        <div class="content-title">
+            <h1>Windows環境でPythonのC拡張をビルドする</h1>
+            <div class="metadata">
+    <span class="label label-inverse">2013/03/17</span>
+    <a href="../../../category/articles.html" class="label label-info">Articles</a>
+</div>        </div>
+
+        <div class="content-body"><p>Windows NativeのPythonでC拡張をビルドする方法を説明します。みなさん普通は
+WindowsではPythonなんて使わないのか、あんまり情報が無いんですよね……</p>
+<div class="section" id="windows-sdk">
+<h2>Windows SDKをインストールする</h2>
+<p>C拡張なのでCコンパイラが必要なので、コンパイラをインストールします。MicrosoftはVistual Studioを売っているのでそれを買えばコンパイラがついてきます。また、無償版のExpress Editionをインストールしてもコンパイラがついてきます。</p>
+<p>C拡張をうまいことビルドするために、distutilsはVS2008のコンパイラに対応するように書かれています。UNIXだと適当にPATHからコンパイラを探してくれば良いのに、なぜWindowsだとdistutilsがVS2008のための特別な処理を入れているかというと、コンパイラの場所がWindowsだとPATHに入っていなかったりして、レジストリから推測しなければならないからです。残念OSですね……</p>
+<p>レジストリからコンパイラの場所を推測する関係で、より新しいバージョンのVSには対応できていません(レジストリエントリの場所が違うので)。そして、最近対応しているVS2008の(一部のVC++ 2008の)Express Editionのダウンロードができなくなったようです。(<a class="reference external" href="http://mail.python.org/pipermail/python-dev/2013-March/124624.html">[Python-Dev] VC++ 2008 Express Edition now locked away?</a>)コンパイラが入手できないのではdistutilsが対応するまでWindows上ではC拡張をビルドすることができません。</p>
+<p>案ずることはありません。まだ道はあります。我々が欲しいのはコンパイラのみです。
+MicrosoftはIDEがついてこないコンパイラ単体も配布しています。それがWindows SDKです。ちょっと前までPlatform SDKという名前だった気がします。VS2008のバージョンと互換性があるのは<a class="reference external" href="http://www.microsoft.com/en-us/download/details.aspx?id=3138">Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1</a>という
+Windows SDKでこちらはまだダウンロード可能です。こちらをインストールしましょう。</p>
+</div>
+<div class="section" id="vcvarsall-bat">
+<h2>vcvarsall.batをつくる</h2>
+<p>この状態でpython setup.py buildをやるとvcvarsall.batがないという趣旨のことを言われてビルドできません。このvcvarsall.batはVS2010と互換性のあるバージョンのWindows SDKだとついてきているのですが、2008と互換性のあるバージョンのSDKだとついてこないようです。中身は単純で現在のシステムが64bitか32bitかによって(これは引数でも指定できるようです)使うコンパイラを選択するという単純なバッチファイルです。コンパイラの選択もほかのバッチファイルを呼んでいるだけですので、自作しましょう。</p>
+<p><tt class="docutils literal"><span class="pre">C:\Program</span> Files <span class="pre">(x86)\Microsoft</span> Visual Studio 9.0\VC\vcvarsall.bat</tt>を作成します。32bit版Pythonを利用している場合は、:</p>
+<pre class="literal-block">
+&#64;call &quot;%~dp0bin\vcvars32.bat&quot;
+</pre>
+<p>という行を、64bit版の場合は:</p>
+<pre class="literal-block">
+&#64;call &quot;%~dp0bin\vcvars64.bat&quot;
+</pre>
+<p>という行を一行書いて保存します。64bit版Windowsではない場合は適宜Program Filesを読み替えてください。</p>
+<p>これでC拡張をコンパイルできるようになります。</p>
+</div>
+<div class="section" id="id1">
+<h2>より新しいバージョンを利用する方法</h2>
+<p>より新しいバージョンのコンパイラを利用する方法もあります。残念ながらdistutilsは(Python本体がコンパイルされたバージョンである)MSVC2008のコンパイラしか認識してくれないので、その部分をスキップしてPATHから探すようにします。</p>
+<p>環境変数に<tt class="docutils literal">MSSdk</tt>と<tt class="docutils literal">DISTUTILS_USE_SDK</tt>という変数を追加して下さい。値はなんでも構いません。これによりdistutilsはパスが通っているところからcl.exeやlink.exeを探します。</p>
+<p>この方法の注意点は、Cygwin上でWindowsネイティブのPythonを利用してC拡張のコンパイルをしようとすると、CygwinのGCCのlink.exeが利用されてしまうことと、Python本体と依存するライブラリが変わることです。後者によりpy2exeなどでexeにして配布するときに、実行環境で再頒布可能パッケージがなくて実行できない可能性があります。
+(再頒布可能パッケージをインストールすれば実行可能です)</p>
+</div>
+</div>
+
+        <hr>
+
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'draftcode-github-com'; 
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</div>
+
+<div id="footer">
+    <div id="about">
+        <ul class="nav nav-list">
+            <li class="nav-header">About the author</li>
+        </ul>
+
+        <div style="padding: 10px;">
+            <a id="about-image" href="../../../pages/about.html" rel="alternate"><img src="../../../static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
+            <p>東京で情報工学を専攻している大学院生です。</p>
+        </div>
+    </div>
+
+    <div id="site">
+        <ul class="nav nav-list">
+            <li class="nav-header">Site</li>
+
+            <li><a href="../../../archives.html">Archives</a>
+            <li><a href="../../../atom.xml" rel="alternate">Atom feed</a></li>
+        </ul>
+    </div>
+
+    <div id="category">
+        <ul class="nav nav-list">
+            <li class="nav-header">Categories</li>
+                        <li><a href="../../../category/android.html">Android</a></li>            <li><a href="../../../category/articles.html">Articles</a></li>            <li><a href="../../../category/java.html">Java</a></li>            <li><a href="../../../category/python.html">Python</a></li>        </ul>
+    </div>
+
+    <div id="social">
+        <ul class="nav nav-list">
+            <li class="nav-header">Social</li>
+                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>        </ul>
+    </div>
+</div>
+
+</body>
+</html>

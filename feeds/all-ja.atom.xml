@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com/" rel="alternate"></link><link href="http://draftcode.github.com//feeds/all-ja.atom.xml" rel="self"></link><id>http://draftcode.github.com/</id><updated>2013-03-10T21:27:45+09:00</updated><entry><title>所得税・住民税についてのメモ</title><link href="http://draftcode.github.com/2013/03/10/937d07c5-9136-4520-8310-17cdce1bb0eb.html" rel="alternate"></link><updated>2013-03-10T21:27:45+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2013-03-10:2013/03/10/937d07c5-9136-4520-8310-17cdce1bb0eb.html</id><summary type="html">&lt;p&gt;社会人になるであろうちょっと手前で税金について調べなければいけなくなったので、必要であろうところだけ書く。正確なことはわからないので、詳しくは&lt;a class="reference external" href="http://www.nta.go.jp/taxanswer/shotoku/shotoku.htm"&gt;タックスアンサー&lt;/a&gt;を見ればいいと思う。というかタックスアンサーを最初から最後まで全部読めばだいたい分かる話。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com/" rel="alternate"></link><link href="http://draftcode.github.com//feeds/all-ja.atom.xml" rel="self"></link><id>http://draftcode.github.com/</id><updated>2013-03-17T13:41:45+09:00</updated><entry><title>Windows環境でPythonのC拡張をビルドする</title><link href="http://draftcode.github.com/2013/03/17/5f45fabb-8b64-469e-a0f6-7f9d76564af8.html" rel="alternate"></link><updated>2013-03-17T13:41:45+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2013-03-17:2013/03/17/5f45fabb-8b64-469e-a0f6-7f9d76564af8.html</id><summary type="html">&lt;p&gt;Windows NativeのPythonでC拡張をビルドする方法を説明します。みなさん普通は
+WindowsではPythonなんて使わないのか、あんまり情報が無いんですよね……&lt;/p&gt;
+&lt;div class="section" id="windows-sdk"&gt;
+&lt;h2&gt;Windows SDKをインストールする&lt;/h2&gt;
+&lt;p&gt;C拡張なのでCコンパイラが必要なので、コンパイラをインストールします。MicrosoftはVistual Studioを売っているのでそれを買えばコンパイラがついてきます。また、無償版のExpress Editionをインストールしてもコンパイラがついてきます。&lt;/p&gt;
+&lt;p&gt;C拡張をうまいことビルドするために、distutilsはVS2008のコンパイラに対応するように書かれています。UNIXだと適当にPATHからコンパイラを探してくれば良いのに、なぜWindowsだとdistutilsがVS2008のための特別な処理を入れているかというと、コンパイラの場所がWindowsだとPATHに入っていなかったりして、レジストリから推測しなければならないからです。残念OSですね……&lt;/p&gt;
+&lt;p&gt;レジストリからコンパイラの場所を推測する関係で、より新しいバージョンのVSには対応できていません(レジストリエントリの場所が違うので)。そして、最近対応しているVS2008の(一部のVC++ 2008の)Express Editionのダウンロードができなくなったようです。(&lt;a class="reference external" href="http://mail.python.org/pipermail/python-dev/2013-March/124624.html"&gt;[Python-Dev] VC++ 2008 Express Edition now locked away?&lt;/a&gt;)コンパイラが入手できないのではdistutilsが対応するまでWindows上ではC拡張をビルドすることができません。&lt;/p&gt;
+&lt;p&gt;案ずることはありません。まだ道はあります。我々が欲しいのはコンパイラのみです。
+MicrosoftはIDEがついてこないコンパイラ単体も配布しています。それがWindows SDKです。ちょっと前までPlatform SDKという名前だった気がします。VS2008のバージョンと互換性があるのは&lt;a class="reference external" href="http://www.microsoft.com/en-us/download/details.aspx?id=3138"&gt;Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1&lt;/a&gt;という
+Windows SDKでこちらはまだダウンロード可能です。こちらをインストールしましょう。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="vcvarsall-bat"&gt;
+&lt;h2&gt;vcvarsall.batをつくる&lt;/h2&gt;
+&lt;p&gt;この状態でpython setup.py buildをやるとvcvarsall.batがないという趣旨のことを言われてビルドできません。このvcvarsall.batはVS2010と互換性のあるバージョンのWindows SDKだとついてきているのですが、2008と互換性のあるバージョンのSDKだとついてこないようです。中身は単純で現在のシステムが64bitか32bitかによって(これは引数でも指定できるようです)使うコンパイラを選択するという単純なバッチファイルです。コンパイラの選択もほかのバッチファイルを呼んでいるだけですので、自作しましょう。&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;C:\Program&lt;/span&gt; Files &lt;span class="pre"&gt;(x86)\Microsoft&lt;/span&gt; Visual Studio 9.0\VC\vcvarsall.bat&lt;/tt&gt;を作成します。32bit版Pythonを利用している場合は、:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&amp;#64;call &amp;quot;%~dp0bin\vcvars32.bat&amp;quot;
+&lt;/pre&gt;
+&lt;p&gt;という行を、64bit版の場合は:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&amp;#64;call &amp;quot;%~dp0bin\vcvars64.bat&amp;quot;
+&lt;/pre&gt;
+&lt;p&gt;という行を一行書いて保存します。64bit版Windowsではない場合は適宜Program Filesを読み替えてください。&lt;/p&gt;
+&lt;p&gt;これでC拡張をコンパイルできるようになります。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;より新しいバージョンを利用する方法&lt;/h2&gt;
+&lt;p&gt;より新しいバージョンのコンパイラを利用する方法もあります。残念ながらdistutilsは(Python本体がコンパイルされたバージョンである)MSVC2008のコンパイラしか認識してくれないので、その部分をスキップしてPATHから探すようにします。&lt;/p&gt;
+&lt;p&gt;環境変数に&lt;tt class="docutils literal"&gt;MSSdk&lt;/tt&gt;と&lt;tt class="docutils literal"&gt;DISTUTILS_USE_SDK&lt;/tt&gt;という変数を追加して下さい。値はなんでも構いません。これによりdistutilsはパスが通っているところからcl.exeやlink.exeを探します。&lt;/p&gt;
+&lt;p&gt;この方法の注意点は、Cygwin上でWindowsネイティブのPythonを利用してC拡張のコンパイルをしようとすると、CygwinのGCCのlink.exeが利用されてしまうことと、Python本体と依存するライブラリが変わることです。後者によりpy2exeなどでexeにして配布するときに、実行環境で再頒布可能パッケージがなくて実行できない可能性があります。
+(再頒布可能パッケージをインストールすれば実行可能です)&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>所得税・住民税についてのメモ</title><link href="http://draftcode.github.com/2013/03/10/937d07c5-9136-4520-8310-17cdce1bb0eb.html" rel="alternate"></link><updated>2013-03-10T21:27:45+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2013-03-10:2013/03/10/937d07c5-9136-4520-8310-17cdce1bb0eb.html</id><summary type="html">&lt;p&gt;社会人になるであろうちょっと手前で税金について調べなければいけなくなったので、必要であろうところだけ書く。正確なことはわからないので、詳しくは&lt;a class="reference external" href="http://www.nta.go.jp/taxanswer/shotoku/shotoku.htm"&gt;タックスアンサー&lt;/a&gt;を見ればいいと思う。というかタックスアンサーを最初から最後まで全部読めばだいたい分かる話。&lt;/p&gt;
 &lt;p&gt;ちなみに会社に入ると使用者側がそこら辺をやってくれる。なので大体の人はあまり関係ないらしい。確かに自分の両親に聞いてもあまり良くわからない感じだった。&lt;/p&gt;
 &lt;div class="section" id="id3"&gt;
 &lt;h2&gt;税金&lt;/h2&gt;
