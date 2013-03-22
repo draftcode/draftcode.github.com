@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>PythonのC拡張を書く - draftcode.github.com</title>
+    <meta name="author" content="draftcode">
+    <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
+
+    <!--[if lt IE 9]>
+    <script src="../../../theme/html5.js"></script>
+    <![endif]-->
+
+    <link href="../../../theme/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../theme/local.css" rel="stylesheet">
+    <link href="../../../theme/pygments.css" rel="stylesheet">
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="../../../atom.xml">
+    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
+</head>
+
+<body>
+
+<h1 id="site-title"><a href="../../..">draftcode.github.com</a></h1>
+
+<div id="content">
+    <div class='article'>
+        <div class="content-title">
+            <h1>PythonのC拡張を書く</h1>
+            <div class="metadata">
+    <span class="label label-inverse">2013/03/22</span>
+    <a href="../../../category/python.html" class="label label-info">Python</a>
+</div>        </div>
+
+        <div class="content-body"><p>最近はPythonのC拡張を書いていたりするので、覚えている範囲でハマった点を説明します。C拡張を書き始めるには、基本的に<a class="reference external" href="http://docs.python.jp/2/extending/index.html">Python インタプリタの拡張と埋め込み</a>をみて、あとは見よう見まねで書きながら<a class="reference external" href="http://docs.python.jp/2/c-api/index.html">Python/C API リファレンスマニュアル</a>を見とけばOKです。</p>
+<div class="section" id="id1">
+<h2>やると良いこと・ハマったこと</h2>
+<div class="section" id="decref">
+<h3>引数はDECREFしてはいけない</h3>
+<p>Pythonのドキュメントをよく読んでないのも悪いのですが、どうやらPythonからCで書かれた関数を呼びだされたときに渡ってくる引数はDECREFしてはいけないようです。
+Python組み込みのAPI用意している分にはドキュメントにNew Referenceとか書いてあるのでそれをみて判断すればいいです。</p>
+</div>
+<div class="section" id="decref2">
+<h3>DECREFの引数は2回以上評価される可能性のあるマクロなので変数のみ渡す</h3>
+<p>同じくDECREF周りですが、Py_DECREFとかはマクロなので引数が複数回評価される可能性があります。というかされます。なので<tt class="docutils literal"><span class="pre">Py_DECREF(PyObject_CallFunction(...))</span></tt>みたいなことをすると死にます。</p>
+</div>
+<div class="section" id="cpython">
+<h3>cpythonのソースコードは手元に持っておく</h3>
+<p>正直ドキュメントを参照するよりかはソースコード直接読んだほうが早かったりするので、cpythonのソースコードは手元においておきましょう。というかPythonのスクリプトを書いててもドキュメントに書いてない感じのこととか、曖昧な感じがする点があったりして、そういうときにソースコード手元に持っておくとすぐ確認できて便利です。</p>
+</div>
+<div class="section" id="id2">
+<h3>デバッグ版Pythonを使う</h3>
+<p>多分これは自分が高速化のために文字列の可変長配列を自分で持っていたりとか、そういうことをしているからだと思いますが、メモリ周りのエラーで苦しみました。ひたすらSegmentation Faultします。デバッグ版のPythonを使うとメモリまわりでチェックが走るのである程度メモリエラーを検出できます。Pythonは自前でメモリ割り当てを行なっている関係なのか、Valgrindとかを使ってもあんまりInvalid writeみたいなのは検出できなかったです。(Valgrindの仕組みとかよくわかってない)</p>
+<p>デバッグ版Pythonのビルドの仕方は<a class="reference external" href="http://docs.python.org/devguide/">Python Developer's Guide</a>に書いてあるのでこれを見て<tt class="docutils literal"><span class="pre">--with-pydebug</span></tt>をつければOKです。自分は<a class="reference external" href="https://github.com/yyuu/pyenv">pyenv</a>を使っているので、そのプラグインの python-build を改造してデバッグ版ビルドができるようにしました。そのうち整理してPull-Request投げてみるかも。</p>
+</div>
+<div class="section" id="yep">
+<h3>yepをつかってプロファイリング</h3>
+<p><a class="reference external" href="https://pypi.python.org/pypi/yep">yep</a>はバックエンドで<a class="reference external" href="https://code.google.com/p/gperftools/">gperftools</a>を使ってプロファイリングをしてくれるモジュールです。普通にPython付属のプロファイラだとPythonのコードしかプロファイリングできないので、このモジュールを使ってどこが遅くなっているのかを調べます。</p>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>よくわかってないこと</h2>
+<div class="section" id="gc">
+<h3>GC周り</h3>
+<p>どうやらオブジェクト内に外のオブジェクトを含み場合は、普通はGCを有効にしなければいけない感じのようなのですが、別に自分が書いているクラスはユニコード文字列とファイルライクオブジェクトなので、GC周りのフラグを立てていません。GC-awareな書き方は、多分ドキュメント見ればわかるんだろうと思いつつ、よくわかってません。</p>
+</div>
+</div>
+</div>
+
+        <hr>
+
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'draftcode-github-com'; 
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</div>
+
+<div id="footer">
+    <div id="about">
+        <ul class="nav nav-list">
+            <li class="nav-header">About the author</li>
+        </ul>
+
+        <div style="padding: 10px;">
+            <a id="about-image" href="../../../pages/about.html" rel="alternate"><img src="../../../static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
+            <p>東京で情報工学を専攻している大学院生です。</p>
+        </div>
+    </div>
+
+    <div id="site">
+        <ul class="nav nav-list">
+            <li class="nav-header">Site</li>
+
+            <li><a href="../../../archives.html">Archives</a>
+            <li><a href="../../../atom.xml" rel="alternate">Atom feed</a></li>
+        </ul>
+    </div>
+
+    <div id="category">
+        <ul class="nav nav-list">
+            <li class="nav-header">Categories</li>
+                        <li><a href="../../../category/android.html">Android</a></li>            <li><a href="../../../category/articles.html">Articles</a></li>            <li><a href="../../../category/java.html">Java</a></li>            <li><a href="../../../category/python.html">Python</a></li>        </ul>
+    </div>
+
+    <div id="social">
+        <ul class="nav nav-list">
+            <li class="nav-header">Social</li>
+                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>        </ul>
+    </div>
+</div>
+
+</body>
+</html>

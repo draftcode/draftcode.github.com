@@ -1,5 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com/" rel="alternate"></link><link href="http://draftcode.github.com//atom.xml" rel="self"></link><id>http://draftcode.github.com/</id><updated>2013-03-17T13:41:45+09:00</updated><entry><title>Windows環境でPythonのC拡張をビルドする</title><link href="http://draftcode.github.com/2013/03/17/5f45fabb-8b64-469e-a0f6-7f9d76564af8.html" rel="alternate"></link><updated>2013-03-17T13:41:45+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2013-03-17:2013/03/17/5f45fabb-8b64-469e-a0f6-7f9d76564af8.html</id><summary type="html">&lt;p&gt;Windows NativeのPythonでC拡張をビルドする方法を説明します。みなさん普通は
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.com</title><link href="http://draftcode.github.com/" rel="alternate"></link><link href="http://draftcode.github.com//atom.xml" rel="self"></link><id>http://draftcode.github.com/</id><updated>2013-03-22T14:42:41+09:00</updated><entry><title>PythonのC拡張を書く</title><link href="http://draftcode.github.com/2013/03/22/278e1973-0066-4749-8097-3a7dec906e0e.html" rel="alternate"></link><updated>2013-03-22T14:42:41+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2013-03-22:2013/03/22/278e1973-0066-4749-8097-3a7dec906e0e.html</id><summary type="html">&lt;p&gt;最近はPythonのC拡張を書いていたりするので、覚えている範囲でハマった点を説明します。C拡張を書き始めるには、基本的に&lt;a class="reference external" href="http://docs.python.jp/2/extending/index.html"&gt;Python インタプリタの拡張と埋め込み&lt;/a&gt;をみて、あとは見よう見まねで書きながら&lt;a class="reference external" href="http://docs.python.jp/2/c-api/index.html"&gt;Python/C API リファレンスマニュアル&lt;/a&gt;を見とけばOKです。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;やると良いこと・ハマったこと&lt;/h2&gt;
+&lt;div class="section" id="decref"&gt;
+&lt;h3&gt;引数はDECREFしてはいけない&lt;/h3&gt;
+&lt;p&gt;Pythonのドキュメントをよく読んでないのも悪いのですが、どうやらPythonからCで書かれた関数を呼びだされたときに渡ってくる引数はDECREFしてはいけないようです。
+Python組み込みのAPI用意している分にはドキュメントにNew Referenceとか書いてあるのでそれをみて判断すればいいです。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="decref2"&gt;
+&lt;h3&gt;DECREFの引数は2回以上評価される可能性のあるマクロなので変数のみ渡す&lt;/h3&gt;
+&lt;p&gt;同じくDECREF周りですが、Py_DECREFとかはマクロなので引数が複数回評価される可能性があります。というかされます。なので&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Py_DECREF(PyObject_CallFunction(...))&lt;/span&gt;&lt;/tt&gt;みたいなことをすると死にます。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="cpython"&gt;
+&lt;h3&gt;cpythonのソースコードは手元に持っておく&lt;/h3&gt;
+&lt;p&gt;正直ドキュメントを参照するよりかはソースコード直接読んだほうが早かったりするので、cpythonのソースコードは手元においておきましょう。というかPythonのスクリプトを書いててもドキュメントに書いてない感じのこととか、曖昧な感じがする点があったりして、そういうときにソースコード手元に持っておくとすぐ確認できて便利です。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h3&gt;デバッグ版Pythonを使う&lt;/h3&gt;
+&lt;p&gt;多分これは自分が高速化のために文字列の可変長配列を自分で持っていたりとか、そういうことをしているからだと思いますが、メモリ周りのエラーで苦しみました。ひたすらSegmentation Faultします。デバッグ版のPythonを使うとメモリまわりでチェックが走るのである程度メモリエラーを検出できます。Pythonは自前でメモリ割り当てを行なっている関係なのか、Valgrindとかを使ってもあんまりInvalid writeみたいなのは検出できなかったです。(Valgrindの仕組みとかよくわかってない)&lt;/p&gt;
+&lt;p&gt;デバッグ版Pythonのビルドの仕方は&lt;a class="reference external" href="http://docs.python.org/devguide/"&gt;Python Developer's Guide&lt;/a&gt;に書いてあるのでこれを見て&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--with-pydebug&lt;/span&gt;&lt;/tt&gt;をつければOKです。自分は&lt;a class="reference external" href="https://github.com/yyuu/pyenv"&gt;pyenv&lt;/a&gt;を使っているので、そのプラグインの python-build を改造してデバッグ版ビルドができるようにしました。そのうち整理してPull-Request投げてみるかも。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="yep"&gt;
+&lt;h3&gt;yepをつかってプロファイリング&lt;/h3&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://pypi.python.org/pypi/yep"&gt;yep&lt;/a&gt;はバックエンドで&lt;a class="reference external" href="https://code.google.com/p/gperftools/"&gt;gperftools&lt;/a&gt;を使ってプロファイリングをしてくれるモジュールです。普通にPython付属のプロファイラだとPythonのコードしかプロファイリングできないので、このモジュールを使ってどこが遅くなっているのかを調べます。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;よくわかってないこと&lt;/h2&gt;
+&lt;div class="section" id="gc"&gt;
+&lt;h3&gt;GC周り&lt;/h3&gt;
+&lt;p&gt;どうやらオブジェクト内に外のオブジェクトを含み場合は、普通はGCを有効にしなければいけない感じのようなのですが、別に自分が書いているクラスはユニコード文字列とファイルライクオブジェクトなので、GC周りのフラグを立てていません。GC-awareな書き方は、多分ドキュメント見ればわかるんだろうと思いつつ、よくわかってません。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>Windows環境でPythonのC拡張をビルドする</title><link href="http://draftcode.github.com/2013/03/17/5f45fabb-8b64-469e-a0f6-7f9d76564af8.html" rel="alternate"></link><updated>2013-03-17T13:41:45+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.com,2013-03-17:2013/03/17/5f45fabb-8b64-469e-a0f6-7f9d76564af8.html</id><summary type="html">&lt;p&gt;Windows NativeのPythonでC拡張をビルドする方法を説明します。みなさん普通は
 WindowsではPythonなんて使わないのか、あんまり情報が無いんですよね……&lt;/p&gt;
 &lt;div class="section" id="windows-sdk"&gt;
 &lt;h2&gt;Windows SDKをインストールする&lt;/h2&gt;

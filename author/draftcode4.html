@@ -26,6 +26,40 @@
 
     <div class='article'>
         <div class="content-title">
+            <h1><a href="../2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html">RoboGuice2とRobolectricを組み合わせてテストを書く</a></h1>
+            <div class="metadata">
+    <span class="label label-inverse">2012/10/17</span>
+    <a href="../category/articles.html" class="label label-info">Articles</a>
+</div>        </div>
+
+        <div class="content-body"><p><a class="reference external" href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html">RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</a>でActivityの
+InjectionタイミングがずれることによりInjectExtraが利用できないことについて述べました。これをRoboGuice2にすることによって回避することができました。</p>
+<div class="section" id="id1">
+<h2>問題背景</h2>
+<p>実機で動く場合は<tt class="docutils literal">RoboActivity.onCreate()</tt>でInjectionが行われますが、
+RoboGuice1だと、ActivityをテストにInjectする場合、次のようになってエラーが起きます:</p>
+<ol class="arabic simple">
+<li>InjectするActivityのIntent付きのオブジェクトをアプリケーションの初めのほうでbindする。</li>
+<li>bindするオブジェクトは、更にInjectionが走る。</li>
+<li>InjectExtraはContextScopeで走らせないといけない。</li>
+</ol>
+<p>また、ActivityをテストにInjectしない場合は、RoboGuice1の場合、まともそうな方法でActivityをテストに渡す方法が無さそうです。staticにして渡してしまうのは、ちょっとアレですよね。</p>
+</div>
+<div class="section" id="roboguice2">
+<h2>RoboGuice2でなぜ解決されるのか</h2>
+<p>RoboGuice1では、Applicationを継承して自分が必要なbindingを追加していました。しかしRoboGuice2ではApplicationを継承する必要がなくなり、適当なタイミングでbindingを追加できます。これを利用して、テストクラスの中でbindingを追加するようにすれば上記の問題が解決できます。</p>
+</div>
+<div class="section" id="id2">
+<h2>サンプルコード</h2>
+<script src="https://gist.github.com/3963845.js"> </script></div>
+</div>
+        <hr />
+    </div>
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <h1><a href="../2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html">Writing Adblock Plus filters -- 日本語訳</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2011/03/22</span>
@@ -206,38 +240,6 @@ git remote add origin &lt;自分のGitHubリポジトリでコピーしてきた
     </div>
 
 
-
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2011/03/14/42aa3a98-4e10-11e0-bcea-d8a25efffee9.html">Macを大きいディスプレイにつなげるときはMini DisplayPort &lt;-&gt; DisplayPort変換ケーブルを使う</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2011/03/14</span>
-    <a href="../category/articles.html" class="label label-info">Articles</a>
-</div>        </div>
-
-        <div class="content-body"><p>Macbook Proを修理に出したときに，どうしてもレポートを書かなければいけない感じだったので，Mac miniを購入しました．Macbook Proは3年ぐらい前のモデルだったので，大きいDVIポートがあり，DELLのU2711のような大きいディスプレイでも直接接続して最適な解像度が出せたのですが，今のMacについているようなMini DisplayPortだと，DVIとの変換ケーブルを使っても，フルHD程度までしか出力することができません．これはDVIのシングルリンクとかデュアルリンクとかの問題らしいんですが，それを解決するためにはAppleの高いデュアルリンク対応の変換アダプタを購入しなければいけません．</p>
-<p>もっとシンプルな解決方法を目指します．最近のディスプレイはDisplayPortがついているようなので，それに変換すれば良いのです．実際自分はMini DisplayPortとDisplayPortの変換ケーブルを使って，大きい解像度の出力ができるようになっています．</p>
-<p>残念ながら，このような変換ケーブルはあまり製造されていないようです．自分は<a class="reference external" href="http://store.shopping.yahoo.co.jp/ats/0203.html">ATS Direct</a>というサイトで購入しました．</p>
-<p>またDisplayPortは音声出力も対応しているので，U2711の音声出力から音を出すこともできています．しかしながらU2711側では音量調節ができないので，音量調節ができるようなもの(スピーカーなど)でないと，音が大きすぎて耳がつぶれます．ヘッドホンとかは難しいです．ちなみに出力切り替えはSoundflowerを使うと便利です．</p>
-<div class="section" id="id1">
-<h2>追記 (2011-06-22)</h2>
-<p>どうも探し方が悪かったようで，他にもいくつか見つかりました．</p>
-<ul class="simple">
-<li><a class="reference external" href="http://www.amazon.co.jp/dp/B004KB5HM6/">http://www.amazon.co.jp/dp/B004KB5HM6/</a></li>
-<li><a class="reference external" href="http://www.amazon.co.jp/dp/B004GCHNP8/">http://www.amazon.co.jp/dp/B004GCHNP8/</a></li>
-<li><a class="reference external" href="http://direct.eizo.co.jp/shop/g/gPM200-BK/">http://direct.eizo.co.jp/shop/g/gPM200-BK/</a></li>
-</ul>
-<p>ただ，ものによっては映らないものもあるみたいですね．</p>
-</div>
-<div class="section" id="id2">
-<h2>追記 (2012-03-11)</h2>
-<p>音声出力の切り替えはOptionキーを押しながらメニューバーの音量調節アイコンをクリックすると、出力装置の切り替えができるので、これが便利です。最近はU2711に別のスピーカーをつけて、そのスピーカーについている音声出力端子にヘッドホンをつけたりしています。</p>
-</div>
-</div>
-        <hr />
-    </div>
-
-
      <div class="pagination">
 <ul>
     <li class="prev"><a href="../author/draftcode3.html">&larr; Previous</a></li>
@@ -248,6 +250,7 @@ git remote add origin &lt;自分のGitHubリポジトリでコピーしてきた
     <li class="active"><a href="../author/draftcode4.html">4</a></li>
     <li class=""><a href="../author/draftcode5.html">5</a></li>
     <li class=""><a href="../author/draftcode6.html">6</a></li>
+    <li class=""><a href="../author/draftcode7.html">7</a></li>
 
     <li class="next"><a href="../author/draftcode5.html">Next &rarr;</a></li>
 

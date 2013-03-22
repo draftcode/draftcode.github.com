@@ -213,32 +213,45 @@ ActivityからIntentがとり出されて、Extraが入ります:</p>
 
     <div class='article'>
         <div class="content-title">
-            <h1><a href="../2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html">RoboGuice2とRobolectricを組み合わせてテストを書く</a></h1>
+            <h1><a href="../2013/03/22/278e1973-0066-4749-8097-3a7dec906e0e.html">PythonのC拡張を書く</a></h1>
             <div class="metadata">
-    <span class="label label-inverse">2012/10/17</span>
-    <a href="../category/articles.html" class="label label-info">Articles</a>
+    <span class="label label-inverse">2013/03/22</span>
+    <a href="../category/python.html" class="label label-info">Python</a>
 </div>        </div>
 
-        <div class="content-body"><p><a class="reference external" href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html">RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</a>でActivityの
-InjectionタイミングがずれることによりInjectExtraが利用できないことについて述べました。これをRoboGuice2にすることによって回避することができました。</p>
+        <div class="content-body"><p>最近はPythonのC拡張を書いていたりするので、覚えている範囲でハマった点を説明します。C拡張を書き始めるには、基本的に<a class="reference external" href="http://docs.python.jp/2/extending/index.html">Python インタプリタの拡張と埋め込み</a>をみて、あとは見よう見まねで書きながら<a class="reference external" href="http://docs.python.jp/2/c-api/index.html">Python/C API リファレンスマニュアル</a>を見とけばOKです。</p>
 <div class="section" id="id1">
-<h2>問題背景</h2>
-<p>実機で動く場合は<tt class="docutils literal">RoboActivity.onCreate()</tt>でInjectionが行われますが、
-RoboGuice1だと、ActivityをテストにInjectする場合、次のようになってエラーが起きます:</p>
-<ol class="arabic simple">
-<li>InjectするActivityのIntent付きのオブジェクトをアプリケーションの初めのほうでbindする。</li>
-<li>bindするオブジェクトは、更にInjectionが走る。</li>
-<li>InjectExtraはContextScopeで走らせないといけない。</li>
-</ol>
-<p>また、ActivityをテストにInjectしない場合は、RoboGuice1の場合、まともそうな方法でActivityをテストに渡す方法が無さそうです。staticにして渡してしまうのは、ちょっとアレですよね。</p>
+<h2>やると良いこと・ハマったこと</h2>
+<div class="section" id="decref">
+<h3>引数はDECREFしてはいけない</h3>
+<p>Pythonのドキュメントをよく読んでないのも悪いのですが、どうやらPythonからCで書かれた関数を呼びだされたときに渡ってくる引数はDECREFしてはいけないようです。
+Python組み込みのAPI用意している分にはドキュメントにNew Referenceとか書いてあるのでそれをみて判断すればいいです。</p>
 </div>
-<div class="section" id="roboguice2">
-<h2>RoboGuice2でなぜ解決されるのか</h2>
-<p>RoboGuice1では、Applicationを継承して自分が必要なbindingを追加していました。しかしRoboGuice2ではApplicationを継承する必要がなくなり、適当なタイミングでbindingを追加できます。これを利用して、テストクラスの中でbindingを追加するようにすれば上記の問題が解決できます。</p>
+<div class="section" id="decref2">
+<h3>DECREFの引数は2回以上評価される可能性のあるマクロなので変数のみ渡す</h3>
+<p>同じくDECREF周りですが、Py_DECREFとかはマクロなので引数が複数回評価される可能性があります。というかされます。なので<tt class="docutils literal"><span class="pre">Py_DECREF(PyObject_CallFunction(...))</span></tt>みたいなことをすると死にます。</p>
+</div>
+<div class="section" id="cpython">
+<h3>cpythonのソースコードは手元に持っておく</h3>
+<p>正直ドキュメントを参照するよりかはソースコード直接読んだほうが早かったりするので、cpythonのソースコードは手元においておきましょう。というかPythonのスクリプトを書いててもドキュメントに書いてない感じのこととか、曖昧な感じがする点があったりして、そういうときにソースコード手元に持っておくとすぐ確認できて便利です。</p>
 </div>
 <div class="section" id="id2">
-<h2>サンプルコード</h2>
-<script src="https://gist.github.com/3963845.js"> </script></div>
+<h3>デバッグ版Pythonを使う</h3>
+<p>多分これは自分が高速化のために文字列の可変長配列を自分で持っていたりとか、そういうことをしているからだと思いますが、メモリ周りのエラーで苦しみました。ひたすらSegmentation Faultします。デバッグ版のPythonを使うとメモリまわりでチェックが走るのである程度メモリエラーを検出できます。Pythonは自前でメモリ割り当てを行なっている関係なのか、Valgrindとかを使ってもあんまりInvalid writeみたいなのは検出できなかったです。(Valgrindの仕組みとかよくわかってない)</p>
+<p>デバッグ版Pythonのビルドの仕方は<a class="reference external" href="http://docs.python.org/devguide/">Python Developer's Guide</a>に書いてあるのでこれを見て<tt class="docutils literal"><span class="pre">--with-pydebug</span></tt>をつければOKです。自分は<a class="reference external" href="https://github.com/yyuu/pyenv">pyenv</a>を使っているので、そのプラグインの python-build を改造してデバッグ版ビルドができるようにしました。そのうち整理してPull-Request投げてみるかも。</p>
+</div>
+<div class="section" id="yep">
+<h3>yepをつかってプロファイリング</h3>
+<p><a class="reference external" href="https://pypi.python.org/pypi/yep">yep</a>はバックエンドで<a class="reference external" href="https://code.google.com/p/gperftools/">gperftools</a>を使ってプロファイリングをしてくれるモジュールです。普通にPython付属のプロファイラだとPythonのコードしかプロファイリングできないので、このモジュールを使ってどこが遅くなっているのかを調べます。</p>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>よくわかってないこと</h2>
+<div class="section" id="gc">
+<h3>GC周り</h3>
+<p>どうやらオブジェクト内に外のオブジェクトを含み場合は、普通はGCを有効にしなければいけない感じのようなのですが、別に自分が書いているクラスはユニコード文字列とファイルライクオブジェクトなので、GC周りのフラグを立てていません。GC-awareな書き方は、多分ドキュメント見ればわかるんだろうと思いつつ、よくわかってません。</p>
+</div>
+</div>
 </div>
         <hr />
     </div>
@@ -254,6 +267,7 @@ RoboGuice1だと、ActivityをテストにInjectする場合、次のように�
     <li class=""><a href="../author/draftcode4.html">4</a></li>
     <li class=""><a href="../author/draftcode5.html">5</a></li>
     <li class=""><a href="../author/draftcode6.html">6</a></li>
+    <li class=""><a href="../author/draftcode7.html">7</a></li>
 
     <li class="next"><a href="../author/draftcode4.html">Next &rarr;</a></li>
 

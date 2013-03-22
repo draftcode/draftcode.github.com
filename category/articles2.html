@@ -26,40 +26,6 @@
 
     <div class='article'>
         <div class="content-title">
-            <h1><a href="../2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html">RoboGuice2とRobolectricを組み合わせてテストを書く</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2012/10/17</span>
-    <a href="../category/articles.html" class="label label-info">Articles</a>
-</div>        </div>
-
-        <div class="content-body"><p><a class="reference external" href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html">RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</a>でActivityの
-InjectionタイミングがずれることによりInjectExtraが利用できないことについて述べました。これをRoboGuice2にすることによって回避することができました。</p>
-<div class="section" id="id1">
-<h2>問題背景</h2>
-<p>実機で動く場合は<tt class="docutils literal">RoboActivity.onCreate()</tt>でInjectionが行われますが、
-RoboGuice1だと、ActivityをテストにInjectする場合、次のようになってエラーが起きます:</p>
-<ol class="arabic simple">
-<li>InjectするActivityのIntent付きのオブジェクトをアプリケーションの初めのほうでbindする。</li>
-<li>bindするオブジェクトは、更にInjectionが走る。</li>
-<li>InjectExtraはContextScopeで走らせないといけない。</li>
-</ol>
-<p>また、ActivityをテストにInjectしない場合は、RoboGuice1の場合、まともそうな方法でActivityをテストに渡す方法が無さそうです。staticにして渡してしまうのは、ちょっとアレですよね。</p>
-</div>
-<div class="section" id="roboguice2">
-<h2>RoboGuice2でなぜ解決されるのか</h2>
-<p>RoboGuice1では、Applicationを継承して自分が必要なbindingを追加していました。しかしRoboGuice2ではApplicationを継承する必要がなくなり、適当なタイミングでbindingを追加できます。これを利用して、テストクラスの中でbindingを追加するようにすれば上記の問題が解決できます。</p>
-</div>
-<div class="section" id="id2">
-<h2>サンプルコード</h2>
-<script src="https://gist.github.com/3963845.js"> </script></div>
-</div>
-        <hr />
-    </div>
-
-
-
-    <div class='article'>
-        <div class="content-title">
             <h1><a href="../2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html">第(1+1)回 六本木 Linux カーネル読書会 参加メモ</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2012/08/01</span>
@@ -264,6 +230,59 @@ F(N, M) =   1 (if M = 1)
 (N-1)-&gt;Mのmonotonic functionであれば、N-1個のポイントの一番下にもう一個付け加えて、それがM個のポイントの一番下に写されたものもmonotonic functionになる。つまり、この場合は(N-1)-&gt;Mのすべてのmonotonic functionの一番下に割り当てを追加してあげれば良いだけ。ということは、その数は<tt class="docutils literal"><span class="pre">F(N-1,</span> M)</tt>と等しいということになる。</p>
 </li>
 </ol>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+    <div class='article'>
+        <div class="content-title">
+            <h1><a href="../2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html">PelicanとGitHub Pagesを使う</a></h1>
+            <div class="metadata">
+    <span class="label label-inverse">2012/03/16</span>
+    <a href="../category/articles.html" class="label label-info">Articles</a>
+</div>        </div>
+
+        <div class="content-body"><p>reStructuredTextが使いたかったので、Pythonで書かれてる<a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html">Pelican</a>という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。</p>
+<div class="section" id="id1">
+<h2>Pelican</h2>
+<p>最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
+Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みのやつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので気に入って使っています。</p>
+<p>自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。開発中のバージョンを使うにはこれだけでOK:</p>
+<div class="highlight"><pre>git clone https://github.com/ametaireau/pelican.git
+cd pelican
+python setup.py develop
+</pre></div>
+<p>こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになります。</p>
+</div>
+<div class="section" id="github-pages">
+<h2>GitHub Pages</h2>
+<p>なんかGitHubには<a class="reference external" href="http://pages.github.com/">GitHub Pages</a>っていうPushすると中のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしました。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
+Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次のようなブランチ構成にしてみました:</p>
+<div class="highlight"><pre>source   -&gt; origin/source
+gh-pages -&gt; origin/master
+</pre></div>
+<p>こういう風にするには、たぶん次のようにすればいいはず:</p>
+<div class="highlight"><pre>git init .
+git branch -m master source
+git remote add origin &lt;自分のGitHubリポジトリでコピーしてきたなにか&gt;
+</pre></div>
+<p>gh-pagesはなんかよしなに作ってくれる<a class="reference external" href="https://github.com/davisp/ghp-import">ghp-import</a>があるので、それを導入しました:</p>
+<div class="highlight"><pre>pip install ghp-import
+</pre></div>
+</div>
+<div class="section" id="conf-py">
+<h2>conf.pyを書く</h2>
+<p><a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source/conf.py">conf.py</a>みたいに書いています。なんか下の方で怪しいことしてますが。ディレクトリ構成は<a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source">draftcode/draftcode.github.com</a>みたいになってます。</p>
+</div>
+<div class="section" id="post-commit">
+<h2>post-commitを仕込む</h2>
+<p>次のような内容のファイルを、<tt class="docutils literal"><span class="pre">.git/hooks/post-commit</span></tt>に仕込んでおきます:</p>
+<div class="highlight"><pre>pelican -s conf.py &amp;&amp; ghp-import output &amp;&amp; git push origin gh-pages:master source:source
+</pre></div>
+<p>これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!</p>
 </div>
 </div>
         <hr />

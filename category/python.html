@@ -26,6 +26,99 @@
 
     <div class='article'>
         <div class="content-title">
+            <h1><a href="../2013/03/22/278e1973-0066-4749-8097-3a7dec906e0e.html">PythonのC拡張を書く</a></h1>
+            <div class="metadata">
+    <span class="label label-inverse">2013/03/22</span>
+    <a href="../category/python.html" class="label label-info">Python</a>
+</div>        </div>
+
+        <div class="content-body"><p>最近はPythonのC拡張を書いていたりするので、覚えている範囲でハマった点を説明します。C拡張を書き始めるには、基本的に<a class="reference external" href="http://docs.python.jp/2/extending/index.html">Python インタプリタの拡張と埋め込み</a>をみて、あとは見よう見まねで書きながら<a class="reference external" href="http://docs.python.jp/2/c-api/index.html">Python/C API リファレンスマニュアル</a>を見とけばOKです。</p>
+<div class="section" id="id1">
+<h2>やると良いこと・ハマったこと</h2>
+<div class="section" id="decref">
+<h3>引数はDECREFしてはいけない</h3>
+<p>Pythonのドキュメントをよく読んでないのも悪いのですが、どうやらPythonからCで書かれた関数を呼びだされたときに渡ってくる引数はDECREFしてはいけないようです。
+Python組み込みのAPI用意している分にはドキュメントにNew Referenceとか書いてあるのでそれをみて判断すればいいです。</p>
+</div>
+<div class="section" id="decref2">
+<h3>DECREFの引数は2回以上評価される可能性のあるマクロなので変数のみ渡す</h3>
+<p>同じくDECREF周りですが、Py_DECREFとかはマクロなので引数が複数回評価される可能性があります。というかされます。なので<tt class="docutils literal"><span class="pre">Py_DECREF(PyObject_CallFunction(...))</span></tt>みたいなことをすると死にます。</p>
+</div>
+<div class="section" id="cpython">
+<h3>cpythonのソースコードは手元に持っておく</h3>
+<p>正直ドキュメントを参照するよりかはソースコード直接読んだほうが早かったりするので、cpythonのソースコードは手元においておきましょう。というかPythonのスクリプトを書いててもドキュメントに書いてない感じのこととか、曖昧な感じがする点があったりして、そういうときにソースコード手元に持っておくとすぐ確認できて便利です。</p>
+</div>
+<div class="section" id="id2">
+<h3>デバッグ版Pythonを使う</h3>
+<p>多分これは自分が高速化のために文字列の可変長配列を自分で持っていたりとか、そういうことをしているからだと思いますが、メモリ周りのエラーで苦しみました。ひたすらSegmentation Faultします。デバッグ版のPythonを使うとメモリまわりでチェックが走るのである程度メモリエラーを検出できます。Pythonは自前でメモリ割り当てを行なっている関係なのか、Valgrindとかを使ってもあんまりInvalid writeみたいなのは検出できなかったです。(Valgrindの仕組みとかよくわかってない)</p>
+<p>デバッグ版Pythonのビルドの仕方は<a class="reference external" href="http://docs.python.org/devguide/">Python Developer's Guide</a>に書いてあるのでこれを見て<tt class="docutils literal"><span class="pre">--with-pydebug</span></tt>をつければOKです。自分は<a class="reference external" href="https://github.com/yyuu/pyenv">pyenv</a>を使っているので、そのプラグインの python-build を改造してデバッグ版ビルドができるようにしました。そのうち整理してPull-Request投げてみるかも。</p>
+</div>
+<div class="section" id="yep">
+<h3>yepをつかってプロファイリング</h3>
+<p><a class="reference external" href="https://pypi.python.org/pypi/yep">yep</a>はバックエンドで<a class="reference external" href="https://code.google.com/p/gperftools/">gperftools</a>を使ってプロファイリングをしてくれるモジュールです。普通にPython付属のプロファイラだとPythonのコードしかプロファイリングできないので、このモジュールを使ってどこが遅くなっているのかを調べます。</p>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>よくわかってないこと</h2>
+<div class="section" id="gc">
+<h3>GC周り</h3>
+<p>どうやらオブジェクト内に外のオブジェクトを含み場合は、普通はGCを有効にしなければいけない感じのようなのですが、別に自分が書いているクラスはユニコード文字列とファイルライクオブジェクトなので、GC周りのフラグを立てていません。GC-awareな書き方は、多分ドキュメント見ればわかるんだろうと思いつつ、よくわかってません。</p>
+</div>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+    <div class='article'>
+        <div class="content-title">
+            <h1><a href="../2013/03/17/5f45fabb-8b64-469e-a0f6-7f9d76564af8.html">Windows環境でPythonのC拡張をビルドする</a></h1>
+            <div class="metadata">
+    <span class="label label-inverse">2013/03/17</span>
+    <a href="../category/python.html" class="label label-info">Python</a>
+</div>        </div>
+
+        <div class="content-body"><p>Windows NativeのPythonでC拡張をビルドする方法を説明します。みなさん普通は
+WindowsではPythonなんて使わないのか、あんまり情報が無いんですよね……</p>
+<div class="section" id="windows-sdk">
+<h2>Windows SDKをインストールする</h2>
+<p>C拡張なのでCコンパイラが必要なので、コンパイラをインストールします。MicrosoftはVistual Studioを売っているのでそれを買えばコンパイラがついてきます。また、無償版のExpress Editionをインストールしてもコンパイラがついてきます。</p>
+<p>C拡張をうまいことビルドするために、distutilsはVS2008のコンパイラに対応するように書かれています。UNIXだと適当にPATHからコンパイラを探してくれば良いのに、なぜWindowsだとdistutilsがVS2008のための特別な処理を入れているかというと、コンパイラの場所がWindowsだとPATHに入っていなかったりして、レジストリから推測しなければならないからです。残念OSですね……</p>
+<p>レジストリからコンパイラの場所を推測する関係で、より新しいバージョンのVSには対応できていません(レジストリエントリの場所が違うので)。そして、最近対応しているVS2008の(一部のVC++ 2008の)Express Editionのダウンロードができなくなったようです。(<a class="reference external" href="http://mail.python.org/pipermail/python-dev/2013-March/124624.html">[Python-Dev] VC++ 2008 Express Edition now locked away?</a>)コンパイラが入手できないのではdistutilsが対応するまでWindows上ではC拡張をビルドすることができません。</p>
+<p>案ずることはありません。まだ道はあります。我々が欲しいのはコンパイラのみです。
+MicrosoftはIDEがついてこないコンパイラ単体も配布しています。それがWindows SDKです。ちょっと前までPlatform SDKという名前だった気がします。VS2008のバージョンと互換性があるのは<a class="reference external" href="http://www.microsoft.com/en-us/download/details.aspx?id=3138">Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1</a>という
+Windows SDKでこちらはまだダウンロード可能です。こちらをインストールしましょう。</p>
+</div>
+<div class="section" id="vcvarsall-bat">
+<h2>vcvarsall.batをつくる</h2>
+<p>この状態でpython setup.py buildをやるとvcvarsall.batがないという趣旨のことを言われてビルドできません。このvcvarsall.batはVS2010と互換性のあるバージョンのWindows SDKだとついてきているのですが、2008と互換性のあるバージョンのSDKだとついてこないようです。中身は単純で現在のシステムが64bitか32bitかによって(これは引数でも指定できるようです)使うコンパイラを選択するという単純なバッチファイルです。コンパイラの選択もほかのバッチファイルを呼んでいるだけですので、自作しましょう。</p>
+<p><tt class="docutils literal"><span class="pre">C:\Program</span> Files <span class="pre">(x86)\Microsoft</span> Visual Studio 9.0\VC\vcvarsall.bat</tt>を作成します。32bit版Pythonを利用している場合は、:</p>
+<pre class="literal-block">
+&#64;call &quot;%~dp0bin\vcvars32.bat&quot;
+</pre>
+<p>という行を、64bit版の場合は:</p>
+<pre class="literal-block">
+&#64;call &quot;%~dp0bin\vcvars64.bat&quot;
+</pre>
+<p>という行を一行書いて保存します。64bit版Windowsではない場合は適宜Program Filesを読み替えてください。</p>
+<p>これでC拡張をコンパイルできるようになります。</p>
+</div>
+<div class="section" id="id1">
+<h2>より新しいバージョンを利用する方法</h2>
+<p>より新しいバージョンのコンパイラを利用する方法もあります。残念ながらdistutilsは(Python本体がコンパイルされたバージョンである)MSVC2008のコンパイラしか認識してくれないので、その部分をスキップしてPATHから探すようにします。</p>
+<p>環境変数に<tt class="docutils literal">MSSdk</tt>と<tt class="docutils literal">DISTUTILS_USE_SDK</tt>という変数を追加して下さい。値はなんでも構いません。これによりdistutilsはパスが通っているところからcl.exeやlink.exeを探します。</p>
+<p>この方法の注意点は、Cygwin上でWindowsネイティブのPythonを利用してC拡張のコンパイルをしようとすると、CygwinのGCCのlink.exeが利用されてしまうことと、Python本体と依存するライブラリが変わることです。後者によりpy2exeなどでexeにして配布するときに、実行環境で再頒布可能パッケージがなくて実行できない可能性があります。
+(再頒布可能パッケージをインストールすれば実行可能です)</p>
+</div>
+</div>
+        <hr />
+    </div>
+
+
+
+    <div class='article'>
+        <div class="content-title">
             <h1><a href="../2012/01/22/005216.html">「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</a></h1>
             <div class="metadata">
     <span class="label label-inverse">2012/01/22</span>
@@ -49,97 +142,14 @@ Readingというのを書いていたりするみたいなので、積極的に�
     </div>
 
 
-
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2011/12/29/145918.html">CPython2.7.2のWindowsでのmultiprocessingの動作</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2011/12/29</span>
-    <a href="../category/python.html" class="label label-info">Python</a>
-</div>        </div>
-
-        <div class="content-body"><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
-<p>Windowsにおける<tt class="docutils literal">multiprocessing</tt>モジュールの動きは次のようなものになります:</p>
-<ol class="arabic simple">
-<li>pipeを作っておく。</li>
-<li>現在の実行ファイルに<tt class="docutils literal"><span class="pre">--multiprocessing-fork</span></tt>というコマンドラインオプションと先ほどのpipeの読み出し側をつけて<tt class="docutils literal">CreateProcess</tt>する。</li>
-<li>親プロセスはpipeを通じて、<tt class="docutils literal">Process</tt>オブジェクトを<tt class="docutils literal">pickle</tt>で直列化して子プロセスに送る。</li>
-<li>子プロセスは<tt class="docutils literal"><span class="pre">--multiprocessing-fork</span></tt>をフラグとして認識して、pipeから<tt class="docutils literal">Process</tt>オブジェクトを読み出す。</li>
-<li>子プロセスが<tt class="docutils literal">Process._bootstrap</tt>を呼び出す。</li>
-</ol>
-<p>Freezeされていない場合は、過程2のところでは、実行ファイルが<tt class="docutils literal">python.exe</tt>になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、<tt class="docutils literal">multiprocessing.freeze_support</tt>がそのような役割を果たします。これがFreezeされている場合に<tt class="docutils literal">multiprocessing.freeze_support</tt>が必要になる理由です。</p>
-</div>
-        <hr />
-    </div>
-
-
-
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2011/12/29/153703.html">CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2011/12/29</span>
-    <a href="../category/python.html" class="label label-info">Python</a>
-</div>        </div>
-
-        <div class="content-body"><p>ドキュメンテーションにも書いてあるとおり、<tt class="docutils literal">csv</tt>モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。<tt class="docutils literal">csv</tt>モジュールのコアの部分はCで書かれており、<tt class="docutils literal">_csv.c</tt>というファイルに記述されています。</p>
-<p><tt class="docutils literal">csv.Reader</tt>は与えられたfile-likeオブジェクトから<tt class="docutils literal">PyString_AsString</tt>をつかって<tt class="docutils literal">char *</tt>を得ようとします。:</p>
-<div class="highlight"><pre><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
-<span class="nf">Reader_iternext</span><span class="p">(</span><span class="n">ReaderObj</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">lineobj</span><span class="p">;</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">fields</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="kt">char</span> <span class="o">*</span><span class="n">line</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span>
-    <span class="p">...</span>
-
-    <span class="k">do</span> <span class="p">{</span>
-        <span class="n">lineobj</span> <span class="o">=</span> <span class="n">PyIter_Next</span><span class="p">(</span><span class="n">self</span><span class="o">-&gt;</span><span class="n">input_iter</span><span class="p">);</span>
-        <span class="p">...</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="n">PyString_AsString</span><span class="p">(</span><span class="n">lineobj</span><span class="p">);</span>
-        <span class="p">...</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-<p>この関数は<tt class="docutils literal">char *</tt>を得るために使われるオブジェクトが<tt class="docutils literal">str</tt>か<tt class="docutils literal">unicode</tt>かで動作が変わります。<tt class="docutils literal">str</tt>であった場合は直接そのオブジェクトのバッファが返されるのですが、<tt class="docutils literal">unicode</tt>であった場合は、<tt class="docutils literal">_PyUnicode_AsDefaultEncodedString</tt>によって、デフォルトエンコーディングに変換された文字列を返す動作になっています。</p>
-<div class="highlight"><pre><span class="cm">/*const*/</span> <span class="kt">char</span> <span class="o">*</span>
-<span class="nf">PyString_AsString</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">op</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">string_getbuffer</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
-    <span class="k">return</span> <span class="p">((</span><span class="n">PyStringObject</span> <span class="o">*</span><span class="p">)</span><span class="n">op</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ob_sval</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kt">int</span>
-<span class="nf">PyString_AsStringAndSize</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">obj</span><span class="p">,</span>
-                         <span class="k">register</span> <span class="kt">char</span> <span class="o">**</span><span class="n">s</span><span class="p">,</span>
-                         <span class="k">register</span> <span class="n">Py_ssize_t</span> <span class="o">*</span><span class="n">len</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="p">...</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
-<span class="cp">#ifdef Py_USING_UNICODE</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">PyUnicode_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">_PyUnicode_AsDefaultEncodedString</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-            <span class="p">...</span>
-        <span class="p">}</span>
-        <span class="p">...</span>
-    <span class="p">}</span>
-    <span class="p">...</span>
-<span class="p">}</span>
-</pre></div>
-<p>このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もしデフォルトエンコーディングが変更されていた場合は、<tt class="docutils literal">codecs.open</tt>を使った場合や<tt class="docutils literal">open</tt>を使った場合とでおもしろい?結果が得られるかもしれません。</p>
-<p><tt class="docutils literal">csv.Reader</tt>が返す結果は、<tt class="docutils literal">unicode</tt>ではなく、ファイルのエンコーディングでエンコードされたそのままの<tt class="docutils literal">str</tt>の配列や辞書になっています。よって、それがきちんと<tt class="docutils literal">unicode</tt>なのか、なにかのエンコーディングでエンコードされた<tt class="docutils literal">str</tt>なのかを意識しないと、あるはずのキーがないというような現象に出くわしたりします。これを意識するのは面倒くさいので、適切な<tt class="docutils literal">csv.Reader</tt>のラッパーを用意して使うようにした方がよいです。</p>
-</div>
-        <hr />
-    </div>
-
-
      <div class="pagination">
 <ul>
     <li class="prev disabled"><a href="#">&larr; Previous</a></li>
 
     <li class="active"><a href="../category/python.html">1</a></li>
+    <li class=""><a href="../category/python2.html">2</a></li>
 
-    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+    <li class="next"><a href="../category/python2.html">Next &rarr;</a></li>
 
 </ul>
 </div> 
