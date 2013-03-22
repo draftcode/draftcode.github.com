@@ -4,6 +4,7 @@ Windows環境でPythonのC拡張をビルドする
 :Author: draftcode
 :Date:   2013-03-17 13:41:45
 :Slug:   5f45fabb-8b64-469e-a0f6-7f9d76564af8
+:Category: Python
 
 Windows NativeのPythonでC拡張をビルドする方法を説明します。みなさん普通は
 WindowsではPythonなんて使わないのか、あんまり情報が無いんですよね……
