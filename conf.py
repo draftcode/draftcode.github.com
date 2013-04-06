@@ -10,8 +10,8 @@ DELETE_OUTPUT_DIRECTORY = True
 PATH = '.'
 PAGE_DIR = 'pages'
 ARTICLE_DIR = 'articles'
-SITENAME = 'draftcode.github.com'
-SITEURL = 'http://draftcode.github.com'
+SITENAME = 'draftcode.github.io'
+SITEURL = 'http://draftcode.github.io'
 STATIC_PATHS = ["images"]
 TIMEZONE = 'Asia/Tokyo'
 DEFAULT_PAGINATION = 3
@@ -20,7 +20,7 @@ ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}.html'
 ARTICLE_SAVE_AS = ARTICLE_URL
 
 FEED_ATOM = "atom.xml"
-FEED_DOMAIN = "http://draftcode.github.com/"
+FEED_DOMAIN = "http://draftcode.github.io/"
 
 DEFAULT_LANG = 'ja'
 
