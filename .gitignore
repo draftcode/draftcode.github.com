@@ -3,3 +3,5 @@ env
 *.egg-info
 amazon_secret.py
 *.pyc
+.ruby-version
+.sass-cache

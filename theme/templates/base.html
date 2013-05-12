@@ -1,69 +1,54 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
+  <head>
     <meta charset="utf-8">
     <title>{% block windowtitle %}{{ SITENAME }}{% endblock %}</title>
     <meta name="author" content="{{ AUTHOR }}">
     <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
 
-    <!--[if lt IE 9]>
-    <script src="{{ SITEURL }}/theme/html5.js"></script>
+    <link href="{{ SITEURL }}/theme/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="{{ SITEURL }}/theme/print.css" media="print" rel="stylesheet" type="text/css" />
+    <!--[if IE]>
+    <link href="{{ SITEURL }}/theme/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <![endif]-->
 
-    <link href="{{ SITEURL }}/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ SITEURL }}/theme/local.css" rel="stylesheet">
-    <link href="{{ SITEURL }}/theme/pygments.css" rel="stylesheet">
     <link rel="alternate" type="application/atom+xml" title="Atom" href="{{ SITEURL }}/{{ FEED_ATOM }}">
     <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
-</head>
+  </head>
 
-<body>
+  <body>
+    <h1 id="site-title"><a href="{{ SITEURL }}">{{ SITENAME }}</a></h1>
 
-<h1 id="site-title"><a href="{{ SITEURL }}">{{ SITENAME }}</a></h1>
-
-<div id="content">
-{% block content %}{% endblock %}
-</div>
-
-<div id="footer">
-    <div id="about">
-        <ul class="nav nav-list">
-            <li class="nav-header">About the author</li>
-        </ul>
-
-        <div style="padding: 10px;">
-            <a id="about-image" href="{{ SITEURL }}/pages/about.html" rel="alternate"><img src="{{ SITEURL }}/static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
-            <p>東京で情報工学を専攻している大学院生です。</p>
-        </div>
+    <div id="content">
+      {% block content %}{% endblock %}
     </div>
 
-    <div id="site">
-        <ul class="nav nav-list">
-            <li class="nav-header">Site</li>
+    <div id="footer">
+      <div id="footer-container">
+        <div id="about">
+          <h2>About the author</h2>
+          <a href="{{ SITEURL }}/pages/about.html"><img src="{{ SITEURL }}/static/images/draftcode.png" /></a>
+          <p>東京で情報工学を専攻している大学院生です。<br />プログラミング言語の研究をしています。<br /></p>
+          <p>詳しくは<a href="{{ SITEURL }}/pages/about.html">こちら</a></p>
+        </div>
 
+        <div id="site">
+          <h2>Site</h2>
+          <ul>
             <li><a href="{{ SITEURL }}/archives.html">Archives</a>
             <li><a href="{{ SITEURL }}/{{ FEED_ATOM }}" rel="alternate">Atom feed</a></li>
-        </ul>
-    </div>
+          </ul>
+        </div>
 
-    <div id="category">
-        <ul class="nav nav-list">
-            <li class="nav-header">Categories</li>
-            {% for cat, null in categories %}
-            <li><a href="{{ SITEURL }}/category/{{ cat|lower }}.html">{{ cat }}</a></li>
-            {%- endfor %}
-        </ul>
-    </div>
-
-    <div id="social">
-        <ul class="nav nav-list">
-            <li class="nav-header">Social</li>
+        <div id="social">
+          <h2>Social</h2>
+          <ul>
             {% for name, link in SOCIAL %}
             <li class="social"><a href="{{ link }}">{{ name }}</a></li>
             {%- endfor %}
-        </ul>
+          </ul>
+        </div>
+      </div>
     </div>
-</div>
-
-</body>
+  </body>
 </html>

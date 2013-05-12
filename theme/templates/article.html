@@ -1,19 +1,31 @@
 {% extends "base.html" %}
-{% block windowtitle -%}
-{{ article.title }} - {{ SITENAME }}
-{%- endblock %}
+{% block windowtitle -%}{{ article.title }} - {{ SITENAME }}{%- endblock %}
 {% block content %}
-    <div class='article'>
-        <div class="content-title">
-            <h1>{{ article.title }}</h1>
-            {% include "metadata.html" %}
-        </div>
+<div class='article'>
+  <div class="content-title">
+    <h1>{{ article.title }}</h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>{{ article.date.strftime("%Y/%m/%d") }}</dd>
+  </dl>
 
-        <div class="content-body">{{ article.content }}</div>
+  <div class="content-body section">{{ article.content }}</div>
+</div>
 
-        <hr>
+{% if DISQUS_SITENAME %}
+<div class="comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = '{{ DISQUS_SITENAME }}';
 
-        <h2>Comments</h2>
-        {% include 'disqus.html' %}
-    </div>
+    (function() {
+     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+{% endif %}
 {% endblock %}
