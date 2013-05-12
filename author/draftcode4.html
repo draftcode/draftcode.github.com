@@ -1,38 +1,37 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
+  <head>
     <meta charset="utf-8">
     <title>draftcode.github.io</title>
     <meta name="author" content="draftcode">
     <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
 
-    <!--[if lt IE 9]>
-    <script src="../theme/html5.js"></script>
+    <link href="../theme/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="../theme/print.css" media="print" rel="stylesheet" type="text/css" />
+    <!--[if IE]>
+    <link href="../theme/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <![endif]-->
 
-    <link href="../theme/bootstrap.min.css" rel="stylesheet">
-    <link href="../theme/local.css" rel="stylesheet">
-    <link href="../theme/pygments.css" rel="stylesheet">
     <link rel="alternate" type="application/atom+xml" title="Atom" href="../atom.xml">
     <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
-</head>
+  </head>
 
-<body>
+  <body>
+    <h1 id="site-title"><a href="..">draftcode.github.io</a></h1>
 
-<h1 id="site-title"><a href="..">draftcode.github.io</a></h1>
+    <div id="content">
+      
 
-<div id="content">
+<div class='article'>
+  <div class="content-title">
+    <h1><a href="../2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html">RoboGuice2とRobolectricを組み合わせてテストを書く</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2012/10/17</dd>
+  </dl>
 
-
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html">RoboGuice2とRobolectricを組み合わせてテストを書く</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2012/10/17</span>
-    <a href="../category/articles.html" class="label label-info">Articles</a>
-</div>        </div>
-
-        <div class="content-body"><p><a class="reference external" href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html">RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</a>でActivityの
+  <div class="content-body section"><p><a class="reference external" href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html">RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</a>でActivityの
 InjectionタイミングがずれることによりInjectExtraが利用できないことについて述べました。これをRoboGuice2にすることによって回避することができました。</p>
 <div class="section" id="id1">
 <h2>問題背景</h2>
@@ -53,20 +52,19 @@ RoboGuice1だと、ActivityをテストにInjectする場合、次のように�
 <h2>サンプルコード</h2>
 <script src="https://gist.github.com/3963845.js"> </script></div>
 </div>
-        <hr />
-    </div>
+</div>
 
 
+<div class='article'>
+  <div class="content-title">
+    <h1><a href="../2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html">Writing Adblock Plus filters -- 日本語訳</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2011/03/22</dd>
+  </dl>
 
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html">Writing Adblock Plus filters -- 日本語訳</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2011/03/22</span>
-    <a href="../category/articles.html" class="label label-info">Articles</a>
-</div>        </div>
-
-        <div class="content-body"><p><a class="reference external" href="http://adblockplus.org/en/filters">Writing Adblock Plus filters</a>の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．</p>
+  <div class="content-body section"><p><a class="reference external" href="http://adblockplus.org/en/filters">Writing Adblock Plus filters</a>の和訳．ないっぽいので．元の文章のライセンスとかわからぬ．直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり．途中から面倒くさくなったので，適当な訳になってたり．</p>
 <p>あと，どうもURLとかフィルタルールが入っている関係で，レイアウトがすごくぐちゃぐちゃになります．それに加えて訳がいまいちなので，さらに読みづらい．超訳でもすればよかった……</p>
 <p>Adblock Plusの新しいバージョンでは，さまざまなほうほうでフィルタを「いじる」ことができるようになっています．ここでは，その方法と使い方について説明しています．</p>
 <p>免責事項: 例としてあげられているフィルタは，すべて単なる例として挙げており，使われることを意図しておりません．</p>
@@ -183,20 +181,19 @@ specification</a>で見ることができます．(すべてのセレクタがFi
 </div>
 </div>
 </div>
-        <hr />
-    </div>
+</div>
 
 
+<div class='article'>
+  <div class="content-title">
+    <h1><a href="../2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html">PelicanとGitHub Pagesを使う</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2012/03/16</dd>
+  </dl>
 
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html">PelicanとGitHub Pagesを使う</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2012/03/16</span>
-    <a href="../category/articles.html" class="label label-info">Articles</a>
-</div>        </div>
-
-        <div class="content-body"><p>reStructuredTextが使いたかったので、Pythonで書かれてる<a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html">Pelican</a>という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。</p>
+  <div class="content-body section"><p>reStructuredTextが使いたかったので、Pythonで書かれてる<a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html">Pelican</a>という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。</p>
 <div class="section" id="id1">
 <h2>Pelican</h2>
 <p>最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
@@ -236,61 +233,51 @@ git remote add origin &lt;自分のGitHubリポジトリでコピーしてきた
 <p>これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!</p>
 </div>
 </div>
-        <hr />
-    </div>
-
-
-     <div class="pagination">
-<ul>
-    <li class="prev"><a href="../author/draftcode3.html">&larr; Previous</a></li>
-
-    <li class=""><a href="../author/draftcode.html">1</a></li>
-    <li class=""><a href="../author/draftcode2.html">2</a></li>
-    <li class=""><a href="../author/draftcode3.html">3</a></li>
-    <li class="active"><a href="../author/draftcode4.html">4</a></li>
-    <li class=""><a href="../author/draftcode5.html">5</a></li>
-    <li class=""><a href="../author/draftcode6.html">6</a></li>
-    <li class=""><a href="../author/draftcode7.html">7</a></li>
-
-    <li class="next"><a href="../author/draftcode5.html">Next &rarr;</a></li>
-
-</ul>
-</div> 
 </div>
 
-<div id="footer">
-    <div id="about">
-        <ul class="nav nav-list">
-            <li class="nav-header">About the author</li>
-        </ul>
+ 
+<div class="pagination">
+  <ul>
+            <a href="../author/draftcode3.html"><li class="prev">&larr; Previous</li></a>
+    
+            <a href="../author/draftcode.html"><li>1</li></a>
+                <a href="../author/draftcode2.html"><li>2</li></a>
+                <a href="../author/draftcode3.html"><li>3</li></a>
+                <li class="active">4</li>
+                <a href="../author/draftcode5.html"><li>5</li></a>
+                <a href="../author/draftcode6.html"><li>6</li></a>
+                <a href="../author/draftcode7.html"><li>7</li></a>
+        
+        <a href="../author/draftcode5.html"><li class="next">Next &rarr;</li></a>
+      </ul>
+</div>
 
-        <div style="padding: 10px;">
-            <a id="about-image" href="../pages/about.html" rel="alternate"><img src="../static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
-            <p>東京で情報工学を専攻している大学院生です。</p>
-        </div>
+ 
     </div>
 
-    <div id="site">
-        <ul class="nav nav-list">
-            <li class="nav-header">Site</li>
+    <div id="footer">
+      <div id="footer-container">
+        <div id="about">
+          <h2>About the author</h2>
+          <a href="../pages/about.html"><img src="../static/images/draftcode.png" /></a>
+          <p>東京で情報工学を専攻している大学院生です。<br />プログラミング言語の研究をしています。<br /></p>
+          <p>詳しくは<a href="../pages/about.html">こちら</a></p>
+        </div>
 
+        <div id="site">
+          <h2>Site</h2>
+          <ul>
             <li><a href="../archives.html">Archives</a>
             <li><a href="../atom.xml" rel="alternate">Atom feed</a></li>
-        </ul>
-    </div>
+          </ul>
+        </div>
 
-    <div id="category">
-        <ul class="nav nav-list">
-            <li class="nav-header">Categories</li>
-                        <li><a href="../category/android.html">Android</a></li>            <li><a href="../category/articles.html">Articles</a></li>            <li><a href="../category/java.html">Java</a></li>            <li><a href="../category/python.html">Python</a></li>        </ul>
+        <div id="social">
+          <h2>Social</h2>
+          <ul>
+                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>          </ul>
+        </div>
+      </div>
     </div>
-
-    <div id="social">
-        <ul class="nav nav-list">
-            <li class="nav-header">Social</li>
-                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>        </ul>
-    </div>
-</div>
-
-</body>
+  </body>
 </html>

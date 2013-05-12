@@ -1,38 +1,37 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
+  <head>
     <meta charset="utf-8">
     <title>draftcode.github.io</title>
     <meta name="author" content="draftcode">
     <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
 
-    <!--[if lt IE 9]>
-    <script src="../theme/html5.js"></script>
+    <link href="../theme/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="../theme/print.css" media="print" rel="stylesheet" type="text/css" />
+    <!--[if IE]>
+    <link href="../theme/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <![endif]-->
 
-    <link href="../theme/bootstrap.min.css" rel="stylesheet">
-    <link href="../theme/local.css" rel="stylesheet">
-    <link href="../theme/pygments.css" rel="stylesheet">
     <link rel="alternate" type="application/atom+xml" title="Atom" href="../atom.xml">
     <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
-</head>
+  </head>
 
-<body>
+  <body>
+    <h1 id="site-title"><a href="..">draftcode.github.io</a></h1>
 
-<h1 id="site-title"><a href="..">draftcode.github.io</a></h1>
+    <div id="content">
+      
 
-<div id="content">
+<div class='article'>
+  <div class="content-title">
+    <h1><a href="../2012/01/01/182300.html">Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2012/01/01</dd>
+  </dl>
 
-
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2012/01/01/182300.html">Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2012/01/01</span>
-    <a href="../category/java.html" class="label label-info">Java</a>
-</div>        </div>
-
-        <div class="content-body"><div class="section" id="id1">
+  <div class="content-body section"><div class="section" id="id1">
 <h2>結論</h2>
 <p>配列はアレなので使ってはいけない</p>
 </div>
@@ -136,27 +135,26 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
 <p>また、配列がcovariantなのもまた変なエラーの原因となるので、配列さえ使わなければ……というのがかなり前から言われているようです。</p>
 </div>
 </div>
-        <hr />
-    </div>
+</div>
 
 
+<div class='article'>
+  <div class="content-title">
+    <h1><a href="../2012/01/01/182705.html">配列はCovariantなので使ってはいけない</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2012/01/01</dd>
+  </dl>
 
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2012/01/01/182705.html">配列はCovariantなので使ってはいけない</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2012/01/01</span>
-    <a href="../category/java.html" class="label label-info">Java</a>
-</div>        </div>
-
-        <div class="content-body"><div class="section" id="id1">
+  <div class="content-body section"><div class="section" id="id1">
 <h2>結論</h2>
 <p>配列はアレなので使ってはいけない。</p>
 </div>
 <div class="section" id="java">
 <h2>Javaの配列とは</h2>
 <p>Javaの配列はcovariantです。<tt class="docutils literal">Integer</tt>は<tt class="docutils literal">Number</tt>のサブクラスなんだから、<tt class="docutils literal">Integer[]</tt>も<tt class="docutils literal">Number[]</tt>のサブクラスだ、というのがcovariantです。なので次のようなことが出来てしまいます。</p>
-<img alt="images/20120101171202.png" src="images/20120101171202.png" />
+<img alt="/static/images/20120101171202.png" src="/static/images/20120101171202.png" />
 <p>見た目の型は<tt class="docutils literal">Number</tt>の配列なのに、代入できる要素は<tt class="docutils literal">Integerの</tt>要素のみという配列が作れます。ここで、<tt class="docutils literal">Integer</tt>以外の要素を代入しようとすると、同じ<tt class="docutils literal">Number</tt>を継承している<tt class="docutils literal">Long</tt>でも実行時エラーになります。このときの<tt class="docutils literal">Number</tt>の配列の実体は、<tt class="docutils literal">Integer</tt>の配列ですから。</p>
 </div>
 <div class="section" id="id2">
@@ -164,20 +162,19 @@ conversion warningが出るけれども、<tt class="docutils literal">ClassCast
 <p><a class="reference external" href="http://draftcode.github.com/2012/01/01/182300.html">先の記事</a>とあわせて、配列は使ってはいけない。</p>
 </div>
 </div>
-        <hr />
-    </div>
+</div>
 
 
+<div class='article'>
+  <div class="content-title">
+    <h1><a href="../2012/02/06/235454.html">HomebrewでクロスコンパイルできるGCCをビルドする</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2012/02/06</dd>
+  </dl>
 
-    <div class='article'>
-        <div class="content-title">
-            <h1><a href="../2012/02/06/235454.html">HomebrewでクロスコンパイルできるGCCをビルドする</a></h1>
-            <div class="metadata">
-    <span class="label label-inverse">2012/02/06</span>
-    <a href="../category/articles.html" class="label label-info">Articles</a>
-</div>        </div>
-
-        <div class="content-body"><p>Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。</p>
+  <div class="content-body section"><p>Mac OS X 10.7.2 の Intel Core i7 を乗っけているMacbook Airで、Homebrewをつかってクロスコンパイラをビルドします。</p>
 <div class="section" id="id1">
 <h2>結論</h2>
 <p><a class="reference external" href="https://gist.github.com/1751385">https://gist.github.com/1751385</a>のようなFormulaをつくればできます。このFormulaは<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/xv6.html">http://pdos.csail.mit.edu/6.828/2011/xv6.html</a>をビルドするために、<a class="reference external" href="http://pdos.csail.mit.edu/6.828/2011/tools.html">http://pdos.csail.mit.edu/6.828/2011/tools.html</a>の設定を参考にして書きました。</p>
@@ -207,61 +204,51 @@ brew install qemu --use-gcc
 </pre></div>
 </div>
 </div>
-        <hr />
-    </div>
-
-
-     <div class="pagination">
-<ul>
-    <li class="prev"><a href="../author/draftcode.html">&larr; Previous</a></li>
-
-    <li class=""><a href="../author/draftcode.html">1</a></li>
-    <li class="active"><a href="../author/draftcode2.html">2</a></li>
-    <li class=""><a href="../author/draftcode3.html">3</a></li>
-    <li class=""><a href="../author/draftcode4.html">4</a></li>
-    <li class=""><a href="../author/draftcode5.html">5</a></li>
-    <li class=""><a href="../author/draftcode6.html">6</a></li>
-    <li class=""><a href="../author/draftcode7.html">7</a></li>
-
-    <li class="next"><a href="../author/draftcode3.html">Next &rarr;</a></li>
-
-</ul>
-</div> 
 </div>
 
-<div id="footer">
-    <div id="about">
-        <ul class="nav nav-list">
-            <li class="nav-header">About the author</li>
-        </ul>
+ 
+<div class="pagination">
+  <ul>
+            <a href="../author/draftcode.html"><li class="prev">&larr; Previous</li></a>
+    
+            <a href="../author/draftcode.html"><li>1</li></a>
+                <li class="active">2</li>
+                <a href="../author/draftcode3.html"><li>3</li></a>
+                <a href="../author/draftcode4.html"><li>4</li></a>
+                <a href="../author/draftcode5.html"><li>5</li></a>
+                <a href="../author/draftcode6.html"><li>6</li></a>
+                <a href="../author/draftcode7.html"><li>7</li></a>
+        
+        <a href="../author/draftcode3.html"><li class="next">Next &rarr;</li></a>
+      </ul>
+</div>
 
-        <div style="padding: 10px;">
-            <a id="about-image" href="../pages/about.html" rel="alternate"><img src="../static/images/draftcode.png" style="width: 100.0px; height: 100.0px;"/></a>
-            <p>東京で情報工学を専攻している大学院生です。</p>
-        </div>
+ 
     </div>
 
-    <div id="site">
-        <ul class="nav nav-list">
-            <li class="nav-header">Site</li>
+    <div id="footer">
+      <div id="footer-container">
+        <div id="about">
+          <h2>About the author</h2>
+          <a href="../pages/about.html"><img src="../static/images/draftcode.png" /></a>
+          <p>東京で情報工学を専攻している大学院生です。<br />プログラミング言語の研究をしています。<br /></p>
+          <p>詳しくは<a href="../pages/about.html">こちら</a></p>
+        </div>
 
+        <div id="site">
+          <h2>Site</h2>
+          <ul>
             <li><a href="../archives.html">Archives</a>
             <li><a href="../atom.xml" rel="alternate">Atom feed</a></li>
-        </ul>
-    </div>
+          </ul>
+        </div>
 
-    <div id="category">
-        <ul class="nav nav-list">
-            <li class="nav-header">Categories</li>
-                        <li><a href="../category/android.html">Android</a></li>            <li><a href="../category/articles.html">Articles</a></li>            <li><a href="../category/java.html">Java</a></li>            <li><a href="../category/python.html">Python</a></li>        </ul>
+        <div id="social">
+          <h2>Social</h2>
+          <ul>
+                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>          </ul>
+        </div>
+      </div>
     </div>
-
-    <div id="social">
-        <ul class="nav nav-list">
-            <li class="nav-header">Social</li>
-                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>        </ul>
-    </div>
-</div>
-
-</body>
+  </body>
 </html>
