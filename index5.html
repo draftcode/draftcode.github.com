@@ -24,6 +24,122 @@
 
 <div class='article'>
   <div class="content-title">
+    <h1><a href="./2012/01/01/182300.html">Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2012/01/01</dd>
+  </dl>
+
+  <div class="content-body section"><div class="section" id="id1">
+<h2>結論</h2>
+<p>配列はアレなので使ってはいけない</p>
+</div>
+<div class="section" id="javagenerics">
+<h2>JavaのGenericsとは</h2>
+<p>JavaのGenericsでは、型パラメーターは最終的にバイトコードになったら消えて<tt class="docutils literal">Object</tt>になってしまって、Generic型からその型パラメーターで示された型を実際に使う側がキャストして使うというものなんですね。だからこのようなコードに対して:</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+
+<span class="kd">class</span> <span class="nc">Main</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">l</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
+    <span class="n">l</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+    <span class="n">Integer</span> <span class="n">a</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+<p>このようなバイトコードが出力されます:</p>
+<div class="highlight"><pre>Compiled from &quot;Main.java&quot;
+class Main extends java.lang.Object{
+Main();
+  Code:
+   0:   aload_0
+   1:   invokespecial   #1; //Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V
+   4:   return
+
+public static void main(java.lang.String[]);
+  Code:
+   0:   new     #2; //class java/util/ArrayList
+   3:   dup
+   4:   invokespecial   #3; //Method java/util/ArrayList.&quot;&lt;init&gt;&quot;:()V
+   7:   astore_1
+   8:   aload_1
+   9:   iconst_1
+   10:  invokestatic    #4; //Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+   13:  invokeinterface #5,  2; //InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+   18:  pop
+   19:  aload_1
+   20:  iconst_0
+   21:  invokeinterface #6,  2; //InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+   26:  checkcast       #7; //class java/lang/Integer
+   29:  astore_2
+   30:  return
+
+}
+</pre></div>
+<p><tt class="docutils literal">ArrayList</tt>の型パラメーターが消えていて、要素を取り出すときに<tt class="docutils literal">checkcast</tt>でキャストしてますね。</p>
+</div>
+<div class="section" id="id2">
+<h2>総称配列を作るときのエラー・警告</h2>
+<p>例えば次のようなコードはgeneric array createionエラーになります:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
+</pre></div>
+<p>これは配列をアロケートするときに、バイトコードの中で型情報が必要になるのに、<tt class="docutils literal">ArrayList&lt;Integer&gt;</tt>は(バイトコードレベルでは)実際は存在せず、<tt class="docutils literal">ArrayList</tt>が存在しているからです。</p>
+<p>なので次のようなコードを書きます:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;?&gt;[</span><span class="mi">10</span><span class="o">];</span>
+</pre></div>
+<p>しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、<tt class="docutils literal">ArrayList</tt>と<tt class="docutils literal">ArrayList&lt;Integer&gt;</tt>は違う型ですから。</p>
+<div class="section" id="id3">
+<h3>追記</h3>
+<p>generic array creationがなぜ禁止なのかきちんと理解してなかった。</p>
+<p>Generic型の配列が作れると仮定しましょう。次のコードはエラー・警告なしでコンパイル出来ます:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
+<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span>
+
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span> <span class="c1">// ClassCastException occur!</span>
+</pre></div>
+<p>一方でGeneric型以外の配列の場合は、次のようになります:</p>
+<div class="highlight"><pre><span class="n">Number</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
+<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">Double</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="c1">// ArrayStoreException occur!</span>
+</pre></div>
+<p>Generic型以外の配列の場合、型の違うオブジェクトの参照を配列に代入しようとすると、<tt class="docutils literal">ArrayStoreException</tt>が発生しますが、Generic型の配列の場合はその例外は発生せずに、値を取り出したときに<tt class="docutils literal">ClassCastException</tt>が発生するようになります。これがGeneric型の配列が作れない理由のようです。</p>
+<p>また、総称配列が作れなくても、上のコードは次のように書き換えると、unchecked
+conversion warningが出るけれども、<tt class="docutils literal">ClassCastException</tt>が発生するように実行することが出来ます:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
+<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span>
+
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span> <span class="c1">// unchecked conversion warning</span>
+<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span> <span class="c1">// ClassCastException occur!</span>
+</pre></div>
+<p>次のように書き換えると、今度はきちんと<tt class="docutils literal">list[0] = stringArray</tt>のところで型エラーを起こしてくれます:</p>
+<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span> <span class="c1">// unchecked conversion warning</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
+<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span> <span class="c1">// Incompatible types error</span>
+
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>配列は使ってはいけない</h2>
+<p>総称配列のエラー・警告はJavaレベルの型とJVMレベルの型が一致していないことが原因に見えますが、実は配列を使わなければこのような問題は回避されるようです。(僕はGenericsによってJavaとJVMの型が一致しなくなったこともなんかアレな気がするんですが)</p>
+<p>また、配列がcovariantなのもまた変なエラーの原因となるので、配列さえ使わなければ……というのがかなり前から言われているようです。</p>
+</div>
+</div>
+</div>
+
+
+<div class='article'>
+  <div class="content-title">
     <h1><a href="./2012/01/01/182705.html">配列はCovariantなので使ってはいけない</a></h1>
   </div>
   <dl class="metadata">
@@ -68,65 +184,6 @@
 <li>子プロセスが<tt class="docutils literal">Process._bootstrap</tt>を呼び出す。</li>
 </ol>
 <p>Freezeされていない場合は、過程2のところでは、実行ファイルが<tt class="docutils literal">python.exe</tt>になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、<tt class="docutils literal">multiprocessing.freeze_support</tt>がそのような役割を果たします。これがFreezeされている場合に<tt class="docutils literal">multiprocessing.freeze_support</tt>が必要になる理由です。</p>
-</div>
-</div>
-
-
-<div class='article'>
-  <div class="content-title">
-    <h1><a href="./2011/12/29/153703.html">CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</a></h1>
-  </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2011/12/29</dd>
-  </dl>
-
-  <div class="content-body section"><p>ドキュメンテーションにも書いてあるとおり、<tt class="docutils literal">csv</tt>モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。<tt class="docutils literal">csv</tt>モジュールのコアの部分はCで書かれており、<tt class="docutils literal">_csv.c</tt>というファイルに記述されています。</p>
-<p><tt class="docutils literal">csv.Reader</tt>は与えられたfile-likeオブジェクトから<tt class="docutils literal">PyString_AsString</tt>をつかって<tt class="docutils literal">char *</tt>を得ようとします。:</p>
-<div class="highlight"><pre><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
-<span class="nf">Reader_iternext</span><span class="p">(</span><span class="n">ReaderObj</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">lineobj</span><span class="p">;</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">fields</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="kt">char</span> <span class="o">*</span><span class="n">line</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span>
-    <span class="p">...</span>
-
-    <span class="k">do</span> <span class="p">{</span>
-        <span class="n">lineobj</span> <span class="o">=</span> <span class="n">PyIter_Next</span><span class="p">(</span><span class="n">self</span><span class="o">-&gt;</span><span class="n">input_iter</span><span class="p">);</span>
-        <span class="p">...</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="n">PyString_AsString</span><span class="p">(</span><span class="n">lineobj</span><span class="p">);</span>
-        <span class="p">...</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-<p>この関数は<tt class="docutils literal">char *</tt>を得るために使われるオブジェクトが<tt class="docutils literal">str</tt>か<tt class="docutils literal">unicode</tt>かで動作が変わります。<tt class="docutils literal">str</tt>であった場合は直接そのオブジェクトのバッファが返されるのですが、<tt class="docutils literal">unicode</tt>であった場合は、<tt class="docutils literal">_PyUnicode_AsDefaultEncodedString</tt>によって、デフォルトエンコーディングに変換された文字列を返す動作になっています。</p>
-<div class="highlight"><pre><span class="cm">/*const*/</span> <span class="kt">char</span> <span class="o">*</span>
-<span class="nf">PyString_AsString</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">op</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">string_getbuffer</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
-    <span class="k">return</span> <span class="p">((</span><span class="n">PyStringObject</span> <span class="o">*</span><span class="p">)</span><span class="n">op</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ob_sval</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kt">int</span>
-<span class="nf">PyString_AsStringAndSize</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">obj</span><span class="p">,</span>
-                         <span class="k">register</span> <span class="kt">char</span> <span class="o">**</span><span class="n">s</span><span class="p">,</span>
-                         <span class="k">register</span> <span class="n">Py_ssize_t</span> <span class="o">*</span><span class="n">len</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="p">...</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
-<span class="cp">#ifdef Py_USING_UNICODE</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">PyUnicode_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">_PyUnicode_AsDefaultEncodedString</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-            <span class="p">...</span>
-        <span class="p">}</span>
-        <span class="p">...</span>
-    <span class="p">}</span>
-    <span class="p">...</span>
-<span class="p">}</span>
-</pre></div>
-<p>このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もしデフォルトエンコーディングが変更されていた場合は、<tt class="docutils literal">codecs.open</tt>を使った場合や<tt class="docutils literal">open</tt>を使った場合とでおもしろい?結果が得られるかもしれません。</p>
-<p><tt class="docutils literal">csv.Reader</tt>が返す結果は、<tt class="docutils literal">unicode</tt>ではなく、ファイルのエンコーディングでエンコードされたそのままの<tt class="docutils literal">str</tt>の配列や辞書になっています。よって、それがきちんと<tt class="docutils literal">unicode</tt>なのか、なにかのエンコーディングでエンコードされた<tt class="docutils literal">str</tt>なのかを意識しないと、あるはずのキーがないというような現象に出くわしたりします。これを意識するのは面倒くさいので、適切な<tt class="docutils literal">csv.Reader</tt>のラッパーを用意して使うようにした方がよいです。</p>
 </div>
 </div>
 

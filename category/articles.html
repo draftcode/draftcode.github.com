@@ -24,6 +24,30 @@
 
 <div class='article'>
   <div class="content-title">
+    <h1><a href="../2013/06/08/faf853f8-7aea-428c-8e3c-3108b83835b7.html">XPS13を買ってLinuxを入れた話</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2013/06/08</dd>
+  </dl>
+
+  <div class="content-body section"><p>最近Macbook Airがスリープから復帰してログインした直後に、すぐに再度スリープに入ってしまうという現象が起きていて、イライラしていた。ということとはあまり関係がなく、どちらかというとそろそろ3年経ったから次のPCを買おうかなということで、
+XPS13を買いました。先のようなこともあり、次は脱Appleしようかなということで、適当に日本からキーボードの種類が選べるものを探して買った感じです。Thinkpad X1
+Carbonとも迷ったのですが、まぁXPS13のほうが安かったので。</p>
+<p>ちょうど1年ぐらいまえにLinuxデスクトップを使い始めていたので、移行自体はすんなり行きました。参考にしたのは次の2つのページです:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://qiita.com/items/12f21126c5117e07decd">Arch Linux インストールから awesome 導入まで - Qiita</a></li>
+<li><a class="reference external" href="https://wiki.archlinux.org/index.php/Installation_Guide">Installation Guice - ArchWiki</a></li>
+</ul>
+<p>せっかくだからということで、GPTパーティション+EFIという構成でセットアップしたのですが、ドハマりしました。一番ハマったのは、Protective MBRにある部分はBootフラグを立ててはいけないというもので、これをそのままにしておいた結果、いつまでたってもEFIパーティションが認識されないという状況になっていました。</p>
+<p>あと、最初に入っていたWindows8を消してWindows7を入れなおそうとしたら、どうやらこのXPS13はEFI起動の64bit Windows7インストールに失敗するようです……残念。</p>
+<p>それ以外はファンがすぐに回るとか、タッチパッドの感度が良すぎるとか、TWMを使っているのだけれども、それとibusの候補ウィンドウのフォーカスの関係で、文字入力がしづらいという事以外は、概ね快適であります。</p>
+</div>
+</div>
+
+
+<div class='article'>
+  <div class="content-title">
     <h1><a href="../2013/03/10/937d07c5-9136-4520-8310-17cdce1bb0eb.html">所得税・住民税についてのメモ</a></h1>
   </div>
   <dl class="metadata">
@@ -223,39 +247,6 @@
 <p>雰囲気がすぐれないと、意見は出にくくなります。特に雰囲気重視をしていた場合は顕著でしょう。雰囲気が優れていない状態になってしまったチーム全体が悪いことをしている気分になり得るからです。これに対する対処法として、普段から雰囲気を良くするというのは、上記の話の2点とらなくてはいけないという意見と変わらないように思えます。変えるとしたら雰囲気を悪くした原因そのものを潰すべきですが、どう頑張っても悪くなるときは悪くなります。であれば、悪くなっても弊害が出ないようにしておく方が良いのではないかと考えています。</p>
 </div>
 </div>
-</div>
-</div>
-
-
-<div class='article'>
-  <div class="content-title">
-    <h1><a href="../2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html">RoboGuice2とRobolectricを組み合わせてテストを書く</a></h1>
-  </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2012/10/17</dd>
-  </dl>
-
-  <div class="content-body section"><p><a class="reference external" href="http://draftcode.github.com/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html">RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</a>でActivityの
-InjectionタイミングがずれることによりInjectExtraが利用できないことについて述べました。これをRoboGuice2にすることによって回避することができました。</p>
-<div class="section" id="id1">
-<h2>問題背景</h2>
-<p>実機で動く場合は<tt class="docutils literal">RoboActivity.onCreate()</tt>でInjectionが行われますが、
-RoboGuice1だと、ActivityをテストにInjectする場合、次のようになってエラーが起きます:</p>
-<ol class="arabic simple">
-<li>InjectするActivityのIntent付きのオブジェクトをアプリケーションの初めのほうでbindする。</li>
-<li>bindするオブジェクトは、更にInjectionが走る。</li>
-<li>InjectExtraはContextScopeで走らせないといけない。</li>
-</ol>
-<p>また、ActivityをテストにInjectしない場合は、RoboGuice1の場合、まともそうな方法でActivityをテストに渡す方法が無さそうです。staticにして渡してしまうのは、ちょっとアレですよね。</p>
-</div>
-<div class="section" id="roboguice2">
-<h2>RoboGuice2でなぜ解決されるのか</h2>
-<p>RoboGuice1では、Applicationを継承して自分が必要なbindingを追加していました。しかしRoboGuice2ではApplicationを継承する必要がなくなり、適当なタイミングでbindingを追加できます。これを利用して、テストクラスの中でbindingを追加するようにすれば上記の問題が解決できます。</p>
-</div>
-<div class="section" id="id2">
-<h2>サンプルコード</h2>
-<script src="https://gist.github.com/3963845.js"> </script></div>
 </div>
 </div>
 

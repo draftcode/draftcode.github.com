@@ -24,6 +24,58 @@
 
 <div class='article'>
   <div class="content-title">
+    <h1><a href="./2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html">PelicanとGitHub Pagesを使う</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2012/03/16</dd>
+  </dl>
+
+  <div class="content-body section"><p>reStructuredTextが使いたかったので、Pythonで書かれてる<a class="reference external" href="http://pelican.notmyidea.org/en/2.8/index.html">Pelican</a>という静的ブログジェネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。</p>
+<div class="section" id="id1">
+<h2>Pelican</h2>
+<p>最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
+Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みのやつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので気に入って使っています。</p>
+<p>自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。開発中のバージョンを使うにはこれだけでOK:</p>
+<div class="highlight"><pre>git clone https://github.com/ametaireau/pelican.git
+cd pelican
+python setup.py develop
+</pre></div>
+<p>こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになります。</p>
+</div>
+<div class="section" id="github-pages">
+<h2>GitHub Pages</h2>
+<p>なんかGitHubには<a class="reference external" href="http://pages.github.com/">GitHub Pages</a>っていうPushすると中のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしました。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開されないみたいです。User
+Pagesの場合はgh-pagesにPushしても無駄みたいですよ。わからないけど。なので次のようなブランチ構成にしてみました:</p>
+<div class="highlight"><pre>source   -&gt; origin/source
+gh-pages -&gt; origin/master
+</pre></div>
+<p>こういう風にするには、たぶん次のようにすればいいはず:</p>
+<div class="highlight"><pre>git init .
+git branch -m master source
+git remote add origin &lt;自分のGitHubリポジトリでコピーしてきたなにか&gt;
+</pre></div>
+<p>gh-pagesはなんかよしなに作ってくれる<a class="reference external" href="https://github.com/davisp/ghp-import">ghp-import</a>があるので、それを導入しました:</p>
+<div class="highlight"><pre>pip install ghp-import
+</pre></div>
+</div>
+<div class="section" id="conf-py">
+<h2>conf.pyを書く</h2>
+<p><a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source/conf.py">conf.py</a>みたいに書いています。なんか下の方で怪しいことしてますが。ディレクトリ構成は<a class="reference external" href="https://github.com/draftcode/draftcode.github.com/tree/source">draftcode/draftcode.github.com</a>みたいになってます。</p>
+</div>
+<div class="section" id="post-commit">
+<h2>post-commitを仕込む</h2>
+<p>次のような内容のファイルを、<tt class="docutils literal"><span class="pre">.git/hooks/post-commit</span></tt>に仕込んでおきます:</p>
+<div class="highlight"><pre>pelican -s conf.py &amp;&amp; ghp-import output &amp;&amp; git push origin gh-pages:master source:source
+</pre></div>
+<p>これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こうの方のページにも反映されます。やったね!</p>
+</div>
+</div>
+</div>
+
+
+<div class='article'>
+  <div class="content-title">
     <h1><a href="./2012/02/06/235454.html">HomebrewでクロスコンパイルできるGCCをビルドする</a></h1>
   </div>
   <dl class="metadata">
@@ -85,122 +137,6 @@ Languagesとか輪講で読んでいましたし。ちなみに、アルバイ�
 <p>あと、アリエルのCTOの井上さんとも少しお話をしまして、最近は上流の方にも興味があるんですよと言ったら、若いうちはもっとガシガシ実装して欲しいという言葉をいただきました。ぐぬぬ。ただ、自分の主張を通すために、いろんな立場の人の考え方、ものの見方、背景とかを知っておきたい。そうしないと、下回しが出来ずに主張が通らないというのが嫌なので、プロジェクトのマネジメントをする人たちや、もっと上の経営に関わる人たちが、どういう見方をするのかを知っておきたい。このために事業戦略やプロジェクトマネジメントあたりの本を読んでいたりするので、そこら辺はさじ加減なのかなと思っています。</p>
 <p>というところで、お開きになりました。後で見てみると、cocoatomoさんはCPython
 Readingというのを書いていたりするみたいなので、積極的に話に行けば良かった。あと型システムとかが停止するとか安全であるとか、そういうのも聞いてみたかったと、少し後悔しつつ、次の日の「(第15回)Python mini Hack-a-thon」に参加しました。</p>
-</div>
-</div>
-
-
-<div class='article'>
-  <div class="content-title">
-    <h1><a href="./2012/01/01/182300.html">Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</a></h1>
-  </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2012/01/01</dd>
-  </dl>
-
-  <div class="content-body section"><div class="section" id="id1">
-<h2>結論</h2>
-<p>配列はアレなので使ってはいけない</p>
-</div>
-<div class="section" id="javagenerics">
-<h2>JavaのGenericsとは</h2>
-<p>JavaのGenericsでは、型パラメーターは最終的にバイトコードになったら消えて<tt class="docutils literal">Object</tt>になってしまって、Generic型からその型パラメーターで示された型を実際に使う側がキャストして使うというものなんですね。だからこのようなコードに対して:</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
-
-<span class="kd">class</span> <span class="nc">Main</span> <span class="o">{</span>
-  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">l</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
-    <span class="n">l</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
-    <span class="n">Integer</span> <span class="n">a</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
-  <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-<p>このようなバイトコードが出力されます:</p>
-<div class="highlight"><pre>Compiled from &quot;Main.java&quot;
-class Main extends java.lang.Object{
-Main();
-  Code:
-   0:   aload_0
-   1:   invokespecial   #1; //Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V
-   4:   return
-
-public static void main(java.lang.String[]);
-  Code:
-   0:   new     #2; //class java/util/ArrayList
-   3:   dup
-   4:   invokespecial   #3; //Method java/util/ArrayList.&quot;&lt;init&gt;&quot;:()V
-   7:   astore_1
-   8:   aload_1
-   9:   iconst_1
-   10:  invokestatic    #4; //Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
-   13:  invokeinterface #5,  2; //InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
-   18:  pop
-   19:  aload_1
-   20:  iconst_0
-   21:  invokeinterface #6,  2; //InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
-   26:  checkcast       #7; //class java/lang/Integer
-   29:  astore_2
-   30:  return
-
-}
-</pre></div>
-<p><tt class="docutils literal">ArrayList</tt>の型パラメーターが消えていて、要素を取り出すときに<tt class="docutils literal">checkcast</tt>でキャストしてますね。</p>
-</div>
-<div class="section" id="id2">
-<h2>総称配列を作るときのエラー・警告</h2>
-<p>例えば次のようなコードはgeneric array createionエラーになります:</p>
-<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
-</pre></div>
-<p>これは配列をアロケートするときに、バイトコードの中で型情報が必要になるのに、<tt class="docutils literal">ArrayList&lt;Integer&gt;</tt>は(バイトコードレベルでは)実際は存在せず、<tt class="docutils literal">ArrayList</tt>が存在しているからです。</p>
-<p>なので次のようなコードを書きます:</p>
-<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
-<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;?&gt;[</span><span class="mi">10</span><span class="o">];</span>
-</pre></div>
-<p>しかし今度はunchecked conversionの警告が起きます。Javaが型チェックをするときは、<tt class="docutils literal">ArrayList</tt>と<tt class="docutils literal">ArrayList&lt;Integer&gt;</tt>は違う型ですから。</p>
-<div class="section" id="id3">
-<h3>追記</h3>
-<p>generic array creationがなぜ禁止なのかきちんと理解してなかった。</p>
-<p>Generic型の配列が作れると仮定しましょう。次のコードはエラー・警告なしでコンパイル出来ます:</p>
-<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
-<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
-<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
-<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span>
-
-<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
-<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span> <span class="c1">// ClassCastException occur!</span>
-</pre></div>
-<p>一方でGeneric型以外の配列の場合は、次のようになります:</p>
-<div class="highlight"><pre><span class="n">Number</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
-<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">Double</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="c1">// ArrayStoreException occur!</span>
-</pre></div>
-<p>Generic型以外の配列の場合、型の違うオブジェクトの参照を配列に代入しようとすると、<tt class="docutils literal">ArrayStoreException</tt>が発生しますが、Generic型の配列の場合はその例外は発生せずに、値を取り出したときに<tt class="docutils literal">ClassCastException</tt>が発生するようになります。これがGeneric型の配列が作れない理由のようです。</p>
-<p>また、総称配列が作れなくても、上のコードは次のように書き換えると、unchecked
-conversion warningが出るけれども、<tt class="docutils literal">ClassCastException</tt>が発生するように実行することが出来ます:</p>
-<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
-<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
-<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
-<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span>
-
-<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span> <span class="c1">// unchecked conversion warning</span>
-<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span> <span class="c1">// ClassCastException occur!</span>
-</pre></div>
-<p>次のように書き換えると、今度はきちんと<tt class="docutils literal">list[0] = stringArray</tt>のところで型エラーを起こしてくれます:</p>
-<div class="highlight"><pre><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span> <span class="c1">// unchecked conversion warning</span>
-<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">stringArray</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
-<span class="n">stringArray</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;Some String&quot;</span><span class="o">);</span>
-<span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">stringArray</span><span class="o">;</span> <span class="c1">// Incompatible types error</span>
-
-<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">intArray</span> <span class="o">=</span> <span class="n">list</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
-<span class="n">Integer</span> <span class="n">intObj</span> <span class="o">=</span> <span class="n">intArray</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="id4">
-<h2>配列は使ってはいけない</h2>
-<p>総称配列のエラー・警告はJavaレベルの型とJVMレベルの型が一致していないことが原因に見えますが、実は配列を使わなければこのような問題は回避されるようです。(僕はGenericsによってJavaとJVMの型が一致しなくなったこともなんかアレな気がするんですが)</p>
-<p>また、配列がcovariantなのもまた変なエラーの原因となるので、配列さえ使わなければ……というのがかなり前から言われているようです。</p>
-</div>
 </div>
 </div>
 

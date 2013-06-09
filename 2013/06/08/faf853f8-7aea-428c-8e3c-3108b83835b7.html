@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>XPS13を買ってLinuxを入れた話 - draftcode.github.io</title>
+    <meta name="author" content="draftcode">
+    <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
+
+    <link href="../../../theme/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="../../../theme/print.css" media="print" rel="stylesheet" type="text/css" />
+    <!--[if IE]>
+    <link href="../../../theme/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <![endif]-->
+
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="../../../atom.xml">
+    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
+  </head>
+
+  <body>
+    <h1 id="site-title"><a href="../../..">draftcode.github.io</a></h1>
+
+    <div id="content">
+      <div class='article'>
+  <div class="content-title">
+    <h1>XPS13を買ってLinuxを入れた話</h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2013/06/08</dd>
+  </dl>
+
+  <div class="content-body section"><p>最近Macbook Airがスリープから復帰してログインした直後に、すぐに再度スリープに入ってしまうという現象が起きていて、イライラしていた。ということとはあまり関係がなく、どちらかというとそろそろ3年経ったから次のPCを買おうかなということで、
+XPS13を買いました。先のようなこともあり、次は脱Appleしようかなということで、適当に日本からキーボードの種類が選べるものを探して買った感じです。Thinkpad X1
+Carbonとも迷ったのですが、まぁXPS13のほうが安かったので。</p>
+<p>ちょうど1年ぐらいまえにLinuxデスクトップを使い始めていたので、移行自体はすんなり行きました。参考にしたのは次の2つのページです:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://qiita.com/items/12f21126c5117e07decd">Arch Linux インストールから awesome 導入まで - Qiita</a></li>
+<li><a class="reference external" href="https://wiki.archlinux.org/index.php/Installation_Guide">Installation Guice - ArchWiki</a></li>
+</ul>
+<p>せっかくだからということで、GPTパーティション+EFIという構成でセットアップしたのですが、ドハマりしました。一番ハマったのは、Protective MBRにある部分はBootフラグを立ててはいけないというもので、これをそのままにしておいた結果、いつまでたってもEFIパーティションが認識されないという状況になっていました。</p>
+<p>あと、最初に入っていたWindows8を消してWindows7を入れなおそうとしたら、どうやらこのXPS13はEFI起動の64bit Windows7インストールに失敗するようです……残念。</p>
+<p>それ以外はファンがすぐに回るとか、タッチパッドの感度が良すぎるとか、TWMを使っているのだけれども、それとibusの候補ウィンドウのフォーカスの関係で、文字入力がしづらいという事以外は、概ね快適であります。</p>
+</div>
+</div>
+
+<div class="comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'draftcode-github-com';
+
+    (function() {
+     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </div>
+
+    <div id="footer">
+      <div id="footer-container">
+        <div id="about">
+          <h2>About the author</h2>
+          <a href="../../../pages/about.html"><img src="../../../static/images/draftcode.png" /></a>
+          <p>東京で情報工学を専攻している大学院生です。<br />プログラミング言語の研究をしています。<br /></p>
+          <p>詳しくは<a href="../../../pages/about.html">こちら</a></p>
+        </div>
+
+        <div id="site">
+          <h2>Site</h2>
+          <ul>
+            <li><a href="../../../archives.html">Archives</a>
+            <li><a href="../../../atom.xml" rel="alternate">Atom feed</a></li>
+          </ul>
+        </div>
+
+        <div id="social">
+          <h2>Social</h2>
+          <ul>
+                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

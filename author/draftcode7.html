@@ -24,6 +24,30 @@
 
 <div class='article'>
   <div class="content-title">
+    <h1><a href="../2013/06/08/faf853f8-7aea-428c-8e3c-3108b83835b7.html">XPS13を買ってLinuxを入れた話</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2013/06/08</dd>
+  </dl>
+
+  <div class="content-body section"><p>最近Macbook Airがスリープから復帰してログインした直後に、すぐに再度スリープに入ってしまうという現象が起きていて、イライラしていた。ということとはあまり関係がなく、どちらかというとそろそろ3年経ったから次のPCを買おうかなということで、
+XPS13を買いました。先のようなこともあり、次は脱Appleしようかなということで、適当に日本からキーボードの種類が選べるものを探して買った感じです。Thinkpad X1
+Carbonとも迷ったのですが、まぁXPS13のほうが安かったので。</p>
+<p>ちょうど1年ぐらいまえにLinuxデスクトップを使い始めていたので、移行自体はすんなり行きました。参考にしたのは次の2つのページです:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://qiita.com/items/12f21126c5117e07decd">Arch Linux インストールから awesome 導入まで - Qiita</a></li>
+<li><a class="reference external" href="https://wiki.archlinux.org/index.php/Installation_Guide">Installation Guice - ArchWiki</a></li>
+</ul>
+<p>せっかくだからということで、GPTパーティション+EFIという構成でセットアップしたのですが、ドハマりしました。一番ハマったのは、Protective MBRにある部分はBootフラグを立ててはいけないというもので、これをそのままにしておいた結果、いつまでたってもEFIパーティションが認識されないという状況になっていました。</p>
+<p>あと、最初に入っていたWindows8を消してWindows7を入れなおそうとしたら、どうやらこのXPS13はEFI起動の64bit Windows7インストールに失敗するようです……残念。</p>
+<p>それ以外はファンがすぐに回るとか、タッチパッドの感度が良すぎるとか、TWMを使っているのだけれども、それとibusの候補ウィンドウのフォーカスの関係で、文字入力がしづらいという事以外は、概ね快適であります。</p>
+</div>
+</div>
+
+
+<div class='article'>
+  <div class="content-title">
     <h1><a href="../2010/08/15/learning_path.html">情報工学科に所属する前後の学習の道筋</a></h1>
   </div>
   <dl class="metadata">
