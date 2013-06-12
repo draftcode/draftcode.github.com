@@ -24,6 +24,29 @@
 
 <div class='article'>
   <div class="content-title">
+    <h1><a href="./2011/12/29/145918.html">CPython2.7.2のWindowsでのmultiprocessingの動作</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2011/12/29</dd>
+  </dl>
+
+  <div class="content-body section"><p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<tt class="docutils literal">Process._bootstrap</tt>が<tt class="docutils literal">Process.run</tt>を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
+<p>Windowsにおける<tt class="docutils literal">multiprocessing</tt>モジュールの動きは次のようなものになります:</p>
+<ol class="arabic simple">
+<li>pipeを作っておく。</li>
+<li>現在の実行ファイルに<tt class="docutils literal"><span class="pre">--multiprocessing-fork</span></tt>というコマンドラインオプションと先ほどのpipeの読み出し側をつけて<tt class="docutils literal">CreateProcess</tt>する。</li>
+<li>親プロセスはpipeを通じて、<tt class="docutils literal">Process</tt>オブジェクトを<tt class="docutils literal">pickle</tt>で直列化して子プロセスに送る。</li>
+<li>子プロセスは<tt class="docutils literal"><span class="pre">--multiprocessing-fork</span></tt>をフラグとして認識して、pipeから<tt class="docutils literal">Process</tt>オブジェクトを読み出す。</li>
+<li>子プロセスが<tt class="docutils literal">Process._bootstrap</tt>を呼び出す。</li>
+</ol>
+<p>Freezeされていない場合は、過程2のところでは、実行ファイルが<tt class="docutils literal">python.exe</tt>になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、<tt class="docutils literal">multiprocessing.freeze_support</tt>がそのような役割を果たします。これがFreezeされている場合に<tt class="docutils literal">multiprocessing.freeze_support</tt>が必要になる理由です。</p>
+</div>
+</div>
+
+
+<div class='article'>
+  <div class="content-title">
     <h1><a href="./2011/12/29/153703.html">CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</a></h1>
   </div>
   <dl class="metadata">
@@ -205,37 +228,6 @@ specification</a>で見ることができます．(すべてのセレクタがFi
 <h3>Simplified element hiding syntax</h3>
 <p>Adblock Plusでは，後方互換性のために，<tt class="docutils literal">#div(id=foo)</tt>のような単純な要素除去ルールをサポートしています．このような書き方は推奨しておらず，CSSセレクタによる方法を推奨しています．この書き方は将来のどこかのタイミングで無効になる予定です．</p>
 </div>
-</div>
-</div>
-</div>
-
-
-<div class='article'>
-  <div class="content-title">
-    <h1><a href="./2011/03/14/42aa3a98-4e10-11e0-bcea-d8a25efffee9.html">Macを大きいディスプレイにつなげるときはMini DisplayPort &lt;-&gt; DisplayPort変換ケーブルを使う</a></h1>
-  </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2011/03/14</dd>
-  </dl>
-
-  <div class="content-body section"><p>Macbook Proを修理に出したときに，どうしてもレポートを書かなければいけない感じだったので，Mac miniを購入しました．Macbook Proは3年ぐらい前のモデルだったので，大きいDVIポートがあり，DELLのU2711のような大きいディスプレイでも直接接続して最適な解像度が出せたのですが，今のMacについているようなMini DisplayPortだと，DVIとの変換ケーブルを使っても，フルHD程度までしか出力することができません．これはDVIのシングルリンクとかデュアルリンクとかの問題らしいんですが，それを解決するためにはAppleの高いデュアルリンク対応の変換アダプタを購入しなければいけません．</p>
-<p>もっとシンプルな解決方法を目指します．最近のディスプレイはDisplayPortがついているようなので，それに変換すれば良いのです．実際自分はMini DisplayPortとDisplayPortの変換ケーブルを使って，大きい解像度の出力ができるようになっています．</p>
-<p>残念ながら，このような変換ケーブルはあまり製造されていないようです．自分は<a class="reference external" href="http://store.shopping.yahoo.co.jp/ats/0203.html">ATS Direct</a>というサイトで購入しました．</p>
-<p>またDisplayPortは音声出力も対応しているので，U2711の音声出力から音を出すこともできています．しかしながらU2711側では音量調節ができないので，音量調節ができるようなもの(スピーカーなど)でないと，音が大きすぎて耳がつぶれます．ヘッドホンとかは難しいです．ちなみに出力切り替えはSoundflowerを使うと便利です．</p>
-<div class="section" id="id1">
-<h2>追記 (2011-06-22)</h2>
-<p>どうも探し方が悪かったようで，他にもいくつか見つかりました．</p>
-<ul class="simple">
-<li><a class="reference external" href="http://www.amazon.co.jp/dp/B004KB5HM6/">http://www.amazon.co.jp/dp/B004KB5HM6/</a></li>
-<li><a class="reference external" href="http://www.amazon.co.jp/dp/B004GCHNP8/">http://www.amazon.co.jp/dp/B004GCHNP8/</a></li>
-<li><a class="reference external" href="http://direct.eizo.co.jp/shop/g/gPM200-BK/">http://direct.eizo.co.jp/shop/g/gPM200-BK/</a></li>
-</ul>
-<p>ただ，ものによっては映らないものもあるみたいですね．</p>
-</div>
-<div class="section" id="id2">
-<h2>追記 (2012-03-11)</h2>
-<p>音声出力の切り替えはOptionキーを押しながらメニューバーの音量調節アイコンをクリックすると、出力装置の切り替えができるので、これが便利です。最近はU2711に別のスピーカーをつけて、そのスピーカーについている音声出力端子にヘッドホンをつけたりしています。</p>
 </div>
 </div>
 </div>

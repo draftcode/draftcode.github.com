@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>ArchLinuxの環境構築まとめ - draftcode.github.io</title>
+    <meta name="author" content="draftcode">
+    <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
+
+    <link href="../../../theme/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="../../../theme/print.css" media="print" rel="stylesheet" type="text/css" />
+    <!--[if IE]>
+    <link href="../../../theme/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <![endif]-->
+
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="../../../atom.xml">
+    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
+  </head>
+
+  <body>
+    <h1 id="site-title"><a href="../../..">draftcode.github.io</a></h1>
+
+    <div id="content">
+      <div class='article'>
+  <div class="content-title">
+    <h1>ArchLinuxの環境構築まとめ</h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2013/06/12</dd>
+  </dl>
+
+  <div class="content-body section"><p>環境構築をしたのでせっかくだから現在使ってる環境をまとめてみる。</p>
+<ul>
+<li><p class="first">twm</p>
+<p>twmはすごい初期に作られたWindow Managerで、ほとんど現代的な機能がない。なんか環境構築のときに、とりあえず使えるWindow Managerとして入れてみたらわりと機能が十分だったので、そのまま使っている。</p>
+</li>
+<li><p class="first">urxvt</p>
+<p>ターミナルエミュレーター。別に好みはないけれども、大学の同期に聞いたらこれを使っているらしかったので、同じにしておいた。</p>
+</li>
+<li><p class="first">google-chrome</p>
+<p>chromiumを使っていたけれども、PDFをみたりとかFlashをみたりするときに他のなにかが必要になるのが面倒くさかったので、AURから入れた。</p>
+</li>
+<li><p class="first">ibus-mozc</p>
+<p>日本語入力はこれで。でもtwmのフォーカスの動きと合わないらしく、変換候補ウィンドウにカーソルが乗ると、カーソルの下にあった候補が選択されてしまう。カーソルを適当に候補ウィンドウが乗らないところに移動することで回避するようにした。</p>
+<p>問題がフォーカスであると切り分けするまでは、なんか日本語入力がおかしいと思っていたので、しばらく英語ツイートを続けていた。これが結構快適だったので、そのまま英語ツイートをある程度続けている。ASCII is great.</p>
+</li>
+<li><p class="first">conky</p>
+<p>デスクトップにCPU使用率とかIPアドレスとか、バッテリの状況を表示するメーターみたいなもの。ネットつながっているかがすぐ見れたり、バッテリーがあとどれぐらい持つかをすぐ見れたりして便利。</p>
+</li>
+<li><p class="first">xclock</p>
+<p>デスクトップ時計。twmでウィンドウタイトルを表示しないようにして端っこにおいてる。本当はアナログクロックのまま日付も真ん中辺りに表示してほしい。</p>
+</li>
+<li><p class="first">xbindkeys</p>
+<p>X全体で利用できるショートカットを定義するプログラム。例えば音量ボタンがキーボードについていて、それを押した時にALSAMixerから音量を上げ下げするようにする、とかのキーバインドが設定できる。自分はこれでdmenuを起動したり、xlockを起動したりしてる。</p>
+<p>重要なのが、自分はこれを使ってCtrl+Enterでurxvt、Ctrl+Shift+EnterでChromeが起動するようにしている。自分が行う作業のほとんどがこの2つのGUIプログラムで行えるので、超便利ショートカットとして1年間ぐらい活躍してる。</p>
+</li>
+<li><p class="first">dmenu</p>
+<p>ランチャー。urxvtとChromeでほとんどの作業できるけど、たまに他の何かをたちあげたいときに使ってる。あとurxvtの設定ミスって立ち上がらないときにxterm使ったりとか。ほとんど使わないけど念の為。</p>
+</li>
+<li><p class="first">xlock</p>
+<p>WindowsでいうWin+Lの機能。xbindkeysでも同じショートカットを割り当ててる。離席するときに画面ロックしておくのはお互いにとって大事。</p>
+</li>
+<li><p class="first">favchecker</p>
+<p>最近自分で作ったTwitter WebのConnectと同じような機能を提供するなにか。
+UserStreamを受け取って、適当に自分の名前(&#64;draftcode)が含まれているツイートと、Favされたツイートを垂れ流す。自分は自己顕示欲が強いのでこういうのを常駐させてる。コンソールで動くので、urxvtをつかってxclockとconkyの間においてる。
+Twitterは公式Webで。</p>
+</li>
+</ul>
+<p>twmのフォーカスあたりとかやっぱり気になるのでWindow Manager作りたい。それ以外は概ね快適。実際のところ、twm, xbindkeys, xterm, Chromeだけでも十分かもしれない。</p>
+</div>
+</div>
+
+<div class="comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'draftcode-github-com';
+
+    (function() {
+     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </div>
+
+    <div id="footer">
+      <div id="footer-container">
+        <div id="about">
+          <h2>About the author</h2>
+          <a href="../../../pages/about.html"><img src="../../../static/images/draftcode.png" /></a>
+          <p>東京で情報工学を専攻している大学院生です。<br />プログラミング言語の研究をしています。<br /></p>
+          <p>詳しくは<a href="../../../pages/about.html">こちら</a></p>
+        </div>
+
+        <div id="site">
+          <h2>Site</h2>
+          <ul>
+            <li><a href="../../../archives.html">Archives</a>
+            <li><a href="../../../atom.xml" rel="alternate">Atom feed</a></li>
+          </ul>
+        </div>
+
+        <div id="social">
+          <h2>Social</h2>
+          <ul>
+                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,5 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.io</title><link href="http://draftcode.github.io/" rel="alternate"></link><link href="http://draftcode.github.io//atom.xml" rel="self"></link><id>http://draftcode.github.io/</id><updated>2013-06-08T12:03:25+09:00</updated><entry><title>XPS13を買ってLinuxを入れた話</title><link href="http://draftcode.github.io/2013/06/08/faf853f8-7aea-428c-8e3c-3108b83835b7.html" rel="alternate"></link><updated>2013-06-08T12:03:25+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.io,2013-06-08:2013/06/08/faf853f8-7aea-428c-8e3c-3108b83835b7.html</id><summary type="html">&lt;p&gt;最近Macbook Airがスリープから復帰してログインした直後に、すぐに再度スリープに入ってしまうという現象が起きていて、イライラしていた。ということとはあまり関係がなく、どちらかというとそろそろ3年経ったから次のPCを買おうかなということで、
+<feed xmlns="http://www.w3.org/2005/Atom"><title>draftcode.github.io</title><link href="http://draftcode.github.io/" rel="alternate"></link><link href="http://draftcode.github.io//atom.xml" rel="self"></link><id>http://draftcode.github.io/</id><updated>2013-06-12T23:38:40+09:00</updated><entry><title>ArchLinuxの環境構築まとめ</title><link href="http://draftcode.github.io/2013/06/12/726ef50a-c05d-44f0-9d3b-e8372a7d6521.html" rel="alternate"></link><updated>2013-06-12T23:38:40+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.io,2013-06-12:2013/06/12/726ef50a-c05d-44f0-9d3b-e8372a7d6521.html</id><summary type="html">&lt;p&gt;環境構築をしたのでせっかくだから現在使ってる環境をまとめてみる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p class="first"&gt;twm&lt;/p&gt;
+&lt;p&gt;twmはすごい初期に作られたWindow Managerで、ほとんど現代的な機能がない。なんか環境構築のときに、とりあえず使えるWindow Managerとして入れてみたらわりと機能が十分だったので、そのまま使っている。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;urxvt&lt;/p&gt;
+&lt;p&gt;ターミナルエミュレーター。別に好みはないけれども、大学の同期に聞いたらこれを使っているらしかったので、同じにしておいた。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;google-chrome&lt;/p&gt;
+&lt;p&gt;chromiumを使っていたけれども、PDFをみたりとかFlashをみたりするときに他のなにかが必要になるのが面倒くさかったので、AURから入れた。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;ibus-mozc&lt;/p&gt;
+&lt;p&gt;日本語入力はこれで。でもtwmのフォーカスの動きと合わないらしく、変換候補ウィンドウにカーソルが乗ると、カーソルの下にあった候補が選択されてしまう。カーソルを適当に候補ウィンドウが乗らないところに移動することで回避するようにした。&lt;/p&gt;
+&lt;p&gt;問題がフォーカスであると切り分けするまでは、なんか日本語入力がおかしいと思っていたので、しばらく英語ツイートを続けていた。これが結構快適だったので、そのまま英語ツイートをある程度続けている。ASCII is great.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;conky&lt;/p&gt;
+&lt;p&gt;デスクトップにCPU使用率とかIPアドレスとか、バッテリの状況を表示するメーターみたいなもの。ネットつながっているかがすぐ見れたり、バッテリーがあとどれぐらい持つかをすぐ見れたりして便利。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;xclock&lt;/p&gt;
+&lt;p&gt;デスクトップ時計。twmでウィンドウタイトルを表示しないようにして端っこにおいてる。本当はアナログクロックのまま日付も真ん中辺りに表示してほしい。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;xbindkeys&lt;/p&gt;
+&lt;p&gt;X全体で利用できるショートカットを定義するプログラム。例えば音量ボタンがキーボードについていて、それを押した時にALSAMixerから音量を上げ下げするようにする、とかのキーバインドが設定できる。自分はこれでdmenuを起動したり、xlockを起動したりしてる。&lt;/p&gt;
+&lt;p&gt;重要なのが、自分はこれを使ってCtrl+Enterでurxvt、Ctrl+Shift+EnterでChromeが起動するようにしている。自分が行う作業のほとんどがこの2つのGUIプログラムで行えるので、超便利ショートカットとして1年間ぐらい活躍してる。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;dmenu&lt;/p&gt;
+&lt;p&gt;ランチャー。urxvtとChromeでほとんどの作業できるけど、たまに他の何かをたちあげたいときに使ってる。あとurxvtの設定ミスって立ち上がらないときにxterm使ったりとか。ほとんど使わないけど念の為。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;xlock&lt;/p&gt;
+&lt;p&gt;WindowsでいうWin+Lの機能。xbindkeysでも同じショートカットを割り当ててる。離席するときに画面ロックしておくのはお互いにとって大事。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;favchecker&lt;/p&gt;
+&lt;p&gt;最近自分で作ったTwitter WebのConnectと同じような機能を提供するなにか。
+UserStreamを受け取って、適当に自分の名前(&amp;#64;draftcode)が含まれているツイートと、Favされたツイートを垂れ流す。自分は自己顕示欲が強いのでこういうのを常駐させてる。コンソールで動くので、urxvtをつかってxclockとconkyの間においてる。
+Twitterは公式Webで。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;twmのフォーカスあたりとかやっぱり気になるのでWindow Manager作りたい。それ以外は概ね快適。実際のところ、twm, xbindkeys, xterm, Chromeだけでも十分かもしれない。&lt;/p&gt;
+</summary></entry><entry><title>XPS13を買ってLinuxを入れた話</title><link href="http://draftcode.github.io/2013/06/08/faf853f8-7aea-428c-8e3c-3108b83835b7.html" rel="alternate"></link><updated>2013-06-08T12:03:25+09:00</updated><author><name>draftcode</name></author><id>tag:draftcode.github.io,2013-06-08:2013/06/08/faf853f8-7aea-428c-8e3c-3108b83835b7.html</id><summary type="html">&lt;p&gt;最近Macbook Airがスリープから復帰してログインした直後に、すぐに再度スリープに入ってしまうという現象が起きていて、イライラしていた。ということとはあまり関係がなく、どちらかというとそろそろ3年経ったから次のPCを買おうかなということで、
 XPS13を買いました。先のようなこともあり、次は脱Appleしようかなということで、適当に日本からキーボードの種類が選べるものを探して買った感じです。Thinkpad X1
 Carbonとも迷ったのですが、まぁXPS13のほうが安かったので。&lt;/p&gt;
 &lt;p&gt;ちょうど1年ぐらいまえにLinuxデスクトップを使い始めていたので、移行自体はすんなり行きました。参考にしたのは次の2つのページです:&lt;/p&gt;

@@ -24,6 +24,57 @@
 
 <div class='article'>
   <div class="content-title">
+    <h1><a href="../2013/06/12/726ef50a-c05d-44f0-9d3b-e8372a7d6521.html">ArchLinuxの環境構築まとめ</a></h1>
+  </div>
+  <dl class="metadata">
+    <dt>Posted</dt>
+    <dd>2013/06/12</dd>
+  </dl>
+
+  <div class="content-body section"><p>環境構築をしたのでせっかくだから現在使ってる環境をまとめてみる。</p>
+<ul>
+<li><p class="first">twm</p>
+<p>twmはすごい初期に作られたWindow Managerで、ほとんど現代的な機能がない。なんか環境構築のときに、とりあえず使えるWindow Managerとして入れてみたらわりと機能が十分だったので、そのまま使っている。</p>
+</li>
+<li><p class="first">urxvt</p>
+<p>ターミナルエミュレーター。別に好みはないけれども、大学の同期に聞いたらこれを使っているらしかったので、同じにしておいた。</p>
+</li>
+<li><p class="first">google-chrome</p>
+<p>chromiumを使っていたけれども、PDFをみたりとかFlashをみたりするときに他のなにかが必要になるのが面倒くさかったので、AURから入れた。</p>
+</li>
+<li><p class="first">ibus-mozc</p>
+<p>日本語入力はこれで。でもtwmのフォーカスの動きと合わないらしく、変換候補ウィンドウにカーソルが乗ると、カーソルの下にあった候補が選択されてしまう。カーソルを適当に候補ウィンドウが乗らないところに移動することで回避するようにした。</p>
+<p>問題がフォーカスであると切り分けするまでは、なんか日本語入力がおかしいと思っていたので、しばらく英語ツイートを続けていた。これが結構快適だったので、そのまま英語ツイートをある程度続けている。ASCII is great.</p>
+</li>
+<li><p class="first">conky</p>
+<p>デスクトップにCPU使用率とかIPアドレスとか、バッテリの状況を表示するメーターみたいなもの。ネットつながっているかがすぐ見れたり、バッテリーがあとどれぐらい持つかをすぐ見れたりして便利。</p>
+</li>
+<li><p class="first">xclock</p>
+<p>デスクトップ時計。twmでウィンドウタイトルを表示しないようにして端っこにおいてる。本当はアナログクロックのまま日付も真ん中辺りに表示してほしい。</p>
+</li>
+<li><p class="first">xbindkeys</p>
+<p>X全体で利用できるショートカットを定義するプログラム。例えば音量ボタンがキーボードについていて、それを押した時にALSAMixerから音量を上げ下げするようにする、とかのキーバインドが設定できる。自分はこれでdmenuを起動したり、xlockを起動したりしてる。</p>
+<p>重要なのが、自分はこれを使ってCtrl+Enterでurxvt、Ctrl+Shift+EnterでChromeが起動するようにしている。自分が行う作業のほとんどがこの2つのGUIプログラムで行えるので、超便利ショートカットとして1年間ぐらい活躍してる。</p>
+</li>
+<li><p class="first">dmenu</p>
+<p>ランチャー。urxvtとChromeでほとんどの作業できるけど、たまに他の何かをたちあげたいときに使ってる。あとurxvtの設定ミスって立ち上がらないときにxterm使ったりとか。ほとんど使わないけど念の為。</p>
+</li>
+<li><p class="first">xlock</p>
+<p>WindowsでいうWin+Lの機能。xbindkeysでも同じショートカットを割り当ててる。離席するときに画面ロックしておくのはお互いにとって大事。</p>
+</li>
+<li><p class="first">favchecker</p>
+<p>最近自分で作ったTwitter WebのConnectと同じような機能を提供するなにか。
+UserStreamを受け取って、適当に自分の名前(&#64;draftcode)が含まれているツイートと、Favされたツイートを垂れ流す。自分は自己顕示欲が強いのでこういうのを常駐させてる。コンソールで動くので、urxvtをつかってxclockとconkyの間においてる。
+Twitterは公式Webで。</p>
+</li>
+</ul>
+<p>twmのフォーカスあたりとかやっぱり気になるのでWindow Manager作りたい。それ以外は概ね快適。実際のところ、twm, xbindkeys, xterm, Chromeだけでも十分かもしれない。</p>
+</div>
+</div>
+
+
+<div class='article'>
+  <div class="content-title">
     <h1><a href="../2013/03/10/937d07c5-9136-4520-8310-17cdce1bb0eb.html">所得税・住民税についてのメモ</a></h1>
   </div>
   <dl class="metadata">
@@ -160,105 +211,6 @@ end
 <p>Schemeの場合，ある関数を呼び出した後にやるべき計算を取り出せるという機能があって，それは(自分も含めて)多くの人の中で「強力そうなのは知っているが，正直なところそれがどういうもので，何に有効なのかよくわからない『継続』」として知られています．</p>
 <p>関数型プログラミングは宣言的プログラミングにおける，部分値を扱うことを制限して，完全値のみで計算するようにした計算モデルなので，継続ってある計算をするために必要な完全値が計算ができないという理由により，その値を必要とする計算を取り出しておいて，いったん制御フローを他の部分に移すためのものとしてみれるのではないでしょうか．それ以外にも，今その値は存在しているけれども，それをつかって計算をするよりも先に別の計算をしたい場合のフロー制御としても使えるとは思いますが．</p>
 </div>
-</div>
-</div>
-</div>
-
-
-<div class='article'>
-  <div class="content-title">
-    <h1><a href="../2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html">Introduction to Domain TheoryのLecture1を読む</a></h1>
-  </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2012/03/20</dd>
-  </dl>
-
-  <div class="content-body section"><p>Graham Hutton先生の<a class="reference external" href="http://www.cs.nott.ac.uk/~gmh/domains.html">Introduction to Domain Theory</a>を読んだメモです。</p>
-<div class="section" id="denotational-semantics">
-<h2>Denotational Semantics</h2>
-<p>BNFを使って形式的にAbstract syntaxが定義されたプログラミング言語Pを考えたときに、そのPのDenotational semanticsは次の二つから構成されるんだよーという話。</p>
-<ol class="arabic">
-<li><p class="first">a semantic domain for each syntactic category</p>
-<p>ここでいうカテゴリーは、expressionとかcommandとか。</p>
-</li>
-<li><p class="first">a valuation function for each syntactic category</p>
-<p>で、このvaluation functionっていうのはシンタックスの各フレーズに対して、
-semantic domainの中の意味を割り当てるものですよー。</p>
-</li>
-</ol>
-<p>で、なんかvaluation functionはhomomorphismじゃないといけないとしている。この
-homomorphismであるということは、各フレーズの意味を割り当てるときは、そのフレーズの中のさらに小さいフレーズの意味から構成されるようなことらしい。で、一般的にはこういう性質のことを、compositionalityと言うらしい。</p>
-</div>
-<div class="section" id="foundational-problems">
-<h2>Foundational Problems</h2>
-<p>で、そもそもこのDomain Theoryがなんで生まれたのかというと、Denotational
-semanticsがuntyped lambda-calculusに適切な意味を与えられなかったから、生まれたらしい。</p>
-<p>で、じゃあ、なんで与えられなかったのか、というところについて、とりあえず単純に集合を使って、semantic domainを与えてみようじゃないかということをしてみる。その与えられなかった理由については、主に二つの理由があって:</p>
-<ol class="arabic simple">
-<li>recursively defined programs</li>
-<li>recursively defined semantic domains</li>
-</ol>
-<p>についての問題らしい。</p>
-<div class="section" id="recursively-defined-programs">
-<h3>1. Recursively Defined Programs</h3>
-<p>なんか直感的には無限ループになるようなプログラムを、ある集合上の関数として対応づけようとすると、そんな関数はネェってなったり、どんな関数でもそのプログラムに対応することになってしまったりして、困るという話。</p>
-<p>この問題を扱うには「終了しない」ということをsemanticsのレベルで表す必要があるよね、とも言っている。</p>
-</div>
-<div class="section" id="recursively-defined-semantic-domains">
-<h3>2. Recursively Defined Semantic Domains</h3>
-<p>次は、関数とか手続きというものを値として扱えるようになったときに、じゃあ、そういった値ってどういう集合なんでしょうねー、関数って言うのは関数から関数への関数も関数なので、これじゃあ関数の集合っていうのが考えられないですよねーというお話。</p>
-<p>で、関数の集合と同型な集合があればいいかなーとしてみても、やっぱり駄目で、ちょっと関数の集合の部分集合を考えてみても、濃度的に段違いなんですねー。あー、可算濃度とか対角線論法とか学部1年のときにやったなー。</p>
-</div>
-</div>
-<div class="section" id="a-first-step-to-scott-domains-lifted-sets">
-<h2>A First Step To Scott-Domains : Lifted Sets</h2>
-<p>ということで、やっぱり集合をsemantic domainにするのは無理っぽいので、一つだけ、なんかエラーとか計算が終了しないとか未定義だとか、そういう値を導入しようということを、どえらい人は考えたんDA!</p>
-<p>そういった値である、bottomというものを単純に一つ加えた集合をflat domainとか
-lifted setとか呼ぶらしい。で、そういった集合では、bottomとそうじゃない値の間に、information orderingという関係が定義できるNE!と、言っている。で、このbottomを含んだ集合をsemantic domainとすると、さっきの1. Recursively Defined
-Programsで問題にしていた、終了しないプログラムに意味が与えられるらしい。</p>
-</div>
-<div class="section" id="partial-orderings">
-<h2>Partial Orderings</h2>
-<p>じゃあ、もうちょっと複雑にして、いくつかの値をとるような関数というものを考えてみよう、という話。とりあえず、2引数の関数はそれぞれの引数の集合の直積を引数にとる関数と考えられる。</p>
-<p>このとき、それぞれの引数の集合が、flat domainだったら、その直積上にも
-information orderingを考えることができる。で、こういう直積はflat setsではなくてpartially ordered sets(posets)になるね。posetsだから、反射律、対称律、推移律が成り立つ。もっというと、bottomというものはbasepointというものらしいので、こういった直積が入ったりすることを考えると、semantic domainsはpointed posetsということができるらしい。</p>
-</div>
-<div class="section" id="monotonic-functions">
-<h2>Monotonic Functions</h2>
-<p>ということで、semantic domainsを(pointed) posetsにするとすると、プログラムは、そういったposets上の関数としてモデル化できるはず。でも、そういった関数すべてがプログラムのモデルとしてふさわしいわけじゃない。</p>
-<p>ここからがよくわからなかったんだけれども、入力と出力で、information orderingが保存されることを要求されるらしい。で、こういった関数のことを、monotonicと呼ぶらしい。</p>
-<p>なんかこの、計算可能な関数はmonotonicであるとか、情報がたくさんあった方が結果の情報もたくさんあるというのがよくわからない。じゃあ、逆にmonotonicじゃないと何がまずいのか、とかもよくわからない。</p>
-</div>
-<div class="section" id="excercises">
-<h2>Excercises</h2>
-<ul>
-<li><pre class="first literal-block">
-E[[proc C]]sigma = proc C
-E[[I]]sigma =  C[[C]]sigma (if I = proc C)
-             | sigma(I) (otherwise)
-</pre>
-</li>
-<li><p class="first">3-&gt;3 を書き下すとたぶん10個</p>
-</li>
-<li><p class="first">N-&gt;M の数は:</p>
-<pre class="literal-block">
-F(N, M) =   1 (if M = 1)
-          | M (if N = 1)
-          | F(N, M-1) + F(N-1, M)
-</pre>
-</li>
-</ul>
-<p>最後の問題は、chainの元のN個のポイントのうち、一番下のポイントが、M個のポイントのどこに写されるのかで場合分けする。</p>
-<ol class="arabic">
-<li><p class="first">一番下のポイントが先のM個のポイントのうち、一番下以外に写される。</p>
-<p>その数は<tt class="docutils literal">F(N, <span class="pre">M-1)</span></tt>と等しい。</p>
-</li>
-<li><p class="first">一番下のポイントが先のM個のポイントのうち、一番下に写される。</p>
-<p>このとき、別に残りのN-1個のポイントがどう写されようと、その対応関係が、
-(N-1)-&gt;Mのmonotonic functionであれば、N-1個のポイントの一番下にもう一個付け加えて、それがM個のポイントの一番下に写されたものもmonotonic functionになる。つまり、この場合は(N-1)-&gt;Mのすべてのmonotonic functionの一番下に割り当てを追加してあげれば良いだけ。ということは、その数は<tt class="docutils literal"><span class="pre">F(N-1,</span> M)</tt>と等しいということになる。</p>
-</li>
-</ol>
 </div>
 </div>
 </div>
