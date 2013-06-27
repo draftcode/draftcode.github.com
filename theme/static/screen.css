@@ -804,3 +804,9 @@ div.highlight .il {
   content: url("./images/icons/gplus.png");
   margin-right: 2px;
 }
+
+/* line 162, ../../sass/screen.sass */
+#disclaimer {
+  text-align: center;
+  font-style: italic;
+}
