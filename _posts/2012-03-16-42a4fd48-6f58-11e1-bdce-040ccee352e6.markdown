@@ -1,0 +1,79 @@
+---
+layout: post
+title:  PelicanとGitHub Pagesを使う
+---
+
+reStructuredTextが使いたかったので、Pythonで書かれてる
+[Pelican](http://pelican.notmyidea.org/en/2.8/index.html) という静的ブログジェ
+ネレータを使ってHTMLを出力し、GitHub Pagesで公開するようにしました。
+
+# Pelican
+
+最近は静的にブログを生成してくれるツールはたくさんあると思うんですが、どうも
+Markdownをなんか拡張したやつだったり、reStructuredTextを使っていても、ファイル
+内のメタデータをうまく使ってくれなかったり、自分が書いたエントリのディレクトリ
+内の位置を日付ごとのディレクトリにしなければいけなかったりして、あんまり好みの
+やつが見つからなかったんですが、最近みつけたPelicanはそのような制限がないので
+気に入って使っています。
+
+自分はPelicanのソースを引っ張ってきて、開発中のバージョンを直接使っています。
+開発中のバージョンを使うにはこれだけでOK:
+
+```bash
+$ git clone https://github.com/ametaireau/pelican.git
+$ cd pelican
+$ python setup.py develop
+```
+
+こうするとcloneしてきたディレクトリにあるファイルを使うようにうまくリンクが張
+られて、ちょっとコードの修正して動かしてみるっていうのが簡単にできるようになり
+ます。
+
+# GitHub Pages
+
+なんかGitHubには [GitHub Pages](http://pages.github.com/) っていうPushすると中
+のHTMLが公開されるというおしゃれ機能があって、それを使って公開するようにしまし
+た。で、自分が使っているのはUser Pagesなんですが、どのブランチにPushしたら公開
+されるのかが書いてなくて、どうもやってみた感じmasterに公開されたやつしか公開さ
+れないみたいです。UserPagesの場合はgh-pagesにPushしても無駄みたいですよ。わか
+らないけど。なので次のようなブランチ構成にしてみました:
+
+```
+source   -> origin/source
+gh-pages -> origin/master
+```
+
+こういう風にするには、たぶん次のようにすればいいはず:
+
+```bash
+$ git init .
+$ git branch -m master source
+$ git remote add origin <自分のGitHubリポジトリでコピーしてきたなにか>
+```
+
+gh-pagesはなんかよしなに作ってくれる
+[ghp-import](https://github.com/davisp/ghp-import) があるので、それを導入しま
+した:
+
+```bash
+$ pip install ghp-import
+```
+
+# conf.pyを書く
+
+[conf.py](https://github.com/draftcode/draftcode.github.com/tree/source/conf.py)
+みたいに書いています。なんか下の方で怪しいことしてますが。ディレク
+トリ構成は
+[draftcode/draftcode.github.com](https://github.com/draftcode/draftcode.github.com/tree/source)
+みたいになってます。
+
+# post-commitを仕込む
+
+次のような内容のファイルを、 `.git/hooks/post-commit` に仕込んでおきます:
+
+```bash
+$ pelican -s conf.py && ghp-import output && git push origin gh-pages:master source:source
+```
+
+これでなんかコミットしたらページがビルドされてPushされます。しばらく待つと向こ
+うの方のページにも反映されます。やったね!

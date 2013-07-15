@@ -1,7 +1,4 @@
-output
-env
-*.egg-info
-amazon_secret.py
-*.pyc
-.ruby-version
+_site
+_deploy
 .sass-cache
+css

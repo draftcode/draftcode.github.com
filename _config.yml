@@ -1,0 +1,20 @@
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - Rakefile
+timezone: Asia/Tokyo
+
+pygments: true
+
+production_url: http://draftcode.github.io
+
+markdown: redcarpet
+
+redcarpet:
+  extensions:
+    - no_intra_emphasis
+    - tables
+    - fenced_code_blocks
+    - strikethrough
+    - space_after_headers
+    - auto_link

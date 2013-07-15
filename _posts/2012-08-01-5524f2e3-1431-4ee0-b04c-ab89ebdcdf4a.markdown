@@ -1,0 +1,140 @@
+---
+layout: post
+title: 第(1+1)回 六本木 Linux カーネル読書会 参加メモ
+---
+
+[第(1+1)回 六本木 Linux カーネル読書会](http://connpass.com/event/824/) に行っ
+てきたので、そのときのメモ。あまりメモがとれていない。今回はforkとかcloneあた
+り。
+
+後で調べたこともいくつか追加している。
+
+# do\_fork (kernel/fork.c)
+
+do\_forkはsys\_cloneやsys\_vfork、sys\_forkから呼ばれる。
+
+* sys\_clone
+
+  arch/x86/kernel/process.c
+* sys\_vfork
+
+  arch/x86/kernel/process.c
+* sys\_fork
+
+  arch/x86/kernel/process.c
+* task\_struct
+
+  include/linux/sched.h
+
+# vfork
+
+古いBSDでfork & execを効率的に行うための仕組み。現在では使われていない。
+
+古いBSDだと、メモリ空間がCopy on Writeではなくて、fork時にコピーするようになっ
+ているらしい。このため、fork & execをやろうとすると、無駄にメモリ空間のコピー
+が走ってしまう。これを防ぐために、vforkというものが生まれた。vforkは子プロセス
+が親プロセスのメモリ空間を使って動く。このままだと、親プロセスと子プロセスのス
+タックも共有してしまうので、まず、親プロセスを停止し、次に子プロセスを動かす。
+子プロセスがexecveを呼ぶかexitするまで、親プロセスは停止する。親プロセスのメモ
+リ空間を利用するため、子プロセスの動きが大きく制約される。
+
+<http://surf.ml.seikei.ac.jp/~nakano/JMwww/html/LDP_man-pages/man2/vfork.2.html>
+
+現代的なプログラムではvforkは使ってはいけない。
+
+<http://www.jpcert.or.jp/sc-rules/c-pos33-c.html>
+
+# メモリ空間
+
+カーネル空間とユーザー空間に分かれている。
+
+* \_\_user
+
+  include/linux/compiler.h
+* \_\_kernel
+
+  include/linux/compiler.h
+
+それぞれでメモリ管理をしているので仮想メモリ空間を指すことになる。
+
+* copy\_process (kernel/fork.c)
+
+親プロセスのtask\_structをコピーしている。
+
+* dup\_task\_structを呼んでる。
+* sched\_forkを呼んでる。
+
+# sched\_fork (kernel/sched/core.c)
+
+プロセスが実行される前のスケジューラ周りのセットアップを行うみたい。
+
+# dup\_task\_struct (kernel/fork.c)
+
+task\_structのメモリ確保はkmem\_cache\_alloc\_nodeで確保している。
+
+# kmem\_cache\_alloc\_node (include/kernel/slab.h)
+
+カーネル空間のメモリを確保する関数。メモリの種類がいろいろ選べるらしい。
+
+<http://www.mech.tohoku-gakuin.ac.jp/rde/contents/linux/drivers/tips1.html>
+
+kmem\_cache\_alloc\_node の node は tsk\_fork\_get\_node から取ってきている。
+しかしnodeは無視されてしまう。
+
+# tsk\_fork\_get\_node (kernel/kthread.c)
+
+どうもNUMAアーキテクチャで気にするものらしい。
+
+NUMA は Non-Uniform Memory Access の略で、たしかそれぞれのプロセッサでメモリを
+持っていて、他のプロセッサが持っているメモリにアクセスするときは、そのプロセッ
+サにお願いして読みに行くというアーキテクチャだったと思う。
+
+# RCUとは
+
+リードコピーアップデート。wikipedia参照。
+
+どうも、Writerが入るときに、コピーを作ってそっちの方を指すようにする。で、
+Readerは読み終わったら上手いことやって、さっきまで見ていた複製元が既に不要に
+なっていたら破棄するようにするものらしい。
+
+<http://togetter.com/li/153033>
+
+# get\_cpu, put\_cpu (include/linux/smp.h)
+
+* get\_cpu
+
+  CPUの割り込みを禁止し、現在のCPUIDを返す。
+* put\_cpu
+
+  CPUの割り込みを有効化。
+
+# wake\_up\_new\_task (kernel/sched/core.c)
+
+do\_forkの中で呼び出される。スケジューラに実際に登録する？
+
+# do\_execve (fs/exec.c)
+
+これは次回で。
+
+# Buddy memory allocation と Slab allocator
+
+kmem\_cache\_alloc\_node が定義されているのはslab.hなので、slabとは何か調べ
+た。
+
+Buddy memory allocationというメモリアロケーションメカニズムがあって、詳しくは
+わからないけれど、ページ\*2^n単位でメモリを確保していくようなものらしい。これ
+で切り取れるのはページ数単位なので、小さいオブジェクトを確保するのには向いてい
+ない。なので間にSlab allocatorというものが入って、小さいオブジェクトを切り出し
+ていきましょうという仕組みらしい。mallocと変わらない？いくつかの最適化もされる
+らしい。
+
+* <http://en.wikipedia.org/wiki/Buddy_memory_system>
+* <http://wiki.bit-hive.com/linuxkernelmemo/pg/%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF>
+
+そもそもスラブというものが何かというと、同じサイズのオブジェクトを切り出すため
+のメモリのことらしい。
+
+<http://wiki.bit-hive.com/north/pg/kmalloc(%A5%B9%A5%E9%A5%D6%A5%A2%A5%ED%A5%B1%A1%BC%A5%BF)>
+
+スラブの割り当て状況みたいなのは/proc/slabinfoで参照できるらしく、さらにtopみ
+たいなslabtopというコマンドもある。

@@ -1,0 +1,74 @@
+---
+layout: post
+title: CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない
+---
+
+ドキュメンテーションにも書いてあるとおり、 `csv` モジュールでは文字列のエン
+コーディングを正しく取り扱ってくれません。 `csv` モジュールのコアの部分はCで
+書かれており、 `_csv.c` というファイルに記述されています。
+
+`csv.Reader` は与えられたfile-likeオブジェクトから `PyString_AsString` をつ
+かって `char *` を得ようとします。:
+
+```c
+static PyObject *
+Reader_iternext(ReaderObj *self)
+{
+    PyObject *lineobj;
+    PyObject *fields = NULL;
+    char *line, c;
+    ...
+
+    do {
+        lineobj = PyIter_Next(self->input_iter);
+        ...
+        line = PyString_AsString(lineobj);
+        ...
+    }
+}
+```
+
+この関数は `char \*` を得るために使われるオブジェクトが `str` か
+`unicode` かで動作が変わります。 `str` であった場合は直接そのオブジェクト
+のバッファが返されるのですが、 `unicode` であった場合は、
+`_PyUnicode_AsDefaultEncodedString` によって、デフォルトエンコーディングに変
+換された文字列を返す動作になっています。
+
+```c
+/*const*/ char *
+PyString_AsString(register PyObject *op)
+{
+    if (!PyString_Check(op))
+        return string_getbuffer(op);
+    return ((PyStringObject *)op) -> ob_sval;
+}
+
+int
+PyString_AsStringAndSize(register PyObject *obj,
+                         register char **s,
+                         register Py_ssize_t *len)
+{
+    ...
+    if (!PyString_Check(obj)) {
+#ifdef Py_USING_UNICODE
+        if (PyUnicode_Check(obj)) {
+            obj = _PyUnicode_AsDefaultEncodedString(obj, NULL);
+            ...
+        }
+        ...
+    }
+    ...
+}
+```
+
+このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もし
+デフォルトエンコーディングが変更されていた場合は、 `codecs.open` を使った場
+合や `open` を使った場合とでおもしろい?結果が得られるかもしれません。
+
+`csv.Reader` が返す結果は、 `unicode` ではなく、ファイルのエンコーディング
+でエンコードされたそのままの `str` の配列や辞書になっています。よって、それ
+がきちんと `unicode` なのか、なにかのエンコーディングでエンコードされた
+`str` なのかを意識しないと、あるはずのキーがないというような現象に出くわした
+りします。これを意識するのは面倒くさいので、適切な `csv.Reader` のラッパーを
+用意して使うようにした方がよいです。
+

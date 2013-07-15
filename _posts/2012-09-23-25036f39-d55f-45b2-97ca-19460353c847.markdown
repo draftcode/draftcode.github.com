@@ -1,0 +1,80 @@
+---
+layout: post
+title:  RoboGuiceのInjectExtraを使うとテストがしにくくなる件について
+---
+
+RoboGuiceのInjectなんとか系は記述量が減ってテストもしやすくなって便利ですが、
+残念ながらInjectExtraだけはイマイチと言わざるを得ません。使っているバーション
+は、RoboGuice 1.1.2とGuice 2.0 no-aopで、Robolectricでテストを書いたりしていま
+す。もしかしたら、RoboGuice 2.0で解消されているのかも知れません。
+
+# 問題背景
+
+まず、実機で動くコードでは、 `RoboActivity.onCreate()` の中でInjectionが行わ
+れます。このとき、 `InjectView` 以外のフィールドがInjectされます。その中には
+当然 `InjectExtra` も入っていますので、ここでそのInjectionのContextである
+ActivityからIntentがとり出されて、Extraが入ります:
+
+```java
+public static final String SOME_EXTRA_ID = "SOME_EXTRA_ID";
+@InjectExtra(SOME_EXTRA_ID)
+int someExtra;
+```
+
+次に、テストコードの中で、クラス中にテスト対象のActivityをInjectしているとしま
+す。このとき、Activityに `InjectExtra` が入っているとInjectionに失敗してしま
+います。失敗する理由としては、次の2つが挙げられます。
+
+1. Injectionを行うActivityにIntentがセットされていないこと。
+2. Injectionを行うScopeが `ContextScope` ではないこと。特に、Activityの
+   `ContextScope` ではないこと。
+
+# 解決策
+
+この2つを回避するために、それなりに現実的な方法で対処をしてみようと試みました
+が、根本的に実際に実機で動くときのコードとテスト中のコードでInjectionタイミン
+グが違うことが問題なので、上手く行きませんでした。Activityはどこかほかのオブ
+ジェクトの中でInjectされることを、あまり想定していないのです。
+
+大掛かりな解決策としては、 `ExtrasListener` と `ContextScope` を変更して、
+`InjectExtra` が処理されるタイミングを変更するというものがありますが、そこま
+でして `InjectExtra` を使いたくありません。
+
+大掛かりな解決策を取らずに `InjectExtra` を利用したActivityに対してテストを
+書くのであれば、ActivityはテストコードでのInjecされないようにして、 `setUp`
+の中で手動Injectするしかありません。その手動Injectを行う場合には、自分でその
+Activityの `ContextScope` を生成して、その中で `injectMembers` を行う必要
+があります。この方法を取ると、一見、テストコード中の `InjectView` が効かなく
+なりそうですが、どうやら `ContextScope` のスタックがきちんとしているのか、そ
+のActivityが `setContentView` をしたときに、きちんとInjectionされます:
+
+```java
+public static final int TEST_EXTRA = 42;
+
+@Inject
+Injector injector;
+@InjectView(R.id.myButton)
+Button myButton;
+
+private MyActivity activity;
+
+@Before
+public void setUp() throws Exception {
+    activity = new MyActivity();
+    Intent intent = new Intent();
+    intent.putExtra(MyActivity.SOME_EXTRA_ID, TEST_EXTRA);
+    activity.setIntent(intent);
+
+    ContextScope scope = injector.getInstance(ContextScope.class);
+    scope.enter(activity);
+    injector.injectMembers(activity);
+    scope.exit(activity);
+}
+```
+
+`ContextScope` 周りは、RoboGuice 2.0では多少改善されているのは確認できまし
+た。 `RoboGuice.injectMembers(Context, T)` というメソッドが存在するのが確認
+できました。
+
+もうひとつの解決策は、もう `InjectExtra` を使わないという方法で、自分はもう
+こっちの方法でいいかなと思っています。

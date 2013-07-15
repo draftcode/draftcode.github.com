@@ -1,0 +1,30 @@
+---
+layout: post
+title: CPython2.7.2のWindowsでのmultiprocessingの動作
+---
+
+フォークが出来るOSであれば、単純にフォークをしてそのあとに
+`Process._bootstrap` が `Process.run` を呼び出すだけですが、Windowsではプ
+ロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることにな
+ります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中
+身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイ
+ル化されたりします。
+
+Windowsにおける `multiprocessing` モジュールの動きは次のようなものになりま
+す:
+
+1. pipeを作っておく。
+2. 現在の実行ファイルに `--multiprocessing-fork` というコマンドラインオプ
+   ションと先ほどのpipeの読み出し側をつけて `CreateProcess` する。
+3. 親プロセスはpipeを通じて、 `Process` オブジェクトを `pickle` で直列化し
+   て子プロセスに送る。
+4. 子プロセスは `--multiprocessing-fork` をフラグとして認識して、pipeから
+   `Process` オブジェクトを読み出す。
+5. 子プロセスが `Process._bootstrap` を呼び出す。
+
+Freezeされていない場合は、過程2のところでは、実行ファイルが `python.exe` に
+なるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeさ
+れている場合は、-cのようなオプションを受け取れないので、
+`multiprocessing.freeze_support` がそのような役割を果たします。これがFreeze
+されている場合に `multiprocessing.freeze_support` が必要になる理由です。
+
