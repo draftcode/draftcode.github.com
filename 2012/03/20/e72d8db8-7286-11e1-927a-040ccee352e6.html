@@ -1,162 +1,135 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
   <head>
-    <meta charset="utf-8">
-    <title>Introduction to Domain TheoryのLecture1を読む - draftcode.github.io</title>
-    <meta name="author" content="draftcode">
-    <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
-
-    <link href="../../../theme/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <link href="../../../theme/print.css" media="print" rel="stylesheet" type="text/css" />
-    <!--[if IE]>
-    <link href="../../../theme/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <![endif]-->
-
-    <link rel="alternate" type="application/atom+xml" title="Atom" href="../../../atom.xml">
-    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>Introduction to Domain TheoryのLecture1を読む</title>
+    <meta content='draftcode' name='author'>
+    <meta content='YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0' name='google-site-verification'>
+    <link href='/css/main.css' rel='stylesheet'>
+    <link href='/atom.xml' rel='alternate' title='Atom' type='application/atom+xml'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
   </head>
-
   <body>
-    <h1 id="site-title"><a href="../../..">draftcode.github.io</a></h1>
-
-    <div id="content">
-      <div class='article'>
-  <div class="content-title">
+    <div id='site-title-short'>
+      <div class='svg' id='links'>
+        <a href='/pages/about.html' id='about'>About</a>
+        <a class='fc-webicon twitter' href='http://twitter.com/draftcode'>Twitter</a>
+        <a class='fc-webicon github' href='http://github.com/draftcode'>GitHub</a>
+        <a class='fc-webicon googleplus' href='https://plus.google.com/107177890582465029754?rel=author'>Google+</a>
+        <a class='fc-webicon rss' href='/atom.xml' rel='alternate'>Atom feed</a>
+      </div>
+      <h1>
+        <a href='/'>draftcode.github.io</a>
+      </h1>
+    </div>
+    <div id='content'>
+      <div id='article'>
+  <div id='content_title'>
     <h1>Introduction to Domain TheoryのLecture1を読む</h1>
   </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2012/03/20</dd>
-  </dl>
-
-  <div class="content-body section"><p>Graham Hutton先生の<a class="reference external" href="http://www.cs.nott.ac.uk/~gmh/domains.html">Introduction to Domain Theory</a>を読んだメモです。</p>
-<div class="section" id="denotational-semantics">
+  <div id='posted_date'>
+    Posted on 2012-03-20
+  </div>
+  <div id='content_body'>
+    <p>Graham Hutton先生の<a href="http://www.cs.nott.ac.uk/%7Egmh/domains.html">Introduction to Domain Theory</a> を読んだメモです。</p>
 <h2>Denotational Semantics</h2>
 <p>BNFを使って形式的にAbstract syntaxが定義されたプログラミング言語Pを考えたときに、そのPのDenotational semanticsは次の二つから構成されるんだよーという話。</p>
-<ol class="arabic">
-<li><p class="first">a semantic domain for each syntactic category</p>
-<p>ここでいうカテゴリーは、expressionとかcommandとか。</p>
-</li>
-<li><p class="first">a valuation function for each syntactic category</p>
-<p>で、このvaluation functionっていうのはシンタックスの各フレーズに対して、
-semantic domainの中の意味を割り当てるものですよー。</p>
-</li>
+
+<ol>
+<li><p>a semantic domain for each syntactic category</p>
+
+<p>ここでいうカテゴリーは、expressionとかcommandとか。</p></li>
+<li><p>a valuation function for each syntactic category</p>
+
+<p>で、このvaluation functionっていうのはシンタックスの各フレーズに対して、 semantic domainの中の意味を割り当てるものですよー。</p></li>
 </ol>
-<p>で、なんかvaluation functionはhomomorphismじゃないといけないとしている。この
-homomorphismであるということは、各フレーズの意味を割り当てるときは、そのフレーズの中のさらに小さいフレーズの意味から構成されるようなことらしい。で、一般的にはこういう性質のことを、compositionalityと言うらしい。</p>
-</div>
-<div class="section" id="foundational-problems">
+
+<p>で、なんかvaluation functionはhomomorphismじゃないといけないとしている。この homomorphismであるということは、各フレーズの意味を割り当てるときは、そのフレーズの中のさらに小さいフレーズの意味から構成されるようなことらしい。で、一般的にはこういう性質のことを、compositionalityと言うらしい。</p>
 <h2>Foundational Problems</h2>
-<p>で、そもそもこのDomain Theoryがなんで生まれたのかというと、Denotational
-semanticsがuntyped lambda-calculusに適切な意味を与えられなかったから、生まれたらしい。</p>
+<p>で、そもそもこのDomain Theoryがなんで生まれたのかというと、Denotational semanticsがuntyped lambda-calculusに適切な意味を与えられなかったから、生まれたらしい。</p>
+
 <p>で、じゃあ、なんで与えられなかったのか、というところについて、とりあえず単純に集合を使って、semantic domainを与えてみようじゃないかということをしてみる。その与えられなかった理由については、主に二つの理由があって:</p>
-<ol class="arabic simple">
+
+<ol>
 <li>recursively defined programs</li>
 <li>recursively defined semantic domains</li>
 </ol>
+
 <p>についての問題らしい。</p>
-<div class="section" id="recursively-defined-programs">
 <h3>1. Recursively Defined Programs</h3>
 <p>なんか直感的には無限ループになるようなプログラムを、ある集合上の関数として対応づけようとすると、そんな関数はネェってなったり、どんな関数でもそのプログラムに対応することになってしまったりして、困るという話。</p>
+
 <p>この問題を扱うには「終了しない」ということをsemanticsのレベルで表す必要があるよね、とも言っている。</p>
-</div>
-<div class="section" id="recursively-defined-semantic-domains">
 <h3>2. Recursively Defined Semantic Domains</h3>
 <p>次は、関数とか手続きというものを値として扱えるようになったときに、じゃあ、そういった値ってどういう集合なんでしょうねー、関数って言うのは関数から関数への関数も関数なので、これじゃあ関数の集合っていうのが考えられないですよねーというお話。</p>
+
 <p>で、関数の集合と同型な集合があればいいかなーとしてみても、やっぱり駄目で、ちょっと関数の集合の部分集合を考えてみても、濃度的に段違いなんですねー。あー、可算濃度とか対角線論法とか学部1年のときにやったなー。</p>
-</div>
-</div>
-<div class="section" id="a-first-step-to-scott-domains-lifted-sets">
 <h2>A First Step To Scott-Domains : Lifted Sets</h2>
 <p>ということで、やっぱり集合をsemantic domainにするのは無理っぽいので、一つだけ、なんかエラーとか計算が終了しないとか未定義だとか、そういう値を導入しようということを、どえらい人は考えたんDA!</p>
-<p>そういった値である、bottomというものを単純に一つ加えた集合をflat domainとか
-lifted setとか呼ぶらしい。で、そういった集合では、bottomとそうじゃない値の間に、information orderingという関係が定義できるNE!と、言っている。で、このbottomを含んだ集合をsemantic domainとすると、さっきの1. Recursively Defined
-Programsで問題にしていた、終了しないプログラムに意味が与えられるらしい。</p>
-</div>
-<div class="section" id="partial-orderings">
+
+<p>そういった値である、bottomというものを単純に一つ加えた集合をflat domainとか lifted setとか呼ぶらしい。で、そういった集合では、bottomとそうじゃない値の間に、information orderingという関係が定義できるNE!と、言っている。で、この bottomを含んだ集合をsemantic domainとすると、さっきの1. Recursively Defined Programsで問題にしていた、終了しないプログラムに意味が与えられるらしい。</p>
 <h2>Partial Orderings</h2>
 <p>じゃあ、もうちょっと複雑にして、いくつかの値をとるような関数というものを考えてみよう、という話。とりあえず、2引数の関数はそれぞれの引数の集合の直積を引数にとる関数と考えられる。</p>
-<p>このとき、それぞれの引数の集合が、flat domainだったら、その直積上にも
-information orderingを考えることができる。で、こういう直積はflat setsではなくてpartially ordered sets(posets)になるね。posetsだから、反射律、対称律、推移律が成り立つ。もっというと、bottomというものはbasepointというものらしいので、こういった直積が入ったりすることを考えると、semantic domainsはpointed posetsということができるらしい。</p>
-</div>
-<div class="section" id="monotonic-functions">
+
+<p>このとき、それぞれの引数の集合が、flat domainだったら、その直積上にも information orderingを考えることができる。で、こういう直積はflat setsではなくてpartially ordered sets(posets)になるね。posetsだから、反射律、対称律、推移律が成り立つ。もっというと、bottomというものはbasepointというものらしいので、こういった直積が入ったりすることを考えると、semantic domainsはpointed posetsということができるらしい。</p>
 <h2>Monotonic Functions</h2>
 <p>ということで、semantic domainsを(pointed) posetsにするとすると、プログラムは、そういったposets上の関数としてモデル化できるはず。でも、そういった関数すべてがプログラムのモデルとしてふさわしいわけじゃない。</p>
+
 <p>ここからがよくわからなかったんだけれども、入力と出力で、information orderingが保存されることを要求されるらしい。で、こういった関数のことを、monotonicと呼ぶらしい。</p>
+
 <p>なんかこの、計算可能な関数はmonotonicであるとか、情報がたくさんあった方が結果の情報もたくさんあるというのがよくわからない。じゃあ、逆にmonotonicじゃないと何がまずいのか、とかもよくわからない。</p>
-</div>
-<div class="section" id="excercises">
 <h2>Excercises</h2>
 <ul>
-<li><pre class="first literal-block">
+<li><code>
 E[[proc C]]sigma = proc C
 E[[I]]sigma =  C[[C]]sigma (if I = proc C)
-             | sigma(I) (otherwise)
-</pre>
-</li>
-<li><p class="first">3-&gt;3 を書き下すとたぶん10個</p>
-</li>
-<li><p class="first">N-&gt;M の数は:</p>
-<pre class="literal-block">
-F(N, M) =   1 (if M = 1)
-          | M (if N = 1)
-          | F(N, M-1) + F(N-1, M)
-</pre>
-</li>
+           | sigma(I) (otherwise)
+</code></li>
 </ul>
+
+<ul>
+<li>3->3 を書き下すとたぶん10個</li>
+<li><p>N->M の数は</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">F(N, M) =   1 (if M = 1)
+        | M (if N = 1)
+        | F(N, M-1) + F(N-1, M)
+</code></pre></div></li>
+</ul>
+
 <p>最後の問題は、chainの元のN個のポイントのうち、一番下のポイントが、M個のポイントのどこに写されるのかで場合分けする。</p>
-<ol class="arabic">
-<li><p class="first">一番下のポイントが先のM個のポイントのうち、一番下以外に写される。</p>
-<p>その数は<tt class="docutils literal">F(N, <span class="pre">M-1)</span></tt>と等しい。</p>
-</li>
-<li><p class="first">一番下のポイントが先のM個のポイントのうち、一番下に写される。</p>
-<p>このとき、別に残りのN-1個のポイントがどう写されようと、その対応関係が、
-(N-1)-&gt;Mのmonotonic functionであれば、N-1個のポイントの一番下にもう一個付け加えて、それがM個のポイントの一番下に写されたものもmonotonic functionになる。つまり、この場合は(N-1)-&gt;Mのすべてのmonotonic functionの一番下に割り当てを追加してあげれば良いだけ。ということは、その数は<tt class="docutils literal"><span class="pre">F(N-1,</span> M)</tt>と等しいということになる。</p>
-</li>
+
+<ol>
+<li><p>一番下のポイントが先のM個のポイントのうち、一番下以外に写される。</p>
+
+<p>その数は <code>F(N, M-1)</code> と等しい。</p></li>
+<li><p>一番下のポイントが先のM個のポイントのうち、一番下に写される。</p>
+
+<p>このとき、別に残りのN-1個のポイントがどう写されようと、その対応関係が、(N-1)->Mのmonotonic functionであれば、N-1個のポイントの一番下にもう一個付け加えて、それがM個のポイントの一番下に写されたものもmonotonic functionになる。つまり、この場合は(N-1)->Mのすべてのmonotonic functionの一番下に割り当てを追加してあげれば良いだけ。ということは、その数は <code>F(N-1, M)</code> と等しいということになる。</p></li>
 </ol>
-</div>
-</div>
-</div>
 
-<div class="comments">
-  <div id="disqus_thread"></div>
-  <script type="text/javascript">
+  </div>
+</div>
+<div id='comments'>
+  <div id='disqus_thread'></div>
+  <script>
     var disqus_shortname = 'draftcode-github-com';
-
+    
     (function() {
      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
      dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
      })();
   </script>
-  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <noscript>
+    Please enable JavaScript to view the
+    <a href='http://disqus.com/?ref_noscript'>comments powered by Disqus.</a>
+  </noscript>
 </div>
+
     </div>
-
-    <div id="footer">
-      <div id="footer-container">
-        <div id="about">
-          <h2>About the author</h2>
-          <a href="../../../pages/about.html"><img src="../../../static/images/draftcode.png" /></a>
-          <p>東京で情報工学を専攻している大学院生です。<br />プログラミング言語の研究をしています。<br /></p>
-          <p>詳しくは<a href="../../../pages/about.html">こちら</a></p>
-        </div>
-
-        <div id="site">
-          <h2>Site</h2>
-          <ul>
-            <li><a href="../../../archives.html">Archives</a>
-            <li><a href="../../../atom.xml" rel="alternate">Atom feed</a></li>
-          </ul>
-        </div>
-
-        <div id="social">
-          <h2>Social</h2>
-          <ul>
-                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>          </ul>
-        </div>
-      </div>
-      <p id="disclaimer">Disclaimer: ここで述べられていることは私の個人的な意見に基づくものであり､私の雇用者には一切の関係はありません｡ </p>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
     </div>
   </body>
 </html>

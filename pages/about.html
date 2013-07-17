@@ -1,112 +1,90 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
   <head>
-    <meta charset="utf-8">
-    <title>About - draftcode.github.io</title>
-    <meta name="author" content="draftcode">
-    <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
-
-    <link href="../theme/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <link href="../theme/print.css" media="print" rel="stylesheet" type="text/css" />
-    <!--[if IE]>
-    <link href="../theme/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <![endif]-->
-
-    <link rel="alternate" type="application/atom+xml" title="Atom" href="../atom.xml">
-    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>About</title>
+    <meta content='draftcode' name='author'>
+    <meta content='YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0' name='google-site-verification'>
+    <link href='/css/main.css' rel='stylesheet'>
+    <link href='/atom.xml' rel='alternate' title='Atom' type='application/atom+xml'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
   </head>
-
   <body>
-    <h1 id="site-title"><a href="..">draftcode.github.io</a></h1>
-
-    <div id="content">
-      <div class='page'>
-  <div class="content-title">
+    <div id='site-title-short'>
+      <div class='svg' id='links'>
+        <a href='/pages/about.html' id='about'>About</a>
+        <a class='fc-webicon twitter' href='http://twitter.com/draftcode'>Twitter</a>
+        <a class='fc-webicon github' href='http://github.com/draftcode'>GitHub</a>
+        <a class='fc-webicon googleplus' href='https://plus.google.com/107177890582465029754?rel=author'>Google+</a>
+        <a class='fc-webicon rss' href='/atom.xml' rel='alternate'>Atom feed</a>
+      </div>
+      <h1>
+        <a href='/'>draftcode.github.io</a>
+      </h1>
+    </div>
+    <div id='content'>
+      <div id='page'>
+  <div id='content_title'>
     <h1>About</h1>
   </div>
+  <div id='content_body'><p>A graduate student majoring Computer Science, interested in:</p>
 
-  <div class="content-body section"><p>情報工学を専攻している大学院生をしています。プログラミング言語、分散処理、ソフトウェアテストに興味があります。</p>
-<div class="section" id="id1">
-<h2>現在やっているアルバイト</h2>
-<ul class="simple">
-<li>社内システムをつくる社内SEのような仕事をしています。<ul>
-<li>Excelがコアを一つしか使ってくれないので、複数のExcelインスタンスを立ち上げて並列処理させる仕事をしました。</li>
-<li>処理が終わらないので、PCを4台ほど使って分散処理する仕事をしました。</li>
-<li>Boss-Workerモデルのアプリケーションが簡単にかけて、Workerが落ちてもリトライ可能なライブラリを書きました。</li>
-<li>ちょっと込み入ったアルゴリズムを設計する必要があったので、<a class="reference external" href="http://alloy.mit.edu/">Alloy</a>を用いてモデル化を行い、8段程度のMapReduce処理に変換する仕事をしました。</li>
-<li>ライブラリに対して大量のオプション設定が必要になったので、基本的にはファイルから設定を読み込む形にして、コマンドラインからオーバーライドできる、<a class="reference external" href="https://code.google.com/p/gflags/">gflags</a>ライクなコマンドラインパーサーライブラリを作成しました。</li>
-<li>CSVの読み込みが遅いのがネックだったので、高速にCSVを読み込むライブラリ<a class="reference external" href="https://pypi.python.org/pypi/fastcsv">fastcsv</a>を開発しました。</li>
-<li>CSVからPythonのオブジェクトへのデータマッパーを開発しました。</li>
-<li>Windowsのバッチファイルの実行環境とログを自動的に残せるようにするライブラリを開発しました。</li>
-<li>おおよそ20000行ほどの規模になっています。</li>
+<ul>
+<li>Programming Languages</li>
+<li>Distributed Computing</li>
+<li>Software Testing</li>
+<li>Model Checking</li>
 </ul>
-</li>
-<li>FileMakerやExcelやOutlookを操作する、VBScript/VBAをつかったアプリケーションを書きました。<ul>
-<li>これらのアプリケーションを作るために、VBScriptでライブラリを書けるようにするフレームワークと、そのフレームワークを利用したアプリケーションを解析し、必要なライブラリをまとめたパッケージを作成できるビルドシステムをVBScriptで書きました。</li>
-<li>おおよそ重複なしで45000行ほどの規模になっています。</li>
+<h2>Work Experience</h2><h3>Tomonokai Corporation (Software Engineer, Part-time, November 2009 - Current)</h3>
+<p><em>Internal back-office systems</em> - Discover requirements, design and develop systems. Python, C, Alloy, VBScript.</p>
+
+<ul>
+<li>Convert a 9 man-day job to a 30 minutes machine job.</li>
+<li>Process 10000+ excel files using multiple computers.</li>
+<li>Use formal method partially to design a system.</li>
 </ul>
-</li>
-<li>技術系の会社ではないので、社内で困っているところから声をかけられて、要求を掘り出し、デザイン、設計、開発、テスト、システムの移行計画、運用手順、データ移行、保守をひと通りやっています。</li>
-<li>これらの規模のアプリケーションを1人で書いてメンテナンスしています。<ul>
-<li>VBScriptについてはメンテナンスができない量になっているので、早くリプレースするなり他の人を雇って欲しいです。</li>
-<li>Pythonもそろそろメンテナンスが難しくなってくる規模なので、早く他の人を雇って欲しいです。</li>
+<h3>COOKPAD Inc. (Software Engineer, Intern, May 2013)</h3>
+<p><em>Distributed automated software testing system</em> - Design and develop the system. Ruby, AWS.</p>
+<h3>Google Japan Inc. (Software Engineer, Intern, Summer 2012)</h3>
+<p><em>Machine translation</em> - Conduct experiments. C++, MapReduce.</p>
+<h3>Humming Heads Inc. (Software Engineer, Part-time, July 2008 - October 2010)</h3>
+<p><em>Computer supervisory system</em> - Fix bugs and implement a new feature towards over a gigabyte of source code. C++.</p>
+
+<ul>
+<li>Intercept the application API calls and trace the behaviour.</li>
+<li>Inquire NTFS and FAT32 file system directly.</li>
 </ul>
-</li>
+
+<p><em>Job controller of a distributed system</em> - Write an initial implementation. VBScript and C++.</p>
+<h2>Activities</h2><h3>Develop an Android Application (Team leader, April 2012 - December 2012)</h3>
+<p>Lead a team of 7 and develop an application. Apply some best practices in Agile.</p>
+<h3>ACM/ICPC (Team haskell-lover, 2011-2012)</h3>
+<p>Got 7th in Tokyo Asia regional, 4th in Kaohsiung Asia regional, and honorable mention in World Finals.</p>
+<h3>Meta-circular Scheme Interpreter</h3>
+<p>Develop a Scheme interpreter in Scheme. Implement a subset of R5RS and partial continuation.</p>
+<h3>MIPS Assembler</h3>
+<p>Develop a MIPS assembler run on the embedded system called MieruPC. It can compile <code>sl</code> program.</p>
+<h2>Education</h2><h3>Graduate School of Science and Engineering in Tokyo Institute of Technology (April 2012 - Current)</h3>
+<p>Pursue MS in Computer Science at Department of Computer Science. Takuo Watanabe Lab.</p>
+<h3>BS Computer Science Tokyo Institute of Technology (March 2012)</h3>
+<p>Concentration: Context-oriented programming. Takuo Watanabe Lab.</p>
+
+<p><em>An Implementation Method of Context-Oriented Programming in Objective-C</em> - Context-oriented programming is a programming method that enables us to define behaviors that depend on the program's execution context. I proposed an implementation method of Context-oriented programming in Objective-C.</p>
+<h2>Languages, Skills and Technologies</h2>
+<ul>
+<li>Assembler(JVM and MIPS), C/C++, Objective-C, Python, Scheme, VBScript, Alloy, Ruby</li>
+<li>Linux, Mac OS X, Windows</li>
+<li>TOEIC score 935 (2011)</li>
 </ul>
-</div>
-<div class="section" id="id2">
-<h2>過去にやったインターン</h2>
-<ul class="simple">
-<li>機械翻訳とか自然言語処理周りのお仕事をしました。</li>
-<li>普通のC++でプログラムを書くお仕事です。</li>
-<li>MapReduceなどを書いたりしました。</li>
-</ul>
-</div>
-<div class="section" id="id3">
-<h2>過去にやったアルバイト</h2>
-<ul class="simple">
-<li>Win32APIやCOMを使ったりするC++を書くアルバイトを経験したことがあります。</li>
-<li>NTFSやFAT32のファイルシステムを生で読んで構造を認識するプログラムを書いた経験があります。</li>
-<li>たくさんのサーバーに適当にジョブを投げたりするコントローラをVBscriptとC++で書いた経験があります。</li>
-<li>C++を使ってはいましたが、Better-C以上のことはしていません。</li>
-</ul>
-</div>
-<div class="section" id="id4">
-<h2>大学の学部生で行った研究</h2>
-<p>Objective-Cに文脈指向プログラミングを行うための拡張をするという研究を行いました。文脈指向プログラミングとは、端的に言えば、メソッドに対して複数のメソッド定義を行うことができ、実行時にそのどちらのメソッド定義をつかうのかを実行中に動的に切り替えることができるという手法です。</p>
-</div>
-<div class="section" id="id5">
-<h2>最近の勉強</h2>
-<p>自分は割と本を読んで勉強していっています。どのような本を読んでいるかは、<a class="reference external" href="http://book.akahoshitakuya.com/u/95348">読書メーター</a>で見ることができます。</p>
+<h2>Others</h2>
+<p>You can see the books I read here: <a href="http://book.akahoshitakuya.com/u/95348">読書メーター</a></p>
 </div>
 </div>
-</div>
+
     </div>
-
-    <div id="footer">
-      <div id="footer-container">
-        <div id="about">
-          <h2>About the author</h2>
-          <a href="../pages/about.html"><img src="../static/images/draftcode.png" /></a>
-          <p>東京で情報工学を専攻している大学院生です。<br />プログラミング言語の研究をしています。<br /></p>
-          <p>詳しくは<a href="../pages/about.html">こちら</a></p>
-        </div>
-
-        <div id="site">
-          <h2>Site</h2>
-          <ul>
-            <li><a href="../archives.html">Archives</a>
-            <li><a href="../atom.xml" rel="alternate">Atom feed</a></li>
-          </ul>
-        </div>
-
-        <div id="social">
-          <h2>Social</h2>
-          <ul>
-                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>          </ul>
-        </div>
-      </div>
-      <p id="disclaimer">Disclaimer: ここで述べられていることは私の個人的な意見に基づくものであり､私の雇用者には一切の関係はありません｡ </p>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
     </div>
   </body>
 </html>

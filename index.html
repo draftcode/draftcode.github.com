@@ -1,191 +1,163 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
     <title>draftcode.github.io</title>
-    <meta name="author" content="draftcode">
-    <meta name="google-site-verification" content="YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0">
-
-    <link href="./theme/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <link href="./theme/print.css" media="print" rel="stylesheet" type="text/css" />
-    <!--[if IE]>
-    <link href="./theme/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <![endif]-->
-
-    <link rel="alternate" type="application/atom+xml" title="Atom" href="./atom.xml">
-    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet'>
+    <meta content='draftcode' name='author'>
+    <meta content='YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0' name='google-site-verification'>
+    <link href='/css/main.css' rel='stylesheet'>
+    <link href='/atom.xml' rel='alternate' title='Atom' type='application/atom+xml'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
   </head>
-
   <body>
-    <h1 id="site-title"><a href=".">draftcode.github.io</a></h1>
-
-    <div id="content">
-      
-
-<div class='article'>
-  <div class="content-title">
-    <h1><a href="./2013/06/12/726ef50a-c05d-44f0-9d3b-e8372a7d6521.html">ArchLinuxの環境構築まとめ</a></h1>
-  </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2013/06/12</dd>
-  </dl>
-
-  <div class="content-body section"><p>環境構築をしたのでせっかくだから現在使ってる環境をまとめてみる。</p>
-<ul>
-<li><p class="first">twm</p>
-<p>twmはすごい初期に作られたWindow Managerで、ほとんど現代的な機能がない。なんか環境構築のときに、とりあえず使えるWindow Managerとして入れてみたらわりと機能が十分だったので、そのまま使っている。</p>
-</li>
-<li><p class="first">urxvt</p>
-<p>ターミナルエミュレーター。別に好みはないけれども、大学の同期に聞いたらこれを使っているらしかったので、同じにしておいた。</p>
-</li>
-<li><p class="first">google-chrome</p>
-<p>chromiumを使っていたけれども、PDFをみたりとかFlashをみたりするときに他のなにかが必要になるのが面倒くさかったので、AURから入れた。</p>
-</li>
-<li><p class="first">ibus-mozc</p>
-<p>日本語入力はこれで。でもtwmのフォーカスの動きと合わないらしく、変換候補ウィンドウにカーソルが乗ると、カーソルの下にあった候補が選択されてしまう。カーソルを適当に候補ウィンドウが乗らないところに移動することで回避するようにした。</p>
-<p>問題がフォーカスであると切り分けするまでは、なんか日本語入力がおかしいと思っていたので、しばらく英語ツイートを続けていた。これが結構快適だったので、そのまま英語ツイートをある程度続けている。ASCII is great.</p>
-</li>
-<li><p class="first">conky</p>
-<p>デスクトップにCPU使用率とかIPアドレスとか、バッテリの状況を表示するメーターみたいなもの。ネットつながっているかがすぐ見れたり、バッテリーがあとどれぐらい持つかをすぐ見れたりして便利。</p>
-</li>
-<li><p class="first">xclock</p>
-<p>デスクトップ時計。twmでウィンドウタイトルを表示しないようにして端っこにおいてる。本当はアナログクロックのまま日付も真ん中辺りに表示してほしい。</p>
-</li>
-<li><p class="first">xbindkeys</p>
-<p>X全体で利用できるショートカットを定義するプログラム。例えば音量ボタンがキーボードについていて、それを押した時にALSAMixerから音量を上げ下げするようにする、とかのキーバインドが設定できる。自分はこれでdmenuを起動したり、xlockを起動したりしてる。</p>
-<p>重要なのが、自分はこれを使ってCtrl+Enterでurxvt、Ctrl+Shift+EnterでChromeが起動するようにしている。自分が行う作業のほとんどがこの2つのGUIプログラムで行えるので、超便利ショートカットとして1年間ぐらい活躍してる。</p>
-</li>
-<li><p class="first">dmenu</p>
-<p>ランチャー。urxvtとChromeでほとんどの作業できるけど、たまに他の何かをたちあげたいときに使ってる。あとurxvtの設定ミスって立ち上がらないときにxterm使ったりとか。ほとんど使わないけど念の為。</p>
-</li>
-<li><p class="first">xlock</p>
-<p>WindowsでいうWin+Lの機能。xbindkeysでも同じショートカットを割り当ててる。離席するときに画面ロックしておくのはお互いにとって大事。</p>
-</li>
-<li><p class="first">favchecker</p>
-<p>最近自分で作ったTwitter WebのConnectと同じような機能を提供するなにか。
-UserStreamを受け取って、適当に自分の名前(&#64;draftcode)が含まれているツイートと、Favされたツイートを垂れ流す。自分は自己顕示欲が強いのでこういうのを常駐させてる。コンソールで動くので、urxvtをつかってxclockとconkyの間においてる。
-Twitterは公式Webで。</p>
-</li>
-</ul>
-<p>twmのフォーカスあたりとかやっぱり気になるのでWindow Manager作りたい。それ以外は概ね快適。実際のところ、twm, xbindkeys, xterm, Chromeだけでも十分かもしれない。</p>
-</div>
-</div>
-
-
-<div class='article'>
-  <div class="content-title">
-    <h1><a href="./2013/06/08/faf853f8-7aea-428c-8e3c-3108b83835b7.html">XPS13を買ってLinuxを入れた話</a></h1>
-  </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2013/06/08</dd>
-  </dl>
-
-  <div class="content-body section"><p>最近Macbook Airがスリープから復帰してログインした直後に、すぐに再度スリープに入ってしまうという現象が起きていて、イライラしていた。ということとはあまり関係がなく、どちらかというとそろそろ3年経ったから次のPCを買おうかなということで、
-XPS13を買いました。先のようなこともあり、次は脱Appleしようかなということで、適当に日本からキーボードの種類が選べるものを探して買った感じです。Thinkpad X1
-Carbonとも迷ったのですが、まぁXPS13のほうが安かったので。</p>
-<p>ちょうど1年ぐらいまえにLinuxデスクトップを使い始めていたので、移行自体はすんなり行きました。参考にしたのは次の2つのページです:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://qiita.com/items/12f21126c5117e07decd">Arch Linux インストールから awesome 導入まで - Qiita</a></li>
-<li><a class="reference external" href="https://wiki.archlinux.org/index.php/Installation_Guide">Installation Guice - ArchWiki</a></li>
-</ul>
-<p>せっかくだからということで、GPTパーティション+EFIという構成でセットアップしたのですが、ドハマりしました。一番ハマったのは、Protective MBRにある部分はBootフラグを立ててはいけないというもので、これをそのままにしておいた結果、いつまでたってもEFIパーティションが認識されないという状況になっていました。</p>
-<p>あと、最初に入っていたWindows8を消してWindows7を入れなおそうとしたら、どうやらこのXPS13はEFI起動の64bit Windows7インストールに失敗するようです……残念。</p>
-<p>それ以外はファンがすぐに回るとか、タッチパッドの感度が良すぎるとか、TWMを使っているのだけれども、それとibusの候補ウィンドウのフォーカスの関係で、文字入力がしづらいという事以外は、概ね快適であります。</p>
-</div>
-</div>
-
-
-<div class='article'>
-  <div class="content-title">
-    <h1><a href="./2013/03/22/278e1973-0066-4749-8097-3a7dec906e0e.html">PythonのC拡張を書く</a></h1>
-  </div>
-  <dl class="metadata">
-    <dt>Posted</dt>
-    <dd>2013/03/22</dd>
-  </dl>
-
-  <div class="content-body section"><p>最近はPythonのC拡張を書いていたりするので、覚えている範囲でハマった点を説明します。C拡張を書き始めるには、基本的に<a class="reference external" href="http://docs.python.jp/2/extending/index.html">Python インタプリタの拡張と埋め込み</a>をみて、あとは見よう見まねで書きながら<a class="reference external" href="http://docs.python.jp/2/c-api/index.html">Python/C API リファレンスマニュアル</a>を見とけばOKです。</p>
-<div class="section" id="id1">
-<h2>やると良いこと・ハマったこと</h2>
-<div class="section" id="decref">
-<h3>引数はDECREFしてはいけない</h3>
-<p>Pythonのドキュメントをよく読んでないのも悪いのですが、どうやらPythonからCで書かれた関数を呼びだされたときに渡ってくる引数はDECREFしてはいけないようです。
-Python組み込みのAPI用意している分にはドキュメントにNew Referenceとか書いてあるのでそれをみて判断すればいいです。</p>
-</div>
-<div class="section" id="decref2">
-<h3>DECREFの引数は2回以上評価される可能性のあるマクロなので変数のみ渡す</h3>
-<p>同じくDECREF周りですが、Py_DECREFとかはマクロなので引数が複数回評価される可能性があります。というかされます。なので<tt class="docutils literal"><span class="pre">Py_DECREF(PyObject_CallFunction(...))</span></tt>みたいなことをすると死にます。</p>
-</div>
-<div class="section" id="cpython">
-<h3>cpythonのソースコードは手元に持っておく</h3>
-<p>正直ドキュメントを参照するよりかはソースコード直接読んだほうが早かったりするので、cpythonのソースコードは手元においておきましょう。というかPythonのスクリプトを書いててもドキュメントに書いてない感じのこととか、曖昧な感じがする点があったりして、そういうときにソースコード手元に持っておくとすぐ確認できて便利です。</p>
-</div>
-<div class="section" id="id2">
-<h3>デバッグ版Pythonを使う</h3>
-<p>多分これは自分が高速化のために文字列の可変長配列を自分で持っていたりとか、そういうことをしているからだと思いますが、メモリ周りのエラーで苦しみました。ひたすらSegmentation Faultします。デバッグ版のPythonを使うとメモリまわりでチェックが走るのである程度メモリエラーを検出できます。Pythonは自前でメモリ割り当てを行なっている関係なのか、Valgrindとかを使ってもあんまりInvalid writeみたいなのは検出できなかったです。(Valgrindの仕組みとかよくわかってない)</p>
-<p>デバッグ版Pythonのビルドの仕方は<a class="reference external" href="http://docs.python.org/devguide/">Python Developer's Guide</a>に書いてあるのでこれを見て<tt class="docutils literal"><span class="pre">--with-pydebug</span></tt>をつければOKです。自分は<a class="reference external" href="https://github.com/yyuu/pyenv">pyenv</a>を使っているので、そのプラグインの python-build を改造してデバッグ版ビルドができるようにしました。そのうち整理してPull-Request投げてみるかも。</p>
-</div>
-<div class="section" id="yep">
-<h3>yepをつかってプロファイリング</h3>
-<p><a class="reference external" href="https://pypi.python.org/pypi/yep">yep</a>はバックエンドで<a class="reference external" href="https://code.google.com/p/gperftools/">gperftools</a>を使ってプロファイリングをしてくれるモジュールです。普通にPython付属のプロファイラだとPythonのコードしかプロファイリングできないので、このモジュールを使ってどこが遅くなっているのかを調べます。</p>
-</div>
-</div>
-<div class="section" id="id4">
-<h2>よくわかってないこと</h2>
-<div class="section" id="gc">
-<h3>GC周り</h3>
-<p>どうやらオブジェクト内に外のオブジェクトを含み場合は、普通はGCを有効にしなければいけない感じのようなのですが、別に自分が書いているクラスはユニコード文字列とファイルライクオブジェクトなので、GC周りのフラグを立てていません。GC-awareな書き方は、多分ドキュメント見ればわかるんだろうと思いつつ、よくわかってません。</p>
-</div>
-</div>
-</div>
-</div>
-
- 
-<div class="pagination">
-  <ul>
-        <li class="prev disabled">&larr; Previous</li>
-    
-            <li class="active">1</li>
-                <a href="./index2.html"><li>2</li></a>
-                <a href="./index3.html"><li>3</li></a>
-                <a href="./index4.html"><li>4</li></a>
-                <a href="./index5.html"><li>5</li></a>
-                <a href="./index6.html"><li>6</li></a>
-                <a href="./index7.html"><li>7</li></a>
-        
-        <a href="./index2.html"><li class="next">Next &rarr;</li></a>
-      </ul>
-</div>
-
- 
-    </div>
-
-    <div id="footer">
-      <div id="footer-container">
-        <div id="about">
-          <h2>About the author</h2>
-          <a href="./pages/about.html"><img src="./static/images/draftcode.png" /></a>
-          <p>東京で情報工学を専攻している大学院生です。<br />プログラミング言語の研究をしています。<br /></p>
-          <p>詳しくは<a href="./pages/about.html">こちら</a></p>
-        </div>
-
-        <div id="site">
-          <h2>Site</h2>
-          <ul>
-            <li><a href="./archives.html">Archives</a>
-            <li><a href="./atom.xml" rel="alternate">Atom feed</a></li>
-          </ul>
-        </div>
-
-        <div id="social">
-          <h2>Social</h2>
-          <ul>
-                        <li class="social"><a href="http://twitter.com/#!/draftcode">Twitter</a></li>            <li class="social"><a href="http://github.com/draftcode">GitHub</a></li>            <li class="social"><a href="https://plus.google.com/107177890582465029754?rel=author">Google+</a></li>          </ul>
-        </div>
+    <div id='site-title'>
+      <div class='svg' id='links'>
+        <a href='/pages/about.html' id='about'>About</a>
+        <a class='fc-webicon twitter' href='http://twitter.com/draftcode'>Twitter</a>
+        <a class='fc-webicon github' href='http://github.com/draftcode'>GitHub</a>
+        <a class='fc-webicon googleplus' href='https://plus.google.com/107177890582465029754?rel=author'>Google+</a>
+        <a class='fc-webicon rss' href='/atom.xml' rel='alternate'>Atom feed</a>
       </div>
-      <p id="disclaimer">Disclaimer: ここで述べられていることは私の個人的な意見に基づくものであり､私の雇用者には一切の関係はありません｡ </p>
+      <h1>
+        <a href='/'>draftcode.github.io</a>
+      </h1>
+    </div>
+    <div id='content'>
+      <div class='page'>
+  <ul id='articles'>
+    <li>
+      <div class='date'>2013-06-12</div>
+      <div class='title'>
+        <a href='/2013/06/12/726ef50a-c05d-44f0-9d3b-e8372a7d6521.html'>ArchLinuxの環境構築まとめ</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2013-06-08</div>
+      <div class='title'>
+        <a href='/2013/06/08/faf853f8-7aea-428c-8e3c-3108b83835b7.html'>XPS13を買ってLinuxを入れた話</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2013-03-22</div>
+      <div class='title'>
+        <a href='/2013/03/22/278e1973-0066-4749-8097-3a7dec906e0e.html'>PythonのC拡張を書く</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2013-03-17</div>
+      <div class='title'>
+        <a href='/2013/03/17/5f45fabb-8b64-469e-a0f6-7f9d76564af8.html'>Windows環境でPythonのC拡張をビルドする</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2013-03-10</div>
+      <div class='title'>
+        <a href='/2013/03/10/937d07c5-9136-4520-8310-17cdce1bb0eb.html'>所得税・住民税についてのメモ</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2013-01-14</div>
+      <div class='title'>
+        <a href='/2013/01/14/26d3c809-d75a-4277-9d5d-92e44b2f51a7.html'>チーム開発レトロスペクティブ</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-10-17</div>
+      <div class='title'>
+        <a href='/2012/10/17/304d5cdb-5069-460f-8c38-e97dc07f5e8c.html'>RoboGuice2とRobolectricを組み合わせてテストを書く</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-09-23</div>
+      <div class='title'>
+        <a href='/2012/09/23/25036f39-d55f-45b2-97ca-19460353c847.html'>RoboGuiceのInjectExtraを使うとテストがしにくくなる件について</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-08-01</div>
+      <div class='title'>
+        <a href='/2012/08/01/5524f2e3-1431-4ee0-b04c-ab89ebdcdf4a.html'>第(1+1)回 六本木 Linux カーネル読書会 参加メモ</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-03-20</div>
+      <div class='title'>
+        <a href='/2012/03/20/e72d8db8-7286-11e1-927a-040ccee352e6.html'>Introduction to Domain TheoryのLecture1を読む</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-03-16</div>
+      <div class='title'>
+        <a href='/2012/03/16/42a4fd48-6f58-11e1-bdce-040ccee352e6.html'>PelicanとGitHub Pagesを使う</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-02-06</div>
+      <div class='title'>
+        <a href='/2012/02/06/235454.html'>HomebrewでクロスコンパイルできるGCCをビルドする</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-01-22</div>
+      <div class='title'>
+        <a href='/2012/01/22/005216.html'>「第八回ありえるえりあ勉強会 ～PyPyのキホンの気」に参加しました</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-01-01</div>
+      <div class='title'>
+        <a href='/2012/01/01/182705.html'>配列はCovariantなので使ってはいけない</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2012-01-01</div>
+      <div class='title'>
+        <a href='/2012/01/01/182300.html'>Generic型の配列を作るとgeneric array creationやunchecked conversionが出る</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2011-12-29</div>
+      <div class='title'>
+        <a href='/2011/12/29/153703.html'>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2011-12-29</div>
+      <div class='title'>
+        <a href='/2011/12/29/145918.html'>CPython2.7.2のWindowsでのmultiprocessingの動作</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2011-03-22</div>
+      <div class='title'>
+        <a href='/2011/03/22/3b44376e-546d-11e0-9e76-d8a25efffee9.html'>Writing Adblock Plus filters -- 日本語訳</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2011-03-14</div>
+      <div class='title'>
+        <a href='/2011/03/14/42aa3a98-4e10-11e0-bcea-d8a25efffee9.html'>Macを大きいディスプレイにつなげるときはMini DisplayPort <-> DisplayPort変換ケーブルを使う</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2010-08-15</div>
+      <div class='title'>
+        <a href='/2010/08/15/learning_path.html'>情報工学科に所属する前後の学習の道筋</a>
+      </div>
+    </li>
+    <li>
+      <div class='date'>2010-08-15</div>
+      <div class='title'>
+        <a href='/2010/08/15/accumulator_programming.html'>アキュムレータについて</a>
+      </div>
+    </li>
+  </ul>
+</div>
+
+    </div>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
     </div>
   </body>
 </html>
