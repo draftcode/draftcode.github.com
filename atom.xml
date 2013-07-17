@@ -3,11 +3,41 @@
   <title>draftcode.github.io</title>
   <link href="http://draftcode.github.io/atom.xml" rel="self" />
   <link href="http://draftcode.github.io" />
-  <updated>2013-07-17T15:37:02+09:00</updated>
+  <updated>2013-07-17T16:08:44+09:00</updated>
   <id>http://draftcode.github.io</id>
   <author>
     <name>draftcode</name>
   </author>
+  
+  <entry>
+    <title>twmでmozcの候補ウィンドウのフォーカスがおかしくなる問題</title>
+    <link href="http://draftcode.github.io/2013/07/17/ea3697f1-c2cf-4583-9dea-68cffb042fd8.html"/>
+    <updated>2013-07-17T00:00:00+09:00</updated>
+    <id>/2013/07/17/ea3697f1-c2cf-4583-9dea-68cffb042fd8</id>
+    <content type="html">&lt;p&gt;twmはマウスカーソルの下のウィンドウに入力フォーカスが移動するようになっています。その関係なのか、mozcの候補ウィンドウにカーソルを移動すると、フォーカスが外れて入力できなくなっていました。&lt;/p&gt;
+
+&lt;p&gt;この候補ウィンドウはGTK経由でXtのPop-upとして出されていて、twmがそれを認識できずに、よくわからないからフォーカスを全部外すという動作をしていたようです。&lt;/p&gt;
+
+&lt;p&gt;適当に次のように修正すると、一応は問題が解決します。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;diff --git a/src/events.c b/src/events.c
+index 2239e6f..c51819a 100644
+--- a/src/events.c
++++ b/src/events.c
+@@ -2225,10 +2225,10 @@ HandleLeaveNotify()
+            if (Tmp_win-&amp;gt;hilite_w)
+              XUnmapWindow (dpy, Tmp_win-&amp;gt;hilite_w);
+            SetBorder (Tmp_win, False);
+-           if (Scr-&amp;gt;TitleFocus ||
++           /*if (Scr-&amp;gt;TitleFocus ||
+            Tmp_win-&amp;gt;protocols &amp;amp; DoesWmTakeFocus)
+              SetFocus ((TwmWindow *) NULL, Event.xcrossing.time);
+-           Scr-&amp;gt;Focus = NULL;
++           Scr-&amp;gt;Focus = NULL;*/
+        } else if (Event.xcrossing.window == Tmp_win-&amp;gt;w &amp;amp;&amp;amp;
+                !scanArgs.enters) {
+            InstallWindowColormaps (LeaveNotify, &amp;amp;Scr-&amp;gt;TwmRoot);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content>
+  </entry>
   
   <entry>
     <title>ArchLinuxの環境構築まとめ</title>

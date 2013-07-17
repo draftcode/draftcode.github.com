@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>twmでmozcの候補ウィンドウのフォーカスがおかしくなる問題</title>
+    <meta content='draftcode' name='author'>
+    <meta content='YjRoDozMq67s3NKiyM6spjwqnSVihlZ11ur-OgfZCU0' name='google-site-verification'>
+    <link href='/css/main.css' rel='stylesheet'>
+    <link href='/atom.xml' rel='alternate' title='Atom' type='application/atom+xml'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id='site-title-short'>
+      <div class='svg' id='links'>
+        <a href='/pages/about.html' id='about'>About</a>
+        <a class='fc-webicon twitter' href='http://twitter.com/draftcode'>Twitter</a>
+        <a class='fc-webicon github' href='http://github.com/draftcode'>GitHub</a>
+        <a class='fc-webicon googleplus' href='https://plus.google.com/107177890582465029754?rel=author'>Google+</a>
+        <a class='fc-webicon rss' href='/atom.xml' rel='alternate'>Atom feed</a>
+      </div>
+      <h1>
+        <a href='/'>draftcode.github.io</a>
+      </h1>
+    </div>
+    <div id='content'>
+      <div id='article'>
+  <div id='content_title'>
+    <h1>twmでmozcの候補ウィンドウのフォーカスがおかしくなる問題</h1>
+  </div>
+  <div id='posted_date'>
+    Posted on 2013-07-17
+  </div>
+  <div id='content_body'>
+    <p>twmはマウスカーソルの下のウィンドウに入力フォーカスが移動するようになっています。その関係なのか、mozcの候補ウィンドウにカーソルを移動すると、フォーカスが外れて入力できなくなっていました。</p>
+
+<p>この候補ウィンドウはGTK経由でXtのPop-upとして出されていて、twmがそれを認識できずに、よくわからないからフォーカスを全部外すという動作をしていたようです。</p>
+
+<p>適当に次のように修正すると、一応は問題が解決します。</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">diff --git a/src/events.c b/src/events.c
+index 2239e6f..c51819a 100644
+--- a/src/events.c
++++ b/src/events.c
+@@ -2225,10 +2225,10 @@ HandleLeaveNotify()
+            if (Tmp_win-&gt;hilite_w)
+              XUnmapWindow (dpy, Tmp_win-&gt;hilite_w);
+            SetBorder (Tmp_win, False);
+-           if (Scr-&gt;TitleFocus ||
++           /*if (Scr-&gt;TitleFocus ||
+            Tmp_win-&gt;protocols &amp; DoesWmTakeFocus)
+              SetFocus ((TwmWindow *) NULL, Event.xcrossing.time);
+-           Scr-&gt;Focus = NULL;
++           Scr-&gt;Focus = NULL;*/
+        } else if (Event.xcrossing.window == Tmp_win-&gt;w &amp;&amp;
+                !scanArgs.enters) {
+            InstallWindowColormaps (LeaveNotify, &amp;Scr-&gt;TwmRoot);
+</code></pre></div>
+  </div>
+</div>
+<div id='comments'>
+  <div id='disqus_thread'></div>
+  <script>
+    var disqus_shortname = 'draftcode-github-com';
+    
+    (function() {
+     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <noscript>
+    Please enable JavaScript to view the
+    <a href='http://disqus.com/?ref_noscript'>comments powered by Disqus.</a>
+  </noscript>
+</div>
+
+    </div>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
+    </div>
+  </body>
+</html>
