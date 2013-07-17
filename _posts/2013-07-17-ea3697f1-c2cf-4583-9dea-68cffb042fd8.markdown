@@ -1,0 +1,33 @@
+---
+layout: post
+title:  twmでmozcの候補ウィンドウのフォーカスがおかしくなる問題
+---
+
+twmはマウスカーソルの下のウィンドウに入力フォーカスが移動するようになっていま
+す。その関係なのか、mozcの候補ウィンドウにカーソルを移動すると、フォーカスが外
+れて入力できなくなっていました。
+
+この候補ウィンドウはGTK経由でXtのPop-upとして出されていて、twmがそれを認識でき
+ずに、よくわからないからフォーカスを全部外すという動作をしていたようです。
+
+適当に次のように修正すると、一応は問題が解決します。
+
+```
+diff --git a/src/events.c b/src/events.c
+index 2239e6f..c51819a 100644
+--- a/src/events.c
++++ b/src/events.c
+@@ -2225,10 +2225,10 @@ HandleLeaveNotify()
+ 		    if (Tmp_win->hilite_w)
+ 		      XUnmapWindow (dpy, Tmp_win->hilite_w);
+ 		    SetBorder (Tmp_win, False);
+-		    if (Scr->TitleFocus ||
++		    /*if (Scr->TitleFocus ||
+ 			Tmp_win->protocols & DoesWmTakeFocus)
+ 		      SetFocus ((TwmWindow *) NULL, Event.xcrossing.time);
+-		    Scr->Focus = NULL;
++		    Scr->Focus = NULL;*/
+ 		} else if (Event.xcrossing.window == Tmp_win->w &&
+ 				!scanArgs.enters) {
+ 		    InstallWindowColormaps (LeaveNotify, &Scr->TwmRoot);
+```
