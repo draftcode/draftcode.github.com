@@ -21,7 +21,7 @@ end
 desc "Copy to _deploy"
 task :deploy => :jekyll do
   cd '_deploy' do
-    sh 'rm -r *'
+    sh 'rm -rf *'
     sh 'cp -R ../_site/* ./'
   end
 end
