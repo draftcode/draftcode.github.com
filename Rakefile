@@ -5,7 +5,7 @@ end
 
 desc "Serve jekyll"
 task :jekyll_serve do
-  sh 'bundle exec jekyll serve --watch'
+  sh 'bundle exec jekyll serve --port 8888 --watch'
 end
 
 desc "Run compass"
