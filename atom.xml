@@ -3,11 +3,33 @@
   <title>draftcode.github.io</title>
   <link href="http://draftcode.github.io/atom.xml" rel="self" />
   <link href="http://draftcode.github.io" />
-  <updated>2013-08-24T13:38:47+09:00</updated>
+  <updated>2013-08-24T19:40:57+09:00</updated>
   <id>http://draftcode.github.io</id>
   <author>
     <name>draftcode</name>
   </author>
+  
+  <entry>
+    <title>LaTeXでTrueTypeフォントを使う</title>
+    <link href="http://draftcode.github.io/2013/08/24/b1000c0e-b7df-4957-8911-5b8fa8ead56f.html"/>
+    <updated>2013-08-24T00:00:00+09:00</updated>
+    <id>/2013/08/24/b1000c0e-b7df-4957-8911-5b8fa8ead56f</id>
+    <content type="html">&lt;p&gt;和文ボールドゴシックを出すためにTTFを使ってdvipdfmxします。Archlinuxで TeXLive2013を使っています。&lt;/p&gt;
+&lt;h2&gt;フォントをKpathseaに認識させる&lt;/h2&gt;
+&lt;p&gt;まずKpathseaが見るtexmfがどこかを認識しましょう。自分の環境では&lt;code&gt;/etc/texmf/web2c/texmf.cnf&lt;/code&gt;に書いてありました。通常人間が触るのを許されているのは&lt;code&gt;$TEXMFLOCAL&lt;/code&gt;です。&lt;/p&gt;
+
+&lt;p&gt;次にシステム内でTTFファイルが置かれているディレクトリへのリンクを貼るようにしましょう。自分はフォントがあるディレクトリが&lt;code&gt;/usr/share/fonts/TTF&lt;/code&gt;で&lt;code&gt;$TEXMFLOCAL&lt;/code&gt;が&lt;code&gt;/usr/share/texmf&lt;/code&gt;だったので次のようにしました。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;mkdir -p /usr/share/texmf/fonts/truetype/public
+ln -s /usr/share/fonts/TTF /usr/share/texmf/fonts/truetype/public/system
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ディレクトリ構成とか名前とかはどうでも良いのだと思います。リンクが張れたらインデックスを作るために、&lt;code&gt;texhash&lt;/code&gt;しましょう。&lt;code&gt;$TEXMFLOCAL/ls-R&lt;/code&gt;に望んだフォントがリストアップされているでしょうか。&lt;/p&gt;
+&lt;h2&gt;LaTeXのソースをいじる&lt;/h2&gt;
+&lt;p&gt;フォントマップを作ったりするのですが、適当に作りましょう。自分が使ったフォントマップは&lt;a href=&quot;http://www.fugenji.org/%7Ethomas/texlive-guide/font_setup.html&quot;&gt;日本語フォントのセットアップ&lt;/a&gt;にある&lt;code&gt;allfree.map&lt;/code&gt;を参考にしました。自分の環境ではファイル名の大文字小文字が違っていたのでそれを修正しました。&lt;/p&gt;
+
+&lt;p&gt;フォントマップとtexファイルを同じディレクトリに置いて、&lt;code&gt;dvipdfmx -f allfree.map
+foo.dvi&lt;/code&gt;とすると上手く指定されたフォントが埋め込まれたPDFが作成されました。&lt;code&gt;\usepackage[expert, deluxe]{otf}&lt;/code&gt;が無いと指定したフォントが使われないので注意してください。&lt;/p&gt;
+</content>
+  </entry>
   
   <entry>
     <title>Thinkpad Bluetoothワイヤレストラックポイントキーボード買った</title>
