@@ -3,11 +3,48 @@
   <title>draftcode.github.io</title>
   <link href="http://draftcode.github.io/atom.xml" rel="self" />
   <link href="http://draftcode.github.io" />
-  <updated>2013-08-09T22:24:39+09:00</updated>
+  <updated>2013-08-24T13:38:47+09:00</updated>
   <id>http://draftcode.github.io</id>
   <author>
     <name>draftcode</name>
   </author>
+  
+  <entry>
+    <title>Thinkpad Bluetoothワイヤレストラックポイントキーボード買った</title>
+    <link href="http://draftcode.github.io/2013/08/24/90c7a5a2-b296-44c8-9301-be68ca7aad52.html"/>
+    <updated>2013-08-24T00:00:00+09:00</updated>
+    <id>/2013/08/24/90c7a5a2-b296-44c8-9301-be68ca7aad52</id>
+    <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/B00DLK4GO2/dcmbcd-22/ref=nosim/&quot;&gt;Thinkpadのはやりのキーボード&lt;/a&gt;を購入した。Bluetoothなのできちんと使えるかどうか不安だったけど普通に使える。トラックポイントの反応が少し悪い気がするのと、ごくまれにキーが押しっぱなし状態になっているように認識される。&lt;/p&gt;
+
+&lt;p&gt;Bluezがversion 5になってから色々変わっている気がしてよくわからなかったけど、とりあえず、&lt;a href=&quot;https://wiki.archlinux.org/index.php/Bluetooth_Keyboard&quot;&gt;Bluetooth Keyboard - Arch Wiki&lt;/a&gt;に書いてあるように&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;$ bluetoothctl -a
+# power on
+# scan on
+# pair &amp;lt;XX:XX:XX:XX:XX:XX&amp;gt;
+# trust &amp;lt;XX:XX:XX:XX:XX:XX&amp;gt;
+# connect &amp;lt;XX:XX:XX:XX:XX:XX&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;と設定すると動くようになった。&lt;/p&gt;
+
+&lt;p&gt;また、起動時にBluetoothコントローラがpower off状態なので、&lt;code&gt;/etc/udev/rules.d/10-local.rules&lt;/code&gt;に&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;ACTION==&amp;quot;add&amp;quot;, KERNEL==&amp;quot;hci0&amp;quot;, RUN+=&amp;quot;/usr/bin/hciconfig hci0 up&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;と書いたら起動時にキーボードが使えるようになった。ちょっと使えるようになるまで遅いけど。&lt;/p&gt;
+
+&lt;p&gt;CapsLockをCtrlにするやつは、xorg.confに次のように書いてみたがダメだった。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;Section &amp;quot;InputClass&amp;quot;
+    Identifier &amp;quot;Thinkpad Keyboard&amp;quot;
+    MatchIsKeyboard &amp;quot;yes&amp;quot;
+    Option &amp;quot;XkbOptions&amp;quot; &amp;quot;ctrl:nocaps&amp;quot;
+EndSection
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;結局&lt;code&gt;$HOME/.xmodmap&lt;/code&gt;を作って次のように書いて、&lt;code&gt;$HOME/.xinitrc&lt;/code&gt;で&lt;code&gt;xmodmap
+~/.xmodmap&lt;/code&gt;するようにした。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;remove Lock = Caps_Lock
+keysym Caps_Lock = Control_L
+add Control = Control_L
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content>
+  </entry>
   
   <entry>
     <title>twmでmozcの候補ウィンドウのフォーカスがおかしくなる問題</title>
