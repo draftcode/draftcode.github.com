@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>CPython2.7.2のWindowsでのmultiprocessingの動作</title>
+    <meta content='draftcode' name='author'>
+    <meta content='3T_u3CXt1yC2LeNvWOzsMSPQrs_0Ek-XUnA8DYgu7zY' name='google-site-verification'>
+    <link href='/stylesheets/old.css' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id='content'>
+      <div id='article'>
+  <div id='content_title'>
+    <h1>CPython2.7.2のWindowsでのmultiprocessingの動作</h1>
+  </div>
+  <div id='posted_date'>
+    Posted on 2011-12-29
+  </div>
+  <div id='content_body'>
+    <p>フォークが出来るOSであれば、単純にフォークをしてそのあとに<code>Process._bootstrap</code> が <code>Process.run</code> を呼び出すだけですが、Windowsではプロセスをフォークすることが出来ないので、まっさらなプロセスを立ち上げることになります。このため、ドキュメンテーションに書いてあるとおり、グローバルな変数の中身は親プロセスと違うものになります。また、Windowsではpy2exeのように実行ファイル化されたりします。</p>
+
+<p>Windowsにおける <code>multiprocessing</code> モジュールの動きは次のようなものになります:</p>
+
+<ol>
+<li>pipeを作っておく。</li>
+<li>現在の実行ファイルに <code>--multiprocessing-fork</code> というコマンドラインオプションと先ほどのpipeの読み出し側をつけて <code>CreateProcess</code> する。</li>
+<li>親プロセスはpipeを通じて、 <code>Process</code> オブジェクトを <code>pickle</code> で直列化して子プロセスに送る。</li>
+<li>子プロセスは <code>--multiprocessing-fork</code> をフラグとして認識して、pipeから<code>Process</code> オブジェクトを読み出す。</li>
+<li>子プロセスが <code>Process._bootstrap</code> を呼び出す。</li>
+</ol>
+
+<p>Freezeされていない場合は、過程2のところでは、実行ファイルが <code>python.exe</code> になるので、-cオプションで過程4を実行するようなプログラムを指定します。Freezeされている場合は、-cのようなオプションを受け取れないので、<code>multiprocessing.freeze_support</code> がそのような役割を果たします。これがFreezeされている場合に <code>multiprocessing.freeze_support</code> が必要になる理由です。</p>
+
+  </div>
+</div>
+
+    </div>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
+    </div>
+  </body>
+</html>

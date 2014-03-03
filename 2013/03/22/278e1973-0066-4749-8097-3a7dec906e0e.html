@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>PythonのC拡張を書く</title>
+    <meta content='draftcode' name='author'>
+    <meta content='3T_u3CXt1yC2LeNvWOzsMSPQrs_0Ek-XUnA8DYgu7zY' name='google-site-verification'>
+    <link href='/stylesheets/old.css' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id='content'>
+      <div id='article'>
+  <div id='content_title'>
+    <h1>PythonのC拡張を書く</h1>
+  </div>
+  <div id='posted_date'>
+    Posted on 2013-03-22
+  </div>
+  <div id='content_body'>
+    <p>最近はPythonのC拡張を書いていたりするので、覚えている範囲でハマった点を説明します。C拡張を書き始めるには、基本的に<a href="http://docs.python.jp/2/extending/index.html">Python インタプリタの拡張と埋め込み</a>をみて、あとは見よう見まねで書きながら<a href="http://docs.python.jp/2/c-api/index.html">Python/C API リファレンスマニュアル</a>を見とけばOKです。</p>
+<h2>やると良いこと・ハマったこと</h2><h3>引数はDECREFしてはいけない</h3>
+<p>Pythonのドキュメントをよく読んでないのも悪いのですが、どうやらPythonからCで書かれた関数を呼びだされたときに渡ってくる引数はDECREFしてはいけないようです。 Python組み込みのAPI用意している分にはドキュメントにNew Referenceとか書いてあるのでそれをみて判断すればいいです。</p>
+<h3>DECREFの引数は2回以上評価される可能性のあるマクロなので変数のみ渡す</h3>
+<p>同じくDECREF周りですが、 <code>Py_DECREF</code> とかはマクロなので引数が複数回評価される可能性があります。というかされます。なので<code>Py_DECREF(PyObject_CallFunction(...))</code> みたいなことをすると死にます。</p>
+<h3>cpythonのソースコードは手元に持っておく</h3>
+<p>正直ドキュメントを参照するよりかはソースコード直接読んだほうが早かったりするので、cpythonのソースコードは手元においておきましょう。というかPythonのスクリプトを書いててもドキュメントに書いてない感じのこととか、曖昧な感じがする点があったりして、そういうときにソースコード手元に持っておくとすぐ確認できて便利です。</p>
+<h3>デバッグ版Pythonを使う</h3>
+<p>多分これは自分が高速化のために文字列の可変長配列を自分で持っていたりとか、そういうことをしているからだと思いますが、メモリ周りのエラーで苦しみました。ひたすらSegmentation Faultします。デバッグ版のPythonを使うとメモリまわりでチェックが走るのである程度メモリエラーを検出できます。Pythonは自前でメモリ割り当てを行なっている関係なのか、Valgrindとかを使ってもあんまりInvalid writeみたいなのは検出できなかったです。(Valgrindの仕組みとかよくわかってない)</p>
+
+<p>デバッグ版Pythonのビルドの仕方は<a href="http://docs.python.org/devguide/">Python Developer's Guide</a> に書いてあるのでこれを見て <code>--with-pydebug</code> をつければOKです。自分は<a href="https://github.com/yyuu/pyenv">pyenv</a> を使っているので、そのプラグインの python-build を改造してデバッグ版ビルドができるようにしました。そのうち整理してPull-Request投げてみるかも。</p>
+<h3>yepをつかってプロファイリング</h3>
+<p><a href="https://pypi.python.org/pypi/yep">yep</a> はバックエンドで<a href="https://code.google.com/p/gperftools/">gperftools</a> を使ってプロファイリングをしてくれるモジュールです。普通にPython付属のプロファイラだとPythonのコードしかプロファイリングできないので、このモジュールを使ってどこが遅くなっているのかを調べます。</p>
+<h2>よくわかってないこと</h2><h3>GC周り</h3>
+<p>どうやらオブジェクト内に外のオブジェクトを含み場合は、普通はGCを有効にしなければいけない感じのようなのですが、別に自分が書いているクラスはユニコード文字列とファイルライクオブジェクトなので、GC周りのフラグを立てていません。GC-awareな書き方は、多分ドキュメント見ればわかるんだろうと思いつつ、よくわかってません。</p>
+
+  </div>
+</div>
+
+    </div>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
+    </div>
+  </body>
+</html>
