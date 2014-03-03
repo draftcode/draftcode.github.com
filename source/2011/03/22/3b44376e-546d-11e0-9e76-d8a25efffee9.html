@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>Writing Adblock Plus filters -- 日本語訳</title>
+    <meta content='draftcode' name='author'>
+    <meta content='3T_u3CXt1yC2LeNvWOzsMSPQrs_0Ek-XUnA8DYgu7zY' name='google-site-verification'>
+    <link href='/stylesheets/old.css' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id='content'>
+      <div id='article'>
+  <div id='content_title'>
+    <h1>Writing Adblock Plus filters -- 日本語訳</h1>
+  </div>
+  <div id='posted_date'>
+    Posted on 2011-03-22
+  </div>
+  <div id='content_body'>
+    <p><a href="http://adblockplus.org/en/filters">Writing Adblock Plus filters</a> の和訳。ないっぽいので。元の文章のライセンスとかわからぬ。直訳しようと思ったらうまく訳せなくて意訳になってしまっている部分もあったり。途中から面倒くさくなったので、適当な訳になってたり。</p>
+
+<p>あと、どうもURLとかフィルタルールが入っている関係で、レイアウトがすごくぐちゃぐちゃになります。それに加えて訳がいまいちなので、さらに読みづらい。超訳でもすればよかった……</p>
+
+<p>Adblock Plusの新しいバージョンでは、さまざまなほうほうでフィルタを「いじる」ことができるようになっています。ここでは、その方法と使い方について説明しています。</p>
+
+<p>免責事項: 例としてあげられているフィルタは、すべて単なる例として挙げており、使われることを意図しておりません。</p>
+<h2>Introduction to Adblock Plus filters</h2>
+<p>この章では、ときどきフィルタを書くようなユーザーにとって十分な方法を説明します。</p>
+<h3>Basic filter rules</h3>
+<p>一番平凡なフィルタはブロックしたいバナーのアドレスを定義することでしょう。しかしながら、こういったアドレスはページを開く度に変わってしまうのがしばしばです。たとえば、 <code>http://example.com/ads/banner123.gif</code> というアドレスで、 <code>123</code>の部分がランダムな数字であるようなものを考えてみましょう。このアドレスをそのままブロックするのでは、あまり役に立ちません。もっと一般的な形のフィルタ、<code>http://example.com/ads/banner*.gif</code> や <code>http://example.com/ads/*</code> のようなものが必要でしょう。</p>
+
+<p>Note: ワイルドカードを使うことで、ブロックしすぎないように注意してください。<code>http://example.com/*</code> というフィルタはすべてのバナーをブロックできるかもしれませんが、同時に、見たいものまでブロックしてしまうかもしれません。</p>
+<h3>Defining exception rules</h3>
+<p>だいたいの場合は非常によくブロックできるようなフィルタが、いくつかの場合ではブロックするべきでないものもブロックしてしまうことに気づくことがあるでしょう。そんなときは、そのフィルタを外したくはないですが、他方でそのいくつかの場合に対しては、マッチさせたくないと思うでしょう。</p>
+
+<p>その場合は例外ルール(exception rules)が最適です。これはフィルタを適用するべきでないケースを定義することができます。たとえば、 <code>adv</code> というフィルタが <code>&quot;http://example.com/advice.html</code> というアドレスもブロックしてしまうことが気に入らないとき、 <code>@@advice</code> という例外ルールを定義することによってそのアドレスがブロックされないようにすることができます。例外ルールは通常のルールと同じように記述でき、ワイルドカードや正規表現を使うことができます。定義する場合には <code>@@</code> を先頭につけるだけで、そのルールは例外ルールになります。</p>
+
+<p>例外ルールは他の使い方もできます。もし例外ルールが" <code>http://</code> や<code>https://</code> で始まっている場合(さらにその前にパイプ(<code>|</code>)があってもかまいません)、そのルールはページ全体を例外とすることができます。たとえば、<code>@@|http://example.com</code> という例外ルールがあった場合、 <code>example.com</code> のすべてのページでAdblock Plusは無効化され、何もブロックされなくなります。</p>
+<h3>Matching at beginning/end of an address</h3>
+<p>通常の場合、Adblock Plusはすべてのフィルタを、最初と最後にワイルドカードがあるものとして扱います。つまり、 <code>ad</code> と <code>*ad*</code> という二つのフィルタには違いがないということです。だいたいの場合はこの動作が問題を起こすことはないですが、ときどき、フィルタがアドレスの最初または最後にのみマッチしてほしい場合があるでしょう。たとえば、すべてのFlashコンテンツをブロックしたいとして、 <code>swf</code> のようなフィルタを追加した場合、 <code>http://example.com/swf/index.html</code> というアドレスもブロックされてしまいます。</p>
+
+<p>この問題はフィルタにパイプ(<code>|</code>)をつけることで解決できます。たとえば <code>swf|</code>というフィルタは、 <code>http://example.com/annoyingflash.swf</code> というアドレスはブロックしますが、 <code>http://example.com/swf/index.html</code> というアドレスはブロックしません。また、 <code>|http://baddomain.example/</code> というフィルタは、<code>http://baddomain.example/banner.gif</code> はブロックしますが、<code>http://gooddomain.example/analyze?http://baddomain.example</code> はブロックしません。</p>
+
+<p>ときには <code>http://example.com/banner.gif</code> や<code>https://example.com/banner.gif</code> 、 <code>http://www.example.com/banner.gif</code> というようなアドレスをブロックしたいこともあるでしょう。これには二つのパイプをフィルタの先頭につけることで達成できます。このようにすることにより、ドメイン名の先頭からマッチするように指定することができます。<code>||example.com/banner.gif</code> というフィルタは先の3つのアドレスすべてをブロックすると同時に、 <code>http://badexample.com/banner.gif</code> や<code>http://gooddomain.example/analyze?http://example.com/banner.gif</code> といったアドレスはブロックしません。(Adblock Plus 1.1以上のバージョンが必要です。)</p>
+<h3>Marking separator characters</h3>
+<p>しばしばフィルタの中で分割文字(separator character)を含めなければならない場合があります。たとえば、 <code>http://example.com/</code> と <code>http://example.com:8000/</code>はブロックしたいが、 <code>http://example.com.ar/</code> はブロックしたくないとしましょう。この場合は記号 <code>^</code> を分割文字のプレースホルダーとして用いることができます。この場合フィルタは <code>http://example.com^</code> のようになります。</p>
+
+<p>分割文字は英数字と <code>_</code> 、<code>-</code> 、 <code>-</code> 、 <code>%</code> 以外の文字すべてです。アドレスの最後も分割文字としてマッチします。分割文字をハイライトすると、<code>http:**//**example.com**:**8000**/**foo.bar**?**a**=**12**&amp;**b**=**%D1%82%D0%B5%D1%81%D1%82</code>のようになります。このアドレスをブロックするならば、 <code>^example.com^</code> や、<code>^%D1%82%D0%B5%D1%81%D1%82^</code> 、 <code>foo.bar</code> のようなフィルタが有効です。</p>
+<h3>Comments</h3>
+<p>エクスクラメーションマークで始まるルールはコメントとして扱われます。コメントはフィルタリストの中で、黒でなくグレーで表示されます。Adblock Plusはこのルールを無視するので、ここには何を書いても大丈夫です。フィルタの上に、そのフィルタが何をするかの説明を書いたり、フィルタリストの先頭にそれを作った作者について書くことができます。(多くのフィルタリストの作者はそうしています。)</p>
+<h3>Advanced features</h3>
+<p>この節で説明している機能は、通常はパワーユーザーやフィルタリストの作成者にしか使われないので、スキップされてもかまいません。</p>
+<h4>Specifying filter options</h4>
+<p>Adblock Plusはフィルタの動作を変える、多くのオプションを指定することができます。これらのオプションを指定するときは、フィルタの最後に <code>$</code> をつけて、カンマ区切りで並べます。たとえば <code>*/ads/*$script,match-case</code> のようになります。このとき、 <code>*/ads/*</code> がフィルタで、 <code>script</code> と <code>match-case</code> がそのオプションになります。現在は次のようなオプションがサポートされています:</p>
+
+<ul>
+<li><p>Type options: そのフィルタがどんな種類の要素をブロックするか(または、例外ルールの場合はホワイトリストに追加するか)を指定します。複数の種類を指定すると、指定した種類すべてにそのフィルタが適用されます。指定できる値は次の通りです。</p>
+
+<ul>
+<li><code>script</code> -- HTMLのスクリプトタグによって読み込まれる外部スクリプト</li>
+<li><code>image</code> -- HTMLのimgタグによって読み込まれるような普通の画像</li>
+<li><code>background</code> -- CSSで指定されるような背景画像</li>
+<li><code>stylesheet</code> -- 外部のCSSファイル</li>
+<li><code>object</code> -- FlashやJavaアプレットのようなブラウザのプラグインによるコンテンツ</li>
+<li><code>xbl</code> -- XBLによるバインド(通常、CSSの <code>-moz-binding</code> によって読み込まれる)</li>
+<li><code>ping</code> -- <a href="http://weblogs.mozillazine.org/darin/archives/009594.html">link pings</a></li>
+<li><code>xmlhttprequest</code> -- <a href="http://www.w3.org/TR/XMLHttpRequest/">XMLHttpRequest</a>オブジェクトによるリクエスト</li>
+<li><code>object-subrequest</code> -- Flashのようなプラグインによるリクエスト</li>
+<li><code>dtd</code> -- XML文章によって読み込まれるDTDファイル</li>
+<li><code>subdocument</code> -- HTMLのフレームによって読み込まれる埋め込みページ</li>
+<li><code>document</code> -- ページ自身(例外ルールのみがページに適用されます)</li>
+<li><code>elemhide</code> -- <code>document</code> と似ていますがページ内の要素除去ルール(element hiding rules)のみ無効になります(このオプションを指定できるのは例外ルールのみ)(Adblock Plus 1.2以上のバージョンが必要です)</li>
+<li><code>other</code> -- このリストで挙げられているもの以外すべて</li>
+</ul></li>
+<li><p>Inverse type options: フィルタが適用されるべきでない要素の種類を指定します。指定できる値は次の通りです。 <code>~script</code> 、 <code>~image</code> 、 <code>~background</code> 、<code>~stylesheet</code> 、 <code>~object</code> 、 <code>~xbl</code> 、 <code>~ping</code> 、<code>~xmlhttprequest</code> 、 <code>~object-subrequest</code> 、 <code>~dtd</code> 、<code>~subdocument</code> 、 <code>~document</code> 、 <code>~elemhide</code> 、 <code>~other</code> 。</p></li>
+<li><p>Restriction to third-party/first-party requests: <code>third-party</code> オプションが指定されている場合、現在見ているページと違うところの要素にのみ、そのフィルタが適用されます。同様に、 <code>~third-party</code> オプションが指定されていた場合は、現  在見ているページと同じところの要素にのみ、そのフィルタが適用されます。(訳注:  たぶん同じところ(origin)って同じドメインとかだと思うんですが、よくわかりません。)</p></li>
+<li><p>Domain restrictions:  <code>domain=example.com</code> のようなオプションが指定されている場合、そのフィルタは <code>example.com</code> のドメインのページにのみ適用されます。 <code>domain=example.com|example.net</code> のように、パイプを区切り文字にして複数のドメインを指定することができます。この場合は、 <code>example.com</code> と<code>example.net</code> のページに適用されます。ドメイン名が <code>~</code> で始まっている場合、そのドメインでは適用されないようになります。たとえば、<code>domain=~example.com</code> は、 <code>example.com</code> 以外のドメインのページで適用するという意味になります。 <code>domain=example.com|~foo.example.com</code> は、<code>example.com</code> のドメインのページで適用するが、サブドメイン<code>foo.example.com</code> は例外として適用しないということになります。</p></li>
+<li><p><code>match-case</code> -- フィルタが大文字と小文字を区別するようになります。たとえば、 <code>*/BannerAd.gif$match-case</code> というフィルタは、<code>http://example.com/BannerAd.gif</code> はブロックしますが、<code>http://example.com/bannerad.gif</code> はブロックしません。</p></li>
+<li><p><code>collapse</code> -- このオプションは、全体の <code>Collapse blocked elements</code> を上書きし、フィルタがブロックした要素を折りたたむようにします。同様に、<code>~collapse</code> は要素が折りたたまれないようにします。</p></li>
+</ul>
+<h4>Using regular expressions</h4>
+<p>フィルタがマッチする、しないについて、より細かい制御をしたい場合は、正規表現を使うことができます。たとえば、 <code>/banner\d+</code> というフィルタは <code>banner123</code>や <code>banner321</code> にはマッチしますが、 <code>banner</code> にはマッチしません。正規表現の書き方については <a href="https://developer.mozilla.org/en/Core_JavaScript_1.5_Guide/Writing_a_Regular_Expression_Pattern">正規表現についてのドキュメント</a>を参照してください。</p>
+
+<p>Note: パフォーマンス上の理由から、正規表現を使わなくてもよいなら使わないことをおすすめします。</p>
+<h2>Element hiding</h2><h3>Basic rules</h3>
+<p>広告がウェブページの中に、テキストとして埋め込まれているために、ブロックできないことがあるでしょう。そういったページのソースコードを見ると、次のようになっています:</p>
+<div class="highlight"><pre><code class="html language-html" data-lang="html"><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;textad&quot;</span><span class="nt">&gt;</span>
+Cheapest tofu, only here and now!
+<span class="nt">&lt;/div&gt;</span>
+
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;sponsorad&quot;</span><span class="nt">&gt;</span>
+Really cheap tofu, click here!
+<span class="nt">&lt;/div&gt;</span>
+
+<span class="nt">&lt;textad&gt;</span>
+Only here you get the best tofu!
+<span class="nt">&lt;/textad&gt;</span>
+</code></pre></div>
+<p>ウェブページを読み込むと一緒に広告まで読み込まれてしまいます。こういったときには、広告を隠すことしかできません。そのために、要素を隠すことが必要になります。</p>
+
+<p>上の例の最初の広告は、 <code>textad</code> というクラスの <code>div</code> 要素の中に入っています。このような広告は <code>##div.textad</code> のようなルールで隠すことができます。この<code>##</code> というマークは要素除去ルールであることを示していて、それいがいは隠すべき要素を指定するセレクタになっています。要素は <code>id</code> を使うことによっても隠すことができます。 <code>##div#sponsorad</code> は二番目のような広告を隠すことができます。要素名は指定しなくてもかまいません。 <code>##\*#sponsorad</code> というルールも同じように働きます。また、要素名のみ指定することもできます。 <code>##textad</code> というルールは三番目のような広告を隠します。</p>
+
+<p><a href="http://adblockplus.org/en/elemhidehelper">Element Hiding Helper extension</a> は適切な要素を選び出し、対応したルールを書くことを、ソースコードを見ることなしにできるよう手助けをしてくれます。とは言っても、基本的なHTMLについての知識はあったほうがよいでしょう。</p>
+
+<p>Note: 要素除去は通常のフィルタとは全く違った動きをします。要素除去ルールではワイルドカードが使えないことに注意してください。</p>
+<h3>Limiting rules to certain domains</h3>
+<p>たいていの場合、要素除去ルールは特定のサイトのみに適用して、それ以外のサイトでは適用されないようにしたいでしょう。たとえば <code>##\*.sponsor</code> というルールはいくつかのサイトでは広告ではない要素も隠してしまうかもしれません。これを<code>example.com##\*.sponsor</code> というように変えることで、このルールが<code>http://example.com/</code> や <code>http://something.example.com/</code> で適用されるようになり、同時に <code>http://example.org/</code> では適用されないようになります。ドメインはカンマで区切ることで複数指定することができます。<code>domain1.example.com,domain2.example,domain3.example##\*.sponsor</code></p>
+
+<p>ドメイン名が <code>~</code> で始まっている場合、そのルールはそのドメイン上のページでは適用されなくなります。(Adblock Plus 1.1以上のバージョンが必要です。)たとえば、<code>~example.com##\*.sponsor</code> は <code>example.com</code> 以外のドメインすべてで適用されるようになり、 <code>example.com,~foo.example.com##\*.sponsor</code> は<code>foo.example.com</code> を除いた <code>example.com</code> 上で適用されるようになります。</p>
+
+<p>Note: 要素除去の実装方法の関係で、フルドメイン名しか指定することができません。つまり、 <code>domain</code> という指定によって、 <code>domain.example</code> や <code>domain.test</code>のようなドメインを対象にすることはできません。</p>
+
+<p>Note: ドメイン指定をした要素除去ルールは、ブラウザのユーザーインターフェースにも使うことができます。たとえば、 <code>browser##menuitem#javascriptConsole</code> は FirefoxのToolメニューにあるJavascript Consoleを隠します。</p>
+<h3>Attribute selectors</h3>
+<p><code>id</code> や <code>class</code> も無いような要素は除去するのが難しいかもしれません。このときは他の属性を指定することができます。たとえば、 <code>##table[width=&quot;80%&quot;]</code> というルールは <code>width</code> が <code>80%</code> に指定されているようなテーブルを隠します。属性の値を完全に指定しなくてもかまいません。 <code>##div[title\*=&quot;adv&quot;]</code> というルールは <code>title</code> の中に <code>adv</code> という文字列が入っているような <code>div</code> 要素を隠します。属性の値は先頭や末尾にもマッチさせることができます。<code>##div[title^=&quot;adv&quot;][title$=&quot;ert&quot;]</code> といったフィルタは、 <code>title</code> が<code>adv</code> で始まり <code>ert</code> で終わるような <code>div</code> 要素を隠します。また、このように複数の条件を使うことができます。 <code>table[width=&quot;80%&quot;][bgcolor=&quot;white&quot;]</code>は、 <code>width</code> が <code>80%</code> かつ、 <code>bgcolor</code> が <code>white</code> であるようなテーブルを隠します。</p>
+<h3>Advanced selectors</h3>
+<p>FirefoxでサポートされているCSSセレクタは要素除去ルールでも使うことができます。<code>##div.adheader + \*</code> というルールは <code>adheader</code> クラスの <code>div</code> 要素に続く、すべての要素を隠します。CSSセレクタのすべてのリストは、<a href="http://www.w3.org/TR/css3-selectors/">W3C CSS specification</a> で見ることができます。(すべてのセレクタがFirefoxでサポートされているわけではないことに注意してください)</p>
+<h3>Simplified element hiding syntax</h3>
+<p>Adblock Plusでは、後方互換性のために、 <code>#div(id=foo)</code> のような単純な要素除去ルールをサポートしています。このような書き方は推奨しておらず、CSSセレクタによる方法を推奨しています。この書き方は将来のどこかのタイミングで無効になる予定です。</p>
+
+  </div>
+</div>
+
+    </div>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
+    </div>
+  </body>
+</html>

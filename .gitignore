@@ -1,4 +1,1 @@
-_site
-_deploy
-.sass-cache
-css
+build

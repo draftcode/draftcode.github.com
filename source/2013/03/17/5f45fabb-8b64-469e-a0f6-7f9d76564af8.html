@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>Windows環境でPythonのC拡張をビルドする</title>
+    <meta content='draftcode' name='author'>
+    <meta content='3T_u3CXt1yC2LeNvWOzsMSPQrs_0Ek-XUnA8DYgu7zY' name='google-site-verification'>
+    <link href='/stylesheets/old.css' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id='content'>
+      <div id='article'>
+  <div id='content_title'>
+    <h1>Windows環境でPythonのC拡張をビルドする</h1>
+  </div>
+  <div id='posted_date'>
+    Posted on 2013-03-17
+  </div>
+  <div id='content_body'>
+    <p>Windows NativeのPythonでC拡張をビルドする方法を説明します。みなさん普通は WindowsではPythonなんて使わないのか、あんまり情報が無いんですよね……</p>
+<h2>Windows SDKをインストールする</h2>
+<p>C拡張なのでCコンパイラが必要なので、コンパイラをインストールします。MicrosoftはVistual Studioを売っているのでそれを買えばコンパイラがついてきます。また、無償版のExpress Editionをインストールしてもコンパイラがついてきます。</p>
+
+<p>C拡張をうまいことビルドするために、distutilsはVS2008のコンパイラに対応するように書かれています。UNIXだと適当にPATHからコンパイラを探してくれば良いのに、なぜ WindowsだとdistutilsがVS2008のための特別な処理を入れているかというと、コンパイラの場所がWindowsだとPATHに入っていなかったりして、レジストリから推測しなければならないからです。残念OSですね……</p>
+
+<p>レジストリからコンパイラの場所を推測する関係で、より新しいバージョンのVSには対応できていません(レジストリエントリの場所が違うので)。そして、最近対応している VS2008の(一部のVC++ 2008の)Express Editionのダウンロードができなくなったようです。(<a href="http://mail.python.org/pipermail/python-dev/2013-March/124624.html">[Python-Dev] VC++ 2008 Express Edition now locked away?</a>)コンパイラが入手できないのではdistutilsが対応するまでWindows上ではC拡張をビルドすることができません。</p>
+
+<p>案ずることはありません。まだ道はあります。我々が欲しいのはコンパイラのみです。 MicrosoftはIDEがついてこないコンパイラ単体も配布しています。それがWindows SDKです。ちょっと前までPlatform SDKという名前だった気がします。VS2008のバージョンと互換性があるのは<a href="http://www.microsoft.com/en-us/download/details.aspx?id=3138">Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1</a>というWindows SDKでこちらはまだダウンロード可能です。こちらをインストールしましょう。</p>
+<h2>vcvarsall.batをつくる</h2>
+<p>この状態でpython setup.py buildをやるとvcvarsall.batがないという趣旨のことを言われてビルドできません。このvcvarsall.batはVS2010と互換性のあるバージョンの Windows SDKだとついてきているのですが、2008と互換性のあるバージョンのSDKだとついてこないようです。中身は単純で現在のシステムが64bitか32bitかによって(これは引数でも指定できるようです)使うコンパイラを選択するという単純なバッチファイルです。コンパイラの選択もほかのバッチファイルを呼んでいるだけですので、自作しましょう。</p>
+
+<p><code>C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat</code> を作成します。32bit版Pythonを利用している場合は、</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">@call &quot;%~dp0bin\vcvars32.bat&quot;
+</code></pre></div>
+<p>という行を、64bit版の場合は、</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">@call &quot;%~dp0bin\vcvars64.bat&quot;
+</code></pre></div>
+<p>という行を一行書いて保存します。64bit版Windowsではない場合は適宜Program Filesを読み替えてください。</p>
+
+<p>これでC拡張をコンパイルできるようになります。</p>
+<h2>より新しいバージョンを利用する方法</h2>
+<p>より新しいバージョンのコンパイラを利用する方法もあります。残念ながらdistutilsは(Python本体がコンパイルされたバージョンである)MSVC2008のコンパイラしか認識してくれないので、その部分をスキップしてPATHから探すようにします。</p>
+
+<p>環境変数に <code>MSSdk</code> と <code>DISTUTILS_USE_SDK</code> という変数を追加して下さい。値はなんでも構いません。これによりdistutilsはパスが通っているところからcl.exeや link.exeを探します。</p>
+
+<p>この方法の注意点は、Cygwin上でWindowsネイティブのPythonを利用してC拡張のコンパイルをしようとすると、CygwinのGCCのlink.exeが利用されてしまうことと、Python本体と依存するライブラリが変わることです。後者によりpy2exeなどでexeにして配布するときに、実行環境で再頒布可能パッケージがなくて実行できない可能性があります。(再頒布可能パッケージをインストールすれば実行可能です)</p>
+
+  </div>
+</div>
+
+    </div>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
+    </div>
+  </body>
+</html>
