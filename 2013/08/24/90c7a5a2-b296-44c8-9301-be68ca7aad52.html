@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>Thinkpad Bluetoothワイヤレストラックポイントキーボード買った</title>
+    <meta content='draftcode' name='author'>
+    <meta content='3T_u3CXt1yC2LeNvWOzsMSPQrs_0Ek-XUnA8DYgu7zY' name='google-site-verification'>
+    <link href='/stylesheets/old.css' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id='content'>
+      <div id='article'>
+  <div id='content_title'>
+    <h1>Thinkpad Bluetoothワイヤレストラックポイントキーボード買った</h1>
+  </div>
+  <div id='posted_date'>
+    Posted on 2013-08-24
+  </div>
+  <div id='content_body'>
+    <p><a href="http://www.amazon.co.jp/exec/obidos/ASIN/B00DLK4GO2/dcmbcd-22/ref=nosim/">Thinkpadのはやりのキーボード</a>を購入した。Bluetoothなのできちんと使えるかどうか不安だったけど普通に使える。トラックポイントの反応が少し悪い気がするのと、ごくまれにキーが押しっぱなし状態になっているように認識される。</p>
+
+<p>Bluezがversion 5になってから色々変わっている気がしてよくわからなかったけど、とりあえず、<a href="https://wiki.archlinux.org/index.php/Bluetooth_Keyboard">Bluetooth Keyboard - Arch Wiki</a>に書いてあるように</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">$ bluetoothctl -a
+# power on
+# scan on
+# pair &lt;XX:XX:XX:XX:XX:XX&gt;
+# trust &lt;XX:XX:XX:XX:XX:XX&gt;
+# connect &lt;XX:XX:XX:XX:XX:XX&gt;
+</code></pre></div>
+<p>と設定すると動くようになった。</p>
+
+<p>また、起動時にBluetoothコントローラがpower off状態なので、<code>/etc/udev/rules.d/10-local.rules</code>に</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">ACTION==&quot;add&quot;, KERNEL==&quot;hci0&quot;, RUN+=&quot;/usr/bin/hciconfig hci0 up&quot;
+</code></pre></div>
+<p>と書いたら起動時にキーボードが使えるようになった。ちょっと使えるようになるまで遅いけど。</p>
+
+<p>CapsLockをCtrlにするやつは、xorg.confに次のように書いてみたがダメだった。</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">Section &quot;InputClass&quot;
+    Identifier &quot;Thinkpad Keyboard&quot;
+    MatchIsKeyboard &quot;yes&quot;
+    Option &quot;XkbOptions&quot; &quot;ctrl:nocaps&quot;
+EndSection
+</code></pre></div>
+<p>結局<code>$HOME/.xmodmap</code>を作って次のように書いて、<code>$HOME/.xinitrc</code>で<code>xmodmap
+~/.xmodmap</code>するようにした。</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">remove Lock = Caps_Lock
+keysym Caps_Lock = Control_L
+add Control = Control_L
+</code></pre></div>
+  </div>
+</div>
+
+    </div>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
+    </div>
+  </body>
+</html>
