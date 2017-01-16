@@ -1,0 +1,198 @@
+!!!
+%html
+  %head
+    %title Masaya SUZUKI
+    %meta(http-equiv="content-type" content="text/html" charset="utf-8")
+    %meta(name="viewport" content="width=680")
+    %link(href="http://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css")
+
+    = stylesheet_link_tag "style"
+  %body
+    .profile
+      %img(src="/photo.jpg")
+
+      %h1 Masaya SUZUKI (draftcode)
+
+      %p
+        Software Engineer, interested in:
+
+      %ul
+        %li Programming Languages
+        %li Distributed Computing
+        %li Software Testing
+        %li Model Checking and Fault Tolerance
+
+    .work-experience
+      %h2 Work Experience
+
+      %h3 COOKPAD Inc. (Software Engineer, Intern and Part-time, May 2013 - March 2014)
+
+      .project
+        %h4
+          %a(href="https://github.com/cookpad/rrrspec")
+            RRRSpec: Distributed test execution service
+
+        %p
+          Design and implement a distributed test execution service. It can tolerate machine failures and process failures.
+
+        %ul
+          %li Reduce the machine cost by using cheap but fragile machines provided by Amazon EC2 Spot Instances.
+          %li Apply Auction Theory and Game Theory to determine the bidding price of machines.
+          %li Apply Queueing Theory to determine the machine scaling strategy.
+
+        .tags
+          .tag Ruby
+          .tag AWS
+          .tag Distributed Systems
+
+      %h3 Google Japan Inc. (Software Engineer, Intern, Summer 2012)
+
+      .project
+        %h4 Machine translation
+
+        %p
+          Conduct experiments.
+
+        .tags
+          .tag C++
+          .tag MapReduce
+
+      %h3 Tomonokai Corporation (Software Engineer, Part-time, November 2009 - March 2014)
+
+      .project
+        %h4 Internal back-office systems
+
+        %p
+          Discover requirements, design and develop systems.
+
+        %ul
+          %li Convert a 9 man-day job to a 30 minutes machine job.
+          %li Process 10000+ excel files using multiple computers.
+          %li Apply formal method partially to design a system.
+
+        .tags
+          .tag Python
+          .tag C
+          .tag Alloy
+          .tag VBScript
+          .tag COM
+          .tag Distributed Systems
+
+      %h3 Humming Heads Inc. (Software Engineer, Part-time, July 2008 - October 2010)
+
+      .project
+        %h4 Computer supervisory system
+
+        %p
+          Fix bugs and implement a new feature towards over a gigabyte of source code. C++.
+
+        %ul
+          %li Intercept the application API calls and trace the behaviour.
+          %li Inquire NTFS and FAT32 file system directly.
+
+        .tags
+          .tag C++
+          .tag Win32API
+          .tag COM
+          .tag Binary
+
+      .project
+        %h4 Job controller of a distributed system
+
+        %p
+          Write an initial implementation.
+
+        .tags
+          .tag VBScript
+          .tag C++
+          .tag Distributed Systems
+
+    .activities
+      %h2 Activities
+
+      %h3
+        %a(href="https://github.com/cookpad/rrrspec") RRRSpec: Distributed test execution service
+        (2013-2014)
+
+      %h3
+        %a(href="https://github.com/draftcode/sandal") Sandal: Fault aware modeling language
+        (2013-2014)
+
+      %p
+        Design and implement a modeling language that is aware about faults. It can eﬀectively check the fault tolerance of systems like RRRSpec. Implemented in Go.
+
+      %h3 Develop an Android Application (Team leader, April 2012 - December 2012)
+
+      %p
+        Lead a team of 7 and develop an application. Apply some best practices in Agile.
+
+      %h3 ACM/ICPC (Team haskell-lover, 2011-2012)
+
+      %p
+        Got 7th in Tokyo Asia regional, 4th in Kaohsiung Asia regional, and honorable mention in World Finals.
+
+      %h3 Meta-circular Scheme Interpreter
+
+      %p
+        Develop a Scheme interpreter in Scheme. Implement a subset of R5RS and partial continuation.
+
+      %h3 MIPS Assembler
+
+      %p
+        Develop a MIPS assembler run on the embedded system called MieruPC. It can compile sl program.
+
+    .education
+      %h2 Education
+
+      %h3 MS Computer Science Tokyo Institute of Technology (March 2014)
+
+      %p
+        Concentration: Model checking and Fault tolerance. Takuo Watanabe Lab.
+
+      %h4 Full-Automatic Exhaustive Fault-Injection on Software Models of Message-Passing Systems
+
+      %p
+        Fault tolerance of distributed systems can be effectively verified by model checking and fault injection, but its process is highly error-prone. I proposed a way to solve this problem by adding a language support to modeling languages, which is a common approach in programming languages.
+
+      %h3 BS Computer Science Tokyo Institute of Technology (March 2012)
+
+      %p
+        Concentration: Context-oriented programming. Takuo Watanabe Lab.
+
+      %h4 An Implementation Method of Context-Oriented Programming in Objective-C
+
+      %p
+        Context-oriented programming is a programming method that enables us to define behaviors that depend on the program's execution context. I proposed an implementation method of Context-oriented programming in Objective-C.
+
+    .skills
+      %h2 Languages, Skills and Technologies
+
+      %ul
+        %li Assembler(JVM and MIPS), C/C++, Ruby, Python, Scheme, VBScript, Alloy, NuSMV
+        %li Linux, Mac OS X, Windows
+        %li TOEIC score 935 (2011)
+
+    .others
+      %h2 Others
+
+      %p
+        You can see the books I read here:
+        %a(href="http://book.akahoshitakuya.com/u/95348") 読書メーター
+
+      %ul
+        %li
+          %a(id="contact")
+        %li
+          %a(href="https://github.com/draftcode") https://github.com/draftcode
+        %li
+          %a(href="https://twitter.com/draftcode") https://twitter.com/draftcode
+        %li
+          %a(href="http://draftcode.osak.jp") http://draftcode.osak.jp
+
+    :javascript
+      (function() {
+        var elem = document.getElementById("contact");
+        var email = decodeURIComponent("%64%72%61%66%74%63%6F%64%65%40%67%6D%61%69%6C%2E%63%6F%6D");
+        elem.href = "mailto:" + email;
+        elem.innerHTML = email;
+      })();

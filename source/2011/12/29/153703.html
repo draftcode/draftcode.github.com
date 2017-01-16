@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</title>
+    <meta content='draftcode' name='author'>
+    <meta content='3T_u3CXt1yC2LeNvWOzsMSPQrs_0Ek-XUnA8DYgu7zY' name='google-site-verification'>
+    <link href='/stylesheets/old.css' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Economica' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id='content'>
+      <div id='article'>
+  <div id='content_title'>
+    <h1>CPython2.7.2のcsvモジュールではunicodeを生み出すようなfile-likeオブジェクトを使ってはいけない</h1>
+  </div>
+  <div id='posted_date'>
+    Posted on 2011-12-29
+  </div>
+  <div id='content_body'>
+    <p>ドキュメンテーションにも書いてあるとおり、 <code>csv</code> モジュールでは文字列のエンコーディングを正しく取り扱ってくれません。 <code>csv</code> モジュールのコアの部分はCで書かれており、 <code>_csv.c</code> というファイルに記述されています。</p>
+
+<p><code>csv.Reader</code> は与えられたfile-likeオブジェクトから <code>PyString_AsString</code> をつかって <code>char *</code> を得ようとします。:</p>
+<div class="highlight"><pre><code class="c language-c" data-lang="c"><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">Reader_iternext</span><span class="p">(</span><span class="n">ReaderObj</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">lineobj</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">fields</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">line</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span>
+    <span class="p">...</span>
+
+    <span class="k">do</span> <span class="p">{</span>
+        <span class="n">lineobj</span> <span class="o">=</span> <span class="n">PyIter_Next</span><span class="p">(</span><span class="n">self</span><span class="o">-&gt;</span><span class="n">input_iter</span><span class="p">);</span>
+        <span class="p">...</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">PyString_AsString</span><span class="p">(</span><span class="n">lineobj</span><span class="p">);</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>この関数は <code>char \*</code> を得るために使われるオブジェクトが <code>str</code> か<code>unicode</code> かで動作が変わります。 <code>str</code> であった場合は直接そのオブジェクトのバッファが返されるのですが、 <code>unicode</code> であった場合は、<code>_PyUnicode_AsDefaultEncodedString</code> によって、デフォルトエンコーディングに変換された文字列を返す動作になっています。</p>
+<div class="highlight"><pre><code class="c language-c" data-lang="c"><span class="cm">/*const*/</span> <span class="kt">char</span> <span class="o">*</span>
+<span class="nf">PyString_AsString</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">op</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">op</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">string_getbuffer</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">PyStringObject</span> <span class="o">*</span><span class="p">)</span><span class="n">op</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ob_sval</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span>
+<span class="nf">PyString_AsStringAndSize</span><span class="p">(</span><span class="k">register</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">obj</span><span class="p">,</span>
+                         <span class="k">register</span> <span class="kt">char</span> <span class="o">**</span><span class="n">s</span><span class="p">,</span>
+                         <span class="k">register</span> <span class="n">Py_ssize_t</span> <span class="o">*</span><span class="n">len</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">...</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyString_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
+<span class="cp">#ifdef Py_USING_UNICODE</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">PyUnicode_Check</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">_PyUnicode_AsDefaultEncodedString</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+            <span class="p">...</span>
+        <span class="p">}</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>このときに変換できないような文字を含んでいた場合は、読み込みが失敗します。もしデフォルトエンコーディングが変更されていた場合は、 <code>codecs.open</code> を使った場合や <code>open</code> を使った場合とでおもしろい?結果が得られるかもしれません。</p>
+
+<p><code>csv.Reader</code> が返す結果は、 <code>unicode</code> ではなく、ファイルのエンコーディングでエンコードされたそのままの <code>str</code> の配列や辞書になっています。よって、それがきちんと <code>unicode</code> なのか、なにかのエンコーディングでエンコードされた<code>str</code> なのかを意識しないと、あるはずのキーがないというような現象に出くわしたりします。これを意識するのは面倒くさいので、適切な <code>csv.Reader</code> のラッパーを用意して使うようにした方がよいです。</p>
+
+  </div>
+</div>
+
+    </div>
+    <div id='disclaimer'>
+      Disclaimer: The opinions stated here are my own, not necessarily those of my company.
+    </div>
+  </body>
+</html>
