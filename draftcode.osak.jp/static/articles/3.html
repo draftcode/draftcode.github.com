@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang=ja>
+<meta charset=utf-8>
+<meta content='width=680' name=viewport>
+<meta content=none name=robots>
+<meta content=never name=referrer>
+<title>3. ローカルDNS自体のアドレスを問い合わせるとlocalhostが返ってくる - 進捗</title>
+<link href=/style.css rel=stylesheet>
+<link href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/googlecode.min.css rel=stylesheet>
+<body class=page>
+
+<div class=contents><h1>3. ローカルDNS自体のアドレスを問い合わせるとlocalhostが返ってくる</h1><p>dnsmasqを使ってローカルDNSサーバーを立ててみたのだけれども、DNSサーバー自体のアドレスを問い合わせたらlocalhostが返ってきた。これはdnsmasqの動いているサーバー内では、自分自身のアドレスはlocalhostなのでそうなってしまうらしい。</p>
+
+<p>新しく/etc/hosts.dnsmasqみたいな新しいhostsファイルを作って、そこにローカルサーバーのアドレスを書く。/etc/dnsmasq.confで</p>
+
+<pre><code>no-hosts
+addn-hosts=/etc/hosts.dnsmasq
+</code></pre>
+
+<p>と指定すると、/etc/hostsを読みに行かずに/etc/hosts.dnsmasqを読みに行ってくれるので、先の問題は解決する。</p>
+</div>
+<div class=date>2014-02-28</div>
+<div class=share><a class=twitter-share-button href=https://twitter.com/share data-lang=en>Tweet</a></div>
+<hr>
+
+<div class=back><a href=/>もどりたい</a></div>
+<script async src=//platform.twitter.com/widgets.js></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js></script>
+<script>hljs.initHighlightingOnLoad();</script>

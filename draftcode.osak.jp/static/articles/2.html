@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang=ja>
+<meta charset=utf-8>
+<meta content='width=680' name=viewport>
+<meta content=none name=robots>
+<meta content=never name=referrer>
+<title>2. File.mtimeをやめてgit logを使うようにした - 進捗</title>
+<link href=/style.css rel=stylesheet>
+<link href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/googlecode.min.css rel=stylesheet>
+<body class=page>
+
+<div class=contents><h1>2. File.mtimeをやめてgit logを使うようにした</h1><p>このサイトのLast modifiedを取るために、<code>File.mtime</code> を使っていたのだが、これは複数マシンでいじっていると信用ならないということがわかったので、Gitのログを使うことにした。</p>
+
+<pre><code class="language-ruby">out, err, status = Open3.capture3(
+  'git log -n 1 --date=iso --pretty=format:&quot;%ad&quot; ' + resource.source_file
+)
+out.strip!
+if out != ''
+  last_modified = Time.zone.parse(out)
+else
+  last_modified = nil
+end
+</code></pre>
+</div>
+<div class=date>2014-02-24</div>
+<div class=share><a class=twitter-share-button href=https://twitter.com/share data-lang=en>Tweet</a></div>
+<hr>
+
+<div class=back><a href=/>もどりたい</a></div>
+<script async src=//platform.twitter.com/widgets.js></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js></script>
+<script>hljs.initHighlightingOnLoad();</script>

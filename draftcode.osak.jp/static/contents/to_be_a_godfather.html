@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang=ja>
+<meta charset=utf-8>
+<meta content='width=680' name=viewport>
+<meta content=none name=robots>
+<meta content=never name=referrer>
+<title>オブジェクトの名づけ親 - 進捗</title>
+<link href=/style.css rel=stylesheet>
+<link href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/googlecode.min.css rel=stylesheet>
+<body class=page>
+<img src='/images/to_be_a_godfather.jpg'>
+<div class=contents><h1>オブジェクトの名づけ親</h1>
+
+<p>特にJavaだとそうなのだと思うのだが、ひたすらクラスを作ることになる。自分はこれを特にデメリットだと思っていないし、逆にクラスごとに責任範囲を考えさせられるので良いことだと思っている。（それを考えるのが面倒くさいという人は、なぜプログラマをしているのだろうか……）しかし、大量に名前を考えなくてはいけなくなるので、名前付けの引き出しを持っておかないと苦しいことになる。</p>
+
+<p>そういった引き出しを作るために、以前<a href="http://draftcode.osak.jp/others/classname_cheatsheet.html">Classname Cheatsheet</a>というページを作った。これはクラス名でよくある名前、特にSuffixをオブジェクトのカテゴリごとに分類したものだ。まだ未完成なのだが、複数のClassnamerっぽいサイトから引っ張ってきたので、そこそこの量はあると思う。</p>
+
+<p>このチートシートをつかっても、微小な差異はわからない。特にObject Constructionのところは微妙なところがあっていつも迷う。なので、いくつかについて自分が考えていることをまとめてみた。</p>
+
+<h2>Builder</h2>
+
+<p><a href="http://en.wikipedia.org/wiki/Fluent_interface">Fluent interface</a>になっているsetterをもつオブジェクト。</p>
+
+<pre><code class="language-java">new Builder()
+    .setA(new A())
+    .setB(new B())
+    .build();
+</code></pre>
+
+<p>基本的にValue objectみたいなImmutableなものを作るときに使うように思える。コンストラクタの部分適用っぽい感じもする。幾つか注意したい点がある。</p>
+
+<ul>
+<li>必須なパラメーターはsetterを提供するのではなく、コンストラクタかbuildメソッドにもたせると良い。</li>
+<li>Builderはgetterを提供するべきではないように思える。というのも、getterを提供するとStateみたいに使われてしまって、Builder本来の役割から外れた使い方ができてしまうからだ。</li>
+
+<li><p>BuilderはDIによってInjectされるべきではないように思える。Moduleの構成によっては、Builderが複数のオブジェクトによって共有されるので、ここでDIを使うとそういう可能性がある印象を与えるように感じられる。</p>
+
+<ul>
+<li><p>この印象はObjectGraph.get()をコード中で呼び出すことによって、またはProvider<Builder>.get()を使うことによって緩和されてしまう。というのも、懸念点は一緒であるにもかかわらず、なんとなく新しいオブジェクトが作られる印象を与えるからだ。こういったコードはdeceivingであるように思う。</p></li>
+
+<li><p>DIによって提供される共通のパラメーターを入れたい場合はある。そういうときはBuilderFactoryを作ってしまう（BuilderProviderではない）。このとき、DIによって提供されるオブジェクトはコンストラクタへ、それ以外の必須パラメーターはbuildメソッドに持たせている。</p></li>
+</ul></li>
+
+<li><p>Builderをテストするときに、Buildする対象のオブジェクトにどういったパラメーターが渡っているか確認したい。しかし、対象のオブジェクトがそういったパラメーターを公開していない場合がある。このときはBuilderとは別にFactoryを書いて、それをMockするようにする。</p></li>
+</ul>
+
+<p>こういうことをするとFoo, FooBuilder, FooBuilderFactory, FooFactoryが並ぶことになるが、自分は正しいことをしているのだと固く信じてコードレビューを出す。逆にここらへん妥協したらレビュワーからFactoryBuilderFactory書こうと言われた。</p>
+
+<h2>Factory</h2>
+
+<p>コンストラクタの抽象化。</p>
+
+<pre><code class="language-java">fooFactory.create(new A(), new B())
+</code></pre>
+
+<p>これを使うのはコンストラクタをMockしたいとか作成されるオブジェクトの種類を制御したい(Fooが基底クラス)とかの場合だと思われる。そのために、Factoryのインスタンスを入れ替えたり、Factoryの内部でつくるオブジェクトを制御したりする。</p>
+
+<ul>
+<li>Factory自体は変化しない。なんかFactoryに対してなんか設定するのであれば、Factoryのコンストラクト時に完了しているべき。</li>
+<li>Factoryは常に新しいオブジェクトをつくる。オブジェクトを生成せずに常に同じオブジェクトを返すのであれば、FactoryではなくProviderのほうがよい。(Providerのほうがよりジェネリックな概念)</li>
+<li>createっぽいメソッドを複数持っても良い。createFromFooみたいなのを持つと便利だったりする。</li>
+</ul>
+
+<p><a href="https://github.com/google/auto/tree/master/factory">auto/factory</a>つかうと勝手に生成されて便利っぽい</p>
+
+<pre><code class="language-java">@AutoFactory(extends=SomeClass.Factory)
+class SomeClass {
+  SomeClass(@Provided Something something, String s) {
+    ...
+  }
+  public abstract static class Factory {
+    public abstract SomeClass createInner(String s);
+    public SomeClass createWithFoo(Foo foo) {
+      return createInner(foo.toString());
+    }
+  }
+}
+</code></pre>
+
+<p>しかしauto/factoryが生成するFactoryはなぜかfinalなので、Mockしようとすると都合がよくない。適当に上のコードみたいにinterfaceとかつくって、それをInjectするようにしたほうが、Mockオブジェクトを注入できて便利になる。しかし、つくったinterfaceと実際のFactoryの結びつきを明示的に書かないといけないというデメリットがある。背に腹は代えられない。</p>
+
+<pre><code class="language-java">class SomeModule {
+  @Provider
+  SomeClass.Factory providesSomeClassFactory(SomeClassFactory someClassFactory) {
+    return someClassFactory;
+  }
+}
+</code></pre>
+
+<p>DaggerにはProviderを継承したFactoryというinterfaceがあるのだが、つかったことはない。コメントを見る限りFactoryはgetのときに常に新しいオブジェクトを生成するという意味を持っているということになっているので、@Injectをコンストラクタに持つようなクラスに対して自動生成されるProviderはFactoryになっていて、それらはFactory<SomeClass>みたいな感じでInjectできるのかもしれない。試していない。</p>
+
+<h2>classにfinalつけますか問題</h2>
+
+<p>finalの話が出たのでついでにclassにfinalつけますかという話をすると、これは場合によるのかなと思っている。たとえば自分がFramework Authorだった場合、finalを付けたくなる。というのも、フレームワークを使うユーザーに意図しない継承をして欲しくないからだ。意図しない継承をされると、フレームワークの変更をするときになんか内部実装に依存してる感じのコードになったりして困ったりするので、そういうことが起こらないようにfinalにしたいと思う。</p>
+
+<p>逆にフレームワークをつかう側のアプリ開発者の場合、finalにしたくないと思う。アプリ開発者の場合は自分の書いたコードが他の人に再利用される可能性は低いので、下手にfinalにするよりもMockできるようにしておきたいという思惑がある。</p>
+
+<p>どっちもどっちで自分は納得できるので、場合によって切り替えたり、Framework Authorのほうがインターフェースをつくって実装するクラスの方はfinalにしたり、テスト用のオブジェクトを提供したりするのが良さそうだと思っている。</p>
+
+<p><a href="http://steve-yegge.blogspot.jp/2010/07/wikileaks-to-leak-5000-open-source-java.html">Steve Yeggeもclassにfinalつけますか問題をネタにしている。</a></p>
+
+<h2>Provider</h2>
+
+<p>どっか知らないところからオブジェクトを持ってくるためのインターフェース。FactoryはProviderのサブクラス。Providerはほんとにオブジェクトを適当に返すということぐらいしか定義してなくて、そのオブジェクトが呼び出される度に生成される(Factory)とか、常に同じオブジェクトを返すとか、いつ生成されるとか、Scopeローカルとか、そういったことは全く定義されていないので、適当にProviderを使うと変なところでオブジェクトが共有されていたりして死ぬ。こういうことがあるので、ProviderをInjectするのはあんまり推奨されないんじゃないかなぁと思う。(Injectしてなくてもオブジェクトがいつの間にか共有されている問題は解決してはないのだけど)</p>
+
+<p>基本的にJavaのオブジェクト生成は超絶速いということになっているので、共有されるべきでないオブジェクトは無難に毎回生成するのがよさそう。あと共有しようとするとThread-safeにするために、Mutexとか入って更にコストがかかる。Value Objectとかは、下手に共有してMutexのコストをかけるよりもそのまま毎回生成して返すのがスッキリしていて良い。</p>
+
+<p>追記: 中の人によると、ProviderはObjectGraph.get()によって返ってくるオブジェクトを返すという意味になっているらしい。ホントかな。 cf. <a href="http://stackoverflow.com/questions/21778330/when-should-i-use-factoryt-instead-of-providert">java - When should I use Factory<T> instead of Provider<T> - Stack Overflow</a></p>
+</div>
+<hr>
+photo credit: <a href="https://www.flickr.com/photos/julianrod/231389384/">julianrod</a> via <a href="http://photopin.com">photopin</a> <a href="http://creativecommons.org/licenses/by-nc-sa/2.0/">cc</a>
+<div class=back><a href=/>もどりたい</a></div>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js></script>
+<script>hljs.initHighlightingOnLoad();</script>

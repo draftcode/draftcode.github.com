@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang=ja>
+<meta charset=utf-8>
+<meta content='width=680' name=viewport>
+<meta content=none name=robots>
+<meta content=never name=referrer>
+<title>4. Linux版Dropboxでアカウント認証できない - 進捗</title>
+<link href=/style.css rel=stylesheet>
+<link href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/googlecode.min.css rel=stylesheet>
+<body class=page>
+
+<div class=contents><h1>4. Linux版Dropboxでアカウント認証できない</h1><p>Dropboxの2.6.13を用いて新規PCをセットアップしようと思うと、アカウントのリンクができない問題があった。通常ならdropboxdを立ち上げると認証用URLが表示されるのだが、このバージョンではされない。多分バグ。</p>
+
+<p>回避策として、認証だけ前のバージョンを使うとよいらしい。<a href="https://aur.archlinux.org/packages/dropbox/?comments=all">AURのdropboxパッケージ</a>の2014-02-19のコメントにあるように、前のバージョンを落としてきて認証URLを出させ、認証が終了したら消すようにすれば、あとは同期してくれる。</p>
+</div>
+<div class=date>2014-02-28</div>
+<div class=share><a class=twitter-share-button href=https://twitter.com/share data-lang=en>Tweet</a></div>
+<hr>
+
+<div class=back><a href=/>もどりたい</a></div>
+<script async src=//platform.twitter.com/widgets.js></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js></script>
+<script>hljs.initHighlightingOnLoad();</script>

@@ -1,0 +1,70 @@
+body {
+  font-family: 'Noto Sans CJK';
+  width: 640px;
+  margin: 50px auto;
+  font-weight: normal;
+  font-size: 14px;
+  color: #212121;
+  line-height: 22px; }
+
+a {
+  color: black;
+  text-decoration: underline; }
+
+img, svg {
+  display: block;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37); }
+
+hr {
+  clear: both; }
+
+.index h1 {
+  font-weight: medium;
+  font-size: 21px;
+  color: #212121;
+  margin: 20px 0; }
+
+.page .contents {
+  margin-bottom: 10px; }
+  .page .contents h1 {
+    font-weight: medium;
+    font-size: 21px;
+    color: #212121;
+    margin: 40px 0; }
+  .page .contents h2 {
+    font-weight: medium;
+    font-size: 14px;
+    color: #212121;
+    line-height: 24px;
+    margin-top: 40px;
+    margin-bottom: 0; }
+  .page .contents p {
+    margin: 0;
+    text-align: justify;
+    text-indent: 1em; }
+  .page .contents h1 + p, .page .contents h2 + p, .page .contents hr + p {
+    text-indent: 0; }
+  .page .contents li {
+    margin: 5px 0; }
+    .page .contents li p {
+      text-indent: 0; }
+  .page .contents img {
+    margin: 10px; }
+  .page .contents pre {
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37); }
+  .page .contents code {
+    font-family: 'DejaVu Sans Mono', monospace;
+    line-height: 1.2em; }
+  .page .contents blockquote p:first-child {
+    text-indent: 0; }
+
+.page .back {
+  margin-top: 10px; }
+
+.page .amazlet-box {
+  padding: 0 20px; }
+  .page .amazlet-box img {
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37); }
+
+.page .date {
+  float: right; }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang=ja>
+<meta charset=utf-8>
+<meta content='width=680' name=viewport>
+<meta content=none name=robots>
+<meta content=never name=referrer>
+<title>1. Gitのコンセプトモデルがどうたらの論文 - 進捗</title>
+<link href=/style.css rel=stylesheet>
+<link href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/googlecode.min.css rel=stylesheet>
+<body class=page>
+
+<div class=contents><h1>1. Gitのコンセプトモデルがどうたらの論文</h1><p><a href="http://dx.doi.org/10.1145/2509578.2509584">What's Wrong with Git? A Conceptual Design Analysis</a>というGitのコンセプトモデルが複雑だから、それを分析してやばそうな点を抜き出して、簡単にしたバージョンを作りましたという論文を読んだ。ACM Digital Libraryでダウンロードせずとも、論文は公開されている。(<a href="http://people.csail.mit.edu/sperezde/onward13.pdf">PDF</a>)</p>
+
+<p>ここでいうコンセプトモデルというのは、メンタルモデルとでも言うんだろうか、ユーザーが想定するシステムの像みたいなもの。ユーザーはシステムに対して「このシステムはこういうことを行う」みたいな「自分の中のシステムの動作予想」みたいなのを持ってるはずで、それが多分コンセプトモデルと呼ばれるもの。</p>
+
+<p>この論文はこのコンセプトモデルが微妙に一貫性の無い動きをしたり、コーナーケースでユーザーの予想を裏切る動作を行うことで、ユーザーの満足度が下がるので、それを改善したいという目的のケーススタディとなっている。Gitのファイル操作に関するコンセプトモデルをうちたてて、そこから発生する想定ダメケースを紹介する。そして、それらを解消するべく、コンセプトモデルをシンプルにして、ユーザーが動作を予想しやすいモデルに変更し、それに基づいたGitのラッパーをつくった、という流れ。</p>
+
+<p>この論文を読んだのはGitのより詳細な動作モデルについて書いてるかなぁと思って読んだのだけど、モデリング部分については分析したやつも、改善案として出された奴も、ちょっとがっかりした。読んでみると分析したのは一部分だけで、しかもコンセプトモデルが自分の思ったやつよりも高レイヤっぽかった。自分はコンセプトモデルというよりかは、データ構造とその操作についてのモデルが欲しかったのかもしれない。分析されていたGitのファイル辺りのモデルは、確かに難しいかなぁと思ったけど、出てきたシンプルなモデルも、それはそれでOversimplifyされている感じがした。まぁ、正直Gitのコンセプトモデルの改善案は割と自分にはどうでも良いことではある。(あまり困ってないから)</p>
+
+<p>あと、Daniel Jackson先生のところの研究なんだからAlloyでモデリングしたんだろうけど、それ公開してくれればいいのに。Gitのラッパーの<a href="https://github.com/sdg-mit/gitless">Gitless</a>は公開されている。がっかりはしたけど、コマンドライン引数の一貫性とか、一つ一つのサブコマンドのResponsibilityの重複とかが問題として触れられていて、そこら辺は確かに問題かもしれないと思ったので、その問題点を提起されたという点では収穫があった。</p>
+
+<p>追記: Related Workをはじめとする各種参考文献は非常に参考になる匂いがした。</p>
+</div>
+<div class=date>2014-02-23</div>
+<div class=share><a class=twitter-share-button href=https://twitter.com/share data-lang=en>Tweet</a></div>
+<hr>
+
+<div class=back><a href=/>もどりたい</a></div>
+<script async src=//platform.twitter.com/widgets.js></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js></script>
+<script>hljs.initHighlightingOnLoad();</script>

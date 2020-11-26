@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang=ja>
+<meta charset=utf-8>
+<meta content='width=680' name=viewport>
+<meta content=none name=robots>
+<meta content=never name=referrer>
+<title>6. LinuxのUIDのはなし - 進捗</title>
+<link href=/style.css rel=stylesheet>
+<link href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/googlecode.min.css rel=stylesheet>
+<body class=page>
+
+<div class=contents><h1>6. LinuxのUIDのはなし</h1><p>setuidとかseteuidとかの話。いまお行儀のよいdaemonを書こうとおもって、そこら辺を調べていた過程でUIDの話が出てきた。</p>
+
+<p>実行中のプログラムにはReal UID, Effective UID, Saved UIDの3つがあって、普通は全部一緒になっている。使われるのはEffective UIDで、それ以外はUID操作に関する特殊用途で持っている。</p>
+
+<h2>Real UIDとEffective UIDのはなし</h2>
+
+<p>プログラムによっては(Effective) UIDを変更したいことがある。(Effective) UIDを変更したいシチュエーションは2つある</p>
+
+<ul>
+<li>一時的に(Effective) UIDを変更して、権限を落とす。(後で戻したい)</li>
+<li>恒久的に(Effective) UIDを変更して、権限を落とす。(後で戻せないようにしたい)</li>
+</ul>
+
+<p>一時的なほうは別ユーザーとしてファイルを作りたいときに使って、恒久的なほうはrootで起動されたdaemonの権限を落としたいというときに使うらしい。</p>
+
+<p>ここで問題なのは、一時的に変更するほうをやりたいときに、単純に一つしかUIDを持っていないと、権限の降格はできても、復帰がセキュリティ上難しくなるということだ。一つしかUIDを持っていないと、次のような2つのUID操作シーケンスが区別できない。</p>
+
+<ol>
+<li>root -&gt; user -&gt; root</li>
+<li>user -&gt; root</li>
+</ol>
+
+<p>1はrootから始まってuserに降格した後にrootに復帰している。逆に2はuserがrootに昇格しようとしている。1は許したいが(一時的に権限を落としただけ)、2は勝手にrootになられては困るので、禁止したい。</p>
+
+<p>ここで、Real UIDとEffective UIDが出てくる。この2つのUIDがあると先の2つのシーケンスが区別できる。</p>
+
+<p>1の場合、Effective UIDのみ変えればReal UIDはrootのままなので、もともとがrootであると判定できて、復帰できる。</p>
+
+<pre><code>    | RUID | EUID |
+(1) | root | root |
+                    &lt;- seteuid(user)
+(2) | root | user |
+                    &lt;- seteuid(root)
+(3) | root | root |
+</code></pre>
+
+<p>2の場合、Effective UIDをrootにしようとしてもどのUIDもuserなので、昇格は禁止され
+る。</p>
+
+<pre><code>    | RUID | EUID |
+(1) | user | user |
+                    &lt;- seteuid(root) EPERM
+</code></pre>
+
+<p>また、恒久的に落としたい場合はReal UIDも変更すればいい。</p>
+
+<pre><code>    | RUID | EUID |
+(1) | root | root |
+                    &lt;- setuid(user)
+(2) | user | user |
+                    &lt;- seteuid(root) EPERM
+</code></pre>
+
+<h2>Saved UIDのはなし</h2>
+
+<p>Linuxではファイルにsetuidというパーミッションが付けられる。これは何かというと、通常の実行可能ファイルは実行ユーザーのReal UIDとEffective UIDを持つようになっているけれども、このパーミッションが付いているファイルはEffective UIDがファイルオーナーの権限になる。例えばuserがrootがオーナーの普通のファイルとrootがオーナーのsetuidファイルを起動すると、起動時のUIDは次のようになる。</p>
+
+<pre><code>            | RUID | EUID |
+normal file | user | user |
+setuid file | user | root |
+</code></pre>
+
+<p>こういう仕組みがあるとなんで便利なのかというと、例えばsudoみたいなプログラムが書けるようになる。rootじゃないといじれないようなリソースを使って動くプログラムで、それを一般ユーザーにも使えるようにさせたいという場合に便利ということらしい。setuidされたファイルはほとんどroot権限なので、以降、setuidファイルはrootオーナーのファイルという前提で話す。</p>
+
+<p>setuidファイルはEffective UIDがrootになっているが、ここで先のような一時的にUIDを変えたり、恒久的にUIDを変えたりしたいとする。恒久的に変える方はそのまま同じようにsetuidすればいいのだが、一時的に変える方では、root -&gt; user -&gt; rootのようなシーケンスが、Real UIDとEffective UIDだけの世界では実現できない。</p>
+
+<pre><code>    | RUID | EUID |
+(1) | user | root |
+                    &lt;- (seteuid)
+(2) | user | user |
+                    &lt;- (seteuid) EPERM
+</code></pre>
+
+<p>ここで2番めの操作はうまくいって欲しい。そこでSaved UIDが出てくる。</p>
+
+<pre><code>    | RUID | EUID | SUID |
+(1) | user | root | root |
+                           &lt;- (seteuid)
+(2) | user | user | root |
+                           &lt;- (seteuid)
+(3) | user | root | root |
+</code></pre>
+
+<p>このようにSaved UIDがあると、setuidファイルじゃないときと同じように権限の降格・復帰ができる。</p>
+
+<p>Real UIDも起動時にファイルオーナーであってもいい気がしてくるが、そうするとsudoが誰のパスワードを聞けばいいのかわからなくなる。やっぱりReal UIDは実行を開始したユーザーである必要がある。</p>
+</div>
+<div class=date>2014-03-15</div>
+<div class=share><a class=twitter-share-button href=https://twitter.com/share data-lang=en>Tweet</a></div>
+<hr>
+
+<div class=back><a href=/>もどりたい</a></div>
+<script async src=//platform.twitter.com/widgets.js></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js></script>
+<script>hljs.initHighlightingOnLoad();</script>

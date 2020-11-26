@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang=ja>
+<meta charset=utf-8>
+<meta content='width=680' name=viewport>
+<meta content=none name=robots>
+<meta content=never name=referrer>
+<title>0. 進捗メモをはじめる - 進捗</title>
+<link href=/style.css rel=stylesheet>
+<link href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/googlecode.min.css rel=stylesheet>
+<body class=page>
+
+<div class=contents><h1>0. 進捗メモをはじめる</h1><p>進捗報告コンテンツの方は、古き良きテキストサイトっぽいものを再現しようとしてはじめた。内容も技術的なものではなく、時間と共に風化する度合いが低そうなコンテンツに絞っている。しかし、ちょっとした技術メモっぽいものを書くのもいいかなと思い、進捗メモというものを作ってみた。</p>
+
+<p>もともとあったコンテンツの方との違いは、投稿日時や更新日時がついたり、Twitterの投稿ボタンがついたり、ATOMの配信をしたりといった点だ。このサイトを生成するために<a href="http://middlemanapp.com/">Middleman</a>のextensionを書いている。いくつか気になるところがあったので、それについて説明する。</p>
+
+<h2>ATOMの配信について</h2>
+
+<p>Middlemanには<a href="http://middlemanapp.com/basics/blogging/">middleman-blog</a>というextensionがあるのだが、そこについてきていたATOMを生成するテンプレートを適当に借用して整形し、出力するようにした。何箇所か<a href="http://atomenabled.org/developers/syndication/">ATOMの規格</a>を見ながら手直ししたように覚えている。</p>
+
+<p>ATOMの配信ではHTMLの本文を入れているのだが、このHTML内部にあるリンクが相対パスになっているとあまりよろしくないように思える。しかし記事を書くときは相対パスで書くほうが便利だ。これを修正するために、Markdownのレンダリングエンジンである<a href="https://github.com/vmg/redcarpet">Redcarpet</a>にすこし手を加えて、ATOMに載せる本文のレンダリングを別途行い、そのときだけ絶対パスになるようにした。</p>
+
+<p>あとから思うと、普通にすべてのレンダリングにおいて、絶対パスにすればいいんじゃないだろうか。なぜATOMのときだけにしたんだろう…… いちおうconfig.rbで変更できる。</p>
+
+<p>また、画像を載せるときに、いままでの方法だと画像のキャプションがATOM内の本文では綺麗に表示できないという問題があった。これは通常のHTMLページであればスタイルがあたっているのだが、ATOM内の本文にはスタイルが当たっていないために発生していた。これを回避するために、HTML5のfigureタグやlegendタグを利用することで、いい感じの表示にすることが出来た。</p>
+
+<p><img src="http://draftcode.osak.jp/images/devcamp_food1.jpg" alt="" title="キャプションがつけられる"></p>
+
+<p>このとき知ったのだが、Markdownでは画像に対してタイトルを付加することが出来たらしい。</p>
+
+<h2>シンタックスハイライトについて</h2>
+
+<p><a href="http://coderay.rubychan.de/">CodeRay</a>をつかってシンタックスハイライトをするようにした。埋め込みでスタイルが適用されるので、ATOM上でもハイライトされているはずだ。</p>
+
+<p>公開した後に確認したが、残念ながらlivedoor Readerではハイライトされていなかった。</p>
+
+<pre><code class="language-ruby">def func
+  42
+end
+</code></pre>
+
+<p>ついでなので、バイト先で使ってみて超便利だった<a href="http://plantuml.sourceforge.net/">PlantUML</a>をつかえるようにした。上のRubyのコードと同じようにPlantUMLのコードを書くと、SVGに変換される。このSVGはページにインラインで埋め込まれ、対応しているブラウザであればそのまま見ることができる。</p>
+
+<pre><code class="language-plantuml">@startuml
+Bob-&gt;Alice : hello
+@enduml
+</code></pre>
+
+<p>公開した後に確認したが、残念ながらlivedoor Readerではテキストしか表示されなかった。</p>
+
+<h2>日本語文章におけるハードラップについて</h2>
+
+<p>自分は日本語の文章をハードラップされた形(80桁で改行文字が挿入された形)で書くのが好きなのだが、ブラウザが改行をスペースにするので、文章中に不自然なスペースがあらわれてしまうという問題がある。これもRedcarpetのレンダリング部分に手をいれて、適当に不要そうな改行を省く処理を行っている。</p>
+</div>
+<div class=date>2014-01-30</div>
+<div class=share><a class=twitter-share-button href=https://twitter.com/share data-lang=en>Tweet</a></div>
+<hr>
+
+<div class=back><a href=/>もどりたい</a></div>
+<script async src=//platform.twitter.com/widgets.js></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js></script>
+<script>hljs.initHighlightingOnLoad();</script>

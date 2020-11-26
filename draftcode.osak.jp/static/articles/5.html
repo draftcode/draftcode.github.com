@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang=ja>
+<meta charset=utf-8>
+<meta content='width=680' name=viewport>
+<meta content=none name=robots>
+<meta content=never name=referrer>
+<title>5. Backtrace系ライブラリ - 進捗</title>
+<link href=/style.css rel=stylesheet>
+<link href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/googlecode.min.css rel=stylesheet>
+<body class=page>
+
+<div class=contents><h1>5. Backtrace系ライブラリ</h1><p>RubyとかPythonみたいな高級言語だと、言語がうまくやってくれるのでBacktraceを簡単に見ることができるけれども、Cみたいな低級言語でそれを自分でやるのは難しい。なのでライブラリが存在している。Windowsは考えてない。</p>
+
+<h2>execinfo.h</h2>
+
+<p>わざわざインストールしなくても動きそうなのが、execinfo.hにあるbacktrace系関数で、man 3 backtraceとかすると見れる。</p>
+
+<pre><code class="language-c">#include &lt;execinfo.h&gt;
+#include &lt;unistd.h&gt;
+
+void show_backtrace() {
+  void *traces[1024];
+  int sz = backtrace(traces, 1024);
+  backtrace_symbols_fd(traces, sz, STDERR_FILENO);
+}
+</code></pre>
+
+<p>backtraceにポインタを格納するための配列を渡すと、そこに戻りアドレスのリストみたいなのを詰め込んでくれる。それを更にbacktrace_symbolsみたいな関数に渡すと、そのアドレスから推測されるバイナリの名前とか関数名とかが書かれた文字列のリストに変換してくれる。この関数名とかはExportされているやつが対象っぽい。</p>
+
+<p>例えばCRubyのvm_dump.cとかで使われていて、rb_bugでよく見るやつはこれ系をつかって生成してたりする。OSXの実装はちょっと劣っているというか、シグナルハンドラのコンテクストをうまく判定できないらしくて、自分で他のライブラリとかつかって実装している。シグナルトランポリンとかよくわからないので教えてほしい。</p>
+
+<h2>libunwind</h2>
+
+<p>execinfo.hのライブラリを更に高機能にしたのがlibunwindで、backtrace関数と互換のあるunw_backtraceを提供している以外にも、スタックの巻き戻しとかもできるっぽい。よく知らないけど、他のプロセスのスタックも見れるんだろうか。ライブラリでの提供なのでいろんなアーキテクチャに頑張って対応している。</p>
+
+<h2>binutilsのaddr2line</h2>
+
+<p>binutilsにはaddr2lineというコマンドラインツールがあって、アドレスから関数名の変換をしてくれる。これはDWARFのデバッグ情報を元に、Exportされていない関数の名前まで使ってくれるので、先のexecinfo.hのbackrace_symbolsよりも情報が多くなる。</p>
+
+<p>CRubyにもどっかから持ってきたのかaddr2line.cってやつがあって、さっきのexecinfo.hで得た情報をもとにして、更にDWARFのデバッグ情報をつかって情報を拾い集めている。</p>
+
+<h2>libbfd</h2>
+
+<p>binutilsのaddr2lineのバックにあるのがlibbfdってやつで、オブジェクトファイルの操作をするライブラリらしい。Wikipediaにも載ってる。addr2lineの実装は1ファイルで結構小さいので、このlibbfdをリンクしながらaddr2lineから適宜ソースをパクってくると、コマンドラインからaddr2lineを叩かなくても、自分で自分のデバッグ情報を参照して自分のBacktraceを出力できる偉いプログラムが書ける。</p>
+
+<p>全然関係ないけど、ibertyっていうライブラリがC++のシンボルのDemangleを行うユーティリティを提供してるみたいなんだけど、この名前がちょうどリンクするときに-libertyっていう名前になってクール。</p>
+
+<h2>libbacktrace</h2>
+
+<p>これはよくわからないんだけど、検索してたら出てきたやつ。多分libbfdと同じ感じの動きをしそうなんだけど、よくわからない。GCCとかGDBに最近組み込まれたのかな？自分は使ってみてはない。</p>
+
+<h2>これで何やったか</h2>
+
+<p>CRuby使ってるとよくstring.cのAssertion Errorで落ちると思うんだけど、それがなんで起こるのかを調査するために、次のようなpost-conditionをチェックする関数を随所に散りばめた。このpost-conditionはまだ正しくなくて、とりあえずminirubyで落ちてるからもっとRefineしないといけない。</p>
+
+<pre><code class="language-c">static VALUE stringcheck(VALUE str) {
+  if (FL_ALL(str, STR_NOEMBED)) {
+    if (FL_ALL(str, STR_SHARED)) {
+      VALUE shared_buffer = RSTRING(str)-&gt;as.heap.aux.shared;
+      char *cache_buffer = RSTRING(str)-&gt;as.heap.ptr;
+      long len = RSTRING(str)-&gt;as.heap.len;
+
+      // Shared strings should have a shared buffer.
+      bt_assert(shared_buffer != 0);
+      // Shared strings should have a cache ptr.
+      bt_assert(cache_buffer != NULL);
+      // The shared buffer should be frozen.
+      bt_assert(OBJ_FROZEN(shared_buffer));
+      // The shared buffer should be a valid string.
+      stringcheck(shared_buffer);
+
+      if (FL_ALL(shared_buffer, STR_NOEMBED)) {
+        // The length should be equal to the shared buffer.
+        bt_assert(len &lt;= RSTRING(shared_buffer)-&gt;as.heap.len);
+        // The cache ptr should be equal to the shared buffer.
+        bt_assert(cache_buffer - (RSTRING(shared_buffer)-&gt;as.heap.len - len) == RSTRING(shared_buffer)-&gt;as.heap.ptr);
+      } else {
+        // The length should be less than or equal to the shared buffer.
+        bt_assert(len == RSTRING_EMBED_LEN(shared_buffer));
+        // The cache ptr should be equal to the shared buffer.
+        bt_assert(cache_buffer == RSTRING(shared_buffer)-&gt;as.ary);
+      }
+    } else {
+      // Normal strings should have a positive length.
+      bt_assert(RSTRING(str)-&gt;as.heap.len &gt;= 0);
+      // Normal strings should have a positive capacity.
+      bt_assert(RSTRING(str)-&gt;as.heap.aux.capa &gt; 0);
+      // The length should be less than or equal to the capacity.
+      bt_assert(RSTRING(str)-&gt;as.heap.aux.capa &gt;= RSTRING(str)-&gt;as.heap.len);
+      // Normal strings should have a buffer ptr.
+      bt_assert(RSTRING(str)-&gt;as.heap.ptr != NULL);
+    }
+  }
+  return str;
+}
+</code></pre>
+
+<p>ここでbt_assertっていうのがAssertion違反を起こしたらBacktraceを吐きつつ落ちるマクロなんだけど、ここで出すBacktraceを名前付きにしたいと思って調べたらこんな感じになった。</p>
+
+<p>実際libbfdでえっちらほっちらやってみたところ、出るには出た。だけど場所が微妙に違ったりしてどうなってるのかよくわからない。自分はexecinfo.hのbacktrace_symbols_fdぐらいの出力で、あとは適当に手でaddr2lineを実行すればいいかなと思った。それかint 3を埋め込む。</p>
+
+<h2>追記</h2>
+
+<p>上のコードをビルドが通るところまでなおした。<a href="https://github.com/draftcode/ruby/tree/string_assertions">string_assertions</a>というブランチを作った。まだ必要なところ全部に入れられているわけではない。</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>!FL_TEST(str, STR_NOEMBED) なら FL_TEST(str, STR_SHARED) ってことはないよな <a href="http://t.co/2d5jk5H3ok">http://t.co/2d5jk5H3ok</a></p>&mdash; なかだ の (@n0kada) <a href="https://twitter.com/n0kada/statuses/441437990674386944">2014, 3月 6</a></blockquote>
+
+<p>Embedのときは、STR_SHAREDの部分が長さになっていることに気づいたので、Embedのときのテストを削除した。</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>どこで落ちてるのか書いてないけど、STR_SHAREDは必ずしも全体を共有するわけじゃないので cache_buffer == RSTRING(shared_buffer)-&gt;as.heap.ptr はダメだろう <a href="http://t.co/2d5jk5H3ok">http://t.co/2d5jk5H3ok</a></p>&mdash; なかだ の (@n0kada) <a href="https://twitter.com/n0kada/statuses/441448854399889408">2014, 3月 6</a></blockquote>
+
+<p>気づいて修正。適当に長さの分だけ下げたら同じポインタというのをチェックしている。ちなみに落ちているのはもともとstring.cにあったassert(OBJ_FROZEN(shared));。</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>というか if (FL_TEST(str, STR_SHARED)) の中で bt_assert(!FL_TEST(str, STR_SHARED)) はないだろ</p>&mdash; なかだ の (@n0kada) <a href="https://twitter.com/n0kada/statuses/441449366230810625">2014, 3月 6</a></blockquote>
+
+<p>bt_assert(!FL_TEST(shared_buffer, STR_SHARED));の間違いだった。結局、Sharedの階層は必ず2階層のフラットな状態になるわけではなく、dupし続ければ多段になることがわかったので、このテストは外している。</p>
+
+<blockquote class="twitter-tweet" lang="ja"><p>そういえば CRuby でCバックトレース欲しい場合は rb_print_backtrace()でおk <a href="http://t.co/tt0U4HoGHI">http://t.co/tt0U4HoGHI</a></p>&mdash; 成瀬 (@nalsh) <a href="https://twitter.com/nalsh/statuses/441873782571945984">2014, 3月 7</a></blockquote>
+
+<p>rb_bugを使って落とすようにした。</p>
+
+<p>その他わかったこと:</p>
+
+<ul>
+<li>gcc -O3 と gcc -O0 で、if (FL_TEST(...)) の動きが違う。</li>
+<li>引数をvolatileにすると、同様にif (FL_TEST(...)) の動きが違う。</li>
+
+<li><p>というかFL_TESTをifの条件部で使うと、何故かどのケースでも正しく判定されない
+ケースが発生する。</p>
+
+<ul>
+<li><p>-O0 で volatile にしても動きがおかしい。</p></li>
+
+<li><p>STR_SHAREDが立っていないのに、if (FL_TEST(str, STR_SHARED))が真になる場合がある。</p></li>
+
+<li><p>as.heap.ptrがgdbで見るとnon-nullなのに、bt_assert(RSTRING(str)-&gt;as.heap.ptr != NULL); で落ちる。</p></li>
+</ul></li>
+
+<li><p>if (FL_TEST(...)) の代わりにif (FL_ALL(...)) を使ったらうまく判定できてい
+る。</p>
+
+<ul>
+<li>何故かas.heap.ptrのやつも引っかからなくなる。</li>
+</ul></li>
+</ul>
+</div>
+<div class=date>2014-03-06</div>
+<div class=share><a class=twitter-share-button href=https://twitter.com/share data-lang=en>Tweet</a></div>
+<hr>
+
+<div class=back><a href=/>もどりたい</a></div>
+<script async src=//platform.twitter.com/widgets.js></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js></script>
+<script>hljs.initHighlightingOnLoad();</script>
