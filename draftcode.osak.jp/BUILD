@@ -17,5 +17,5 @@ remapped_filegroup(
 gcs_upload(
     name = "upload",
     src = ":final_layout",
-    dst = "gs://draftcode-osak-jp",
+    dst = "gs://draftcode.osak.jp",
 )
