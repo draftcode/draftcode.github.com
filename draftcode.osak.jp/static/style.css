@@ -3,7 +3,7 @@ body {
     width: 640px;
     margin: 50px auto;
     font-weight: normal;
-    font-size: 14px;
+    font-size: 16px;
     color: #212121;
     line-height: 22px;
 }
@@ -85,6 +85,10 @@ hr {
 
 .page .contents blockquote p:first-child {
     text-indent: 0;
+}
+
+.page .contents dd {
+    margin-bottom: 10px;
 }
 
 .page .back {
