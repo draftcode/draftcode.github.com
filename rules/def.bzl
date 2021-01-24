@@ -43,27 +43,3 @@ remapped_filegroup = rule(
     },
     implementation = _remapped_filegroup,
 )
-
-def _gcs_upload(ctx):
-    command = """#!/bin/sh
-    gsutil -m rsync -r "{}" "{}"
-    """.format(ctx.file.src.short_path, ctx.attr.dst)
-    ctx.actions.write(
-        output = ctx.outputs.executable,
-        content = command,
-    )
-    return [DefaultInfo(runfiles = ctx.runfiles(files = [ctx.file.src]))]
-
-gcs_upload = rule(
-    attrs = {
-        "dst": attr.string(
-            mandatory = True,
-        ),
-        "src": attr.label(
-            mandatory = True,
-            allow_single_file = True,
-        ),
-    },
-    executable = True,
-    implementation = _gcs_upload,
-)

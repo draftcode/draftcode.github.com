@@ -1,4 +1,4 @@
-load("//rules:def.bzl", "gcs_upload", "path_mapping", "path_mappings", "remapped_filegroup")
+load("//rules:def.bzl", "path_mapping", "path_mappings", "remapped_filegroup")
 
 filegroup(
     name = "static",
@@ -12,10 +12,4 @@ remapped_filegroup(
             path_mapping("static", ""),
         ]),
     },
-)
-
-gcs_upload(
-    name = "upload",
-    src = ":final_layout",
-    dst = "gs://draftcode.osak.jp",
 )
