@@ -1,0 +1,34 @@
+name: push
+
+on:
+  push:
+    branches: ["draftcode.osak.jp"]
+
+jobs:
+  build:
+    name: Push
+    environment: prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          service_account_key: ${{secrets.GCP_SA_KEY}}
+          export_default_credentials: true
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Mount bazel cache
+        uses: actions/cache@v2
+        with:
+          path: "/home/runner/.cache/bazel"
+          key: bazel
+      - name: Install bazelisk
+        run: |
+          curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-linux-amd64"
+          mkdir -p "${GITHUB_WORKSPACE}/bin/"
+          mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
+          chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
+      - name: Push
+        run: |
+          "${GITHUB_WORKSPACE}/bin/bazel" run //draftcode.osak.jp:upload
