@@ -1,7 +1,7 @@
 backend:
   name: github
-  site_domain: xenodochial-heisenberg-b5bd61.netlify.app
   repo: draftcode/draftcode.github.com
+  site_domain: xenodochial-heisenberg-b5bd61.netlify.app
   branch: draftcode.osak.jp
 
 media_folder: "draftcode.osak.jp/static/images"
