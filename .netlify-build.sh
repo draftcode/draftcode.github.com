@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NETLIFY_CACHE_DIR=/opt/buildhome/cache
+NETLIFY_CACHE_DIR="${NETLIFY_BUILD_BASE}/cache"
 BAZEL="${NETLIFY_CACHE_DIR}/bazelisk-linux-amd64"
 
 if [ ! -e "$BAZEL" ]; then
