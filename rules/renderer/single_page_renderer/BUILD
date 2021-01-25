@@ -5,14 +5,7 @@ go_library(
     srcs = ["single_page_renderer.go"],
     importpath = "github.com/draftcode/draftcode.github.com/rules/renderer/single_page_renderer",
     visibility = ["//visibility:private"],
-    deps = [
-        "@com_github_yuin_goldmark//:goldmark",
-        "@com_github_yuin_goldmark//extension",
-        "@com_github_yuin_goldmark//parser",
-        "@com_github_yuin_goldmark//renderer/html",
-        "@com_github_yuin_goldmark_highlighting//:goldmark-highlighting",
-        "@com_github_yuin_goldmark_meta//:goldmark-meta",
-    ],
+    deps = ["//rules/renderer"],
 )
 
 go_binary(

@@ -23,3 +23,4 @@ osa_kさんとは同一人物ではないですか？
 * [コンピューターメモ](/others/computer_memo.html)
 * [Classname Cheatsheet](/others/classname_cheatsheet.html)
 * [Old contents](/old_contents.html)
+* [New contents](/contents/)

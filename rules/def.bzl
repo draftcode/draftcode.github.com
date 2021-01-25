@@ -111,3 +111,37 @@ render_single_page = rule(
     },
     implementation = _render_single_page,
 )
+
+def _render_articles(ctx):
+    output = ctx.actions.declare_directory(ctx.label.name)
+    inputs = []
+    for src in ctx.attr.srcs:
+        for f in src.files.to_list():
+            inputs.append(f)
+
+    args = ctx.actions.args()
+    args.add("--input_files", ",".join([f.path for f in inputs]))
+    args.add("--output_dir", output.path)
+    ctx.actions.run(
+        outputs = [output],
+        executable = ctx.file._article_renderer,
+        inputs = inputs,
+        arguments = [args],
+    )
+    return [DefaultInfo(files = depset([output]))]
+
+render_articles = rule(
+    attrs = {
+        "srcs": attr.label_list(
+            allow_files = True,
+            mandatory = True,
+        ),
+        "_article_renderer": attr.label(
+            default = "//rules/renderer/article_renderer",
+            allow_single_file = True,
+            executable = True,
+            cfg = "exec",
+        ),
+    },
+    implementation = _render_articles,
+)
