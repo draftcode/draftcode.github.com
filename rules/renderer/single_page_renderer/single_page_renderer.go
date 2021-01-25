@@ -30,7 +30,7 @@ const tpl = `
 {{if .Title}}<h1>{{.Title}}</h1>{{end}}
 {{.Body}}
 </div>
-<div class=back><a href=/>もどりたい</a></div>
+{{if .Title}}<div class=back><a href=/>もどりたい</a></div>{{end}}
 </html>`
 
 type templateInput struct {

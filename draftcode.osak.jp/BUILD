@@ -11,7 +11,13 @@ remapped_filegroup(
     files = {
         ":static": "",
         ":computer_memo.html": "others/computer_memo.html",
+        ":index.html": "index.html",
     },
+)
+
+render_single_page(
+    name = "index.html",
+    src = "pages/index.md",
 )
 
 render_single_page(
