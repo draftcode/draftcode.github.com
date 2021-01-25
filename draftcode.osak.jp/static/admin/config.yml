@@ -27,3 +27,8 @@ collections:
         fields:
           - {label: "Title", name: "title", widget: "string"}
           - {label: "Body", name: "body", widget: "markdown"}
+      - label: "Index"
+        name: "index"
+        file: "draftcode.osak.jp/pages/index.md"
+        fields:
+          - {label: "Body", name: "body", widget: "markdown"}
