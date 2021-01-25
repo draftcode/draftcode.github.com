@@ -18,40 +18,53 @@ var (
 
 func main() {
 	flag.Parse()
-	configs, err := parseConfigs()
+	configs, err := parseConfigs(*outputDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	written := map[string]bool{}
-	for base, dstBase := range configs {
-		err = filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if info.IsDir() {
-				return nil
-			}
-			rel, err := filepath.Rel(base, path)
-			if err != nil {
-				return err
-			}
-			dst := filepath.Join(*outputDir, dstBase, rel)
-			if written[dst] {
-				return fmt.Errorf("%q is written by two entries", dst)
-			}
-			if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
-				return err
-			}
-			return copyFile(dst, path)
-		})
-		if err != nil {
+	for src, dst := range configs {
+		if stat, err := os.Lstat(src); err != nil {
 			log.Fatal(err)
+		} else if stat.IsDir() {
+			err = filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				if info.IsDir() {
+					return nil
+				}
+				rel, err := filepath.Rel(src, path)
+				if err != nil {
+					return err
+				}
+				d := filepath.Join(dst, rel)
+				if written[d] {
+					return fmt.Errorf("%q is written by two entries", dst)
+				}
+				written[d] = true
+				return copyFile(d, path)
+			})
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if written[dst] {
+				log.Fatalf("%q is written by two entries", dst)
+			}
+			written[dst] = true
+			if err := copyFile(dst, src); err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 }
 
 func copyFile(dst, src string) error {
+	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
+		return err
+	}
 	srcF, err := os.Open(src)
 	if err != nil {
 		return err
@@ -68,7 +81,7 @@ func copyFile(dst, src string) error {
 
 }
 
-func parseConfigs() (map[string]string, error) {
+func parseConfigs(outputDir string) (map[string]string, error) {
 	bs, err := ioutil.ReadFile(*mappingFile)
 	if err != nil {
 		return nil, err
@@ -79,23 +92,15 @@ func parseConfigs() (map[string]string, error) {
 	}
 	m := map[string]string{}
 	for _, pmc := range configs {
-		for _, pm := range pmc.Mappings {
-			p := filepath.Join(pmc.Package, pm.Src)
-			if _, ok := m[p]; ok {
-				return nil, fmt.Errorf("path %s has duplicate mappings", p)
-			}
-			m[p] = pm.Dst
+		if _, ok := m[pmc.Src]; ok {
+			return nil, fmt.Errorf("path %s has duplicate mappings", pmc.Src)
 		}
+		m[pmc.Src] = filepath.Join(outputDir, pmc.Dst)
 	}
 	return m, nil
 }
 
 type PackageMappingConfig struct {
-	Package  string         `json:"package"`
-	Mappings []*PathMapping `json:"mappings"`
-}
-
-type PathMapping struct {
 	Src string `json:"src"`
 	Dst string `json:"dst"`
 }

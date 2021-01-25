@@ -1,15 +1,20 @@
-load("//rules:def.bzl", "path_mapping", "path_mappings", "remapped_filegroup")
+load("//rules:def.bzl", "remapped_filegroup", "render_single_page", "static_files")
 
-filegroup(
+static_files(
     name = "static",
     srcs = glob(["static/**/*"]),
+    trim_prefix = "static",
 )
 
 remapped_filegroup(
     name = "final_layout",
     files = {
-        ":static": path_mappings([
-            path_mapping("static", ""),
-        ]),
+        ":static": "",
+        ":computer_memo.html": "others/computer_memo.html",
     },
+)
+
+render_single_page(
+    name = "computer_memo.html",
+    src = "pages/computer_memo.md",
 )

@@ -18,3 +18,12 @@ collections:
       - {label: "Publish Date", name: "date", widget: "datetime"}
       - {label: "Thumbnail", name: "thumbnail", widget: "image"}
       - {label: "Body", name: "body", widget: "markdown"}
+  - name: "individual_pages"
+    label: "Individual pages"
+    files:
+      - label: "Computer Memo"
+        name: "computer_memo"
+        file: "draftcode.osak.jp/pages/computer_memo.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Body", name: "body", widget: "markdown"}
