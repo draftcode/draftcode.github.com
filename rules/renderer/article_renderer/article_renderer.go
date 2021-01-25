@@ -13,32 +13,30 @@ import (
 	"github.com/draftcode/draftcode.github.com/rules/renderer"
 )
 
-const (
-	timeFormat = "2006-01-02T15:04"
-	pageTpl    = `
-<!DOCTYPE html>
-<html lang=ja>
-<meta charset=utf-8>
-<meta content='width=680' name=viewport>
-<meta content=none name=robots>
-<meta content=never name=referrer>
-<title>New contents - draftcode.osak.jp</title>
-<link href=/style.css rel=stylesheet>
-<body class=index>
-<ul>
-{{range .}}
-<li><a href='{{.Path}}'>{{.Title}}</a>
-{{end}}
-</ul>
-<div class=back><a href=/>もどりたい</a></div>
-</html>`
-)
-
 var (
 	inputPaths = flag.String("input_files", "", "Input file path, comma separated")
 	outputPath = flag.String("output_dir", "", "Output dir path")
 
 	pageTmpl = template.Must(template.New("webpage").Parse(pageTpl))
+)
+
+const (
+	timeFormat = "2006-01-02T15:04"
+	pageTpl    = `
+<!DOCTYPE html>
+<html lang=ja>
+  <meta charset=utf-8>
+  <meta content='width=680' name=viewport>
+  <meta content=none name=robots>
+  <meta content=never name=referrer>
+  <title>New contents - draftcode.osak.jp</title>
+  <link href=/style.css rel=stylesheet>
+  <ul>
+    {{range .}}<li><a href='{{.Path}}'>{{.Title}}</a>
+    {{end}}
+  </ul>
+  <div class=back><a href=/>もどりたい</a></div>
+</html>`
 )
 
 type entry struct {

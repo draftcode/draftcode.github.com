@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
@@ -18,25 +19,32 @@ var (
 	pageTmpl = template.Must(template.New("webpage").Parse(pageTpl))
 )
 
-const pageTpl = `
+const (
+	timeFormat = "2006-01-02T15:04"
+	pageTpl = `
 <!DOCTYPE html>
 <html lang=ja>
-<meta charset=utf-8>
-<meta content='width=680' name=viewport>
-<meta content=none name=robots>
-<meta content=never name=referrer>
-<title>{{if .Title}}{{.Title}} - {{end}}draftcode.osak.jp</title>
-<link href=/style.css rel=stylesheet>
-<body class=page>
-<div class=contents>
-{{if .Title}}<h1>{{.Title}}</h1>{{end}}
-{{.Body}}
-</div>
-{{if .Title}}<div class=back><a href=/>もどりたい</a></div>{{end}}
-</html>`
+  <meta charset=utf-8>
+  <meta content='width=680' name=viewport>
+  <meta content=none name=robots>
+  <meta content=never name=referrer>
+  <title>{{if .Title}}{{.Title}} - {{end}}draftcode.osak.jp</title>
+  <link href=/style.css rel=stylesheet>
+  <article>
+    <header>
+      {{if .Time}}<time datetime={{.Time}}>{{.Time}}</time>{{end}}
+      {{if .Title}}<h1>{{.Title}}</h1>{{end}}
+    </header>
+    <div>
+      {{.Body}}
+    </div>
+  </article>
+{{if .Title}}<div class=back><a href=/>もどりたい</a></div>{{end}}`
+)
 
 type templateInput struct {
 	Title string
+	Time  string
 	Body  template.HTML
 }
 
@@ -53,6 +61,13 @@ func RenderPage(fp string, fm map[string]interface{}, body string) error {
 	}
 	if t, ok := fm["title"]; ok {
 		in.Title = t.(string)
+	}
+	if date, ok := fm["date"]; ok {
+		t, err := time.Parse(timeFormat, date.(string))
+		if err != nil {
+			return err
+		}
+		in.Time = t.Format("2006-01-02")
 	}
 	if err := pageTmpl.Execute(of, in); err != nil {
 		return err
