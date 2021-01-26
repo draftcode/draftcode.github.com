@@ -1,1 +1,4 @@
 /bazel-*
+
+# Local Netlify folder
+.netlify
