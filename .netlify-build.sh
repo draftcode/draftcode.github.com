@@ -16,4 +16,4 @@ else
   BAZEL=bazel
   BAZEL_OPT=()
 fi
-"$BAZEL" "${BAZEL_OPT[@]}" build //draftcode.osak.jp:final_layout
+"$BAZEL" "${BAZEL_OPT[@]}" --batch build //draftcode.osak.jp:final_layout
