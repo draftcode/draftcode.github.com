@@ -1,9 +1,12 @@
 #!/bin/bash
 
+set -ex
+
 if [ -n "${NETLIFY_BUILD_BASE}" ]; then
   NETLIFY_CACHE_DIR="${NETLIFY_BUILD_BASE}/cache"
   BAZEL="${NETLIFY_CACHE_DIR}/bazelisk-linux-amd64"
   BAZEL_OPT=(--output_user_root="${NETLIFY_CACHE_DIR}/bazel_user_root")
+  export BAZELISK_HOME="${NETLIFY_CACHE_DIR}/bazelisk-home"
 
   if [ ! -e "$BAZEL" ]; then
     (cd "$NETLIFY_CACHE_DIR" && curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-linux-amd64")
