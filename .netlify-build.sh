@@ -1,10 +1,16 @@
 #!/bin/bash
 
-NETLIFY_CACHE_DIR="${NETLIFY_BUILD_BASE}/cache"
-BAZEL="${NETLIFY_CACHE_DIR}/bazelisk-linux-amd64"
+if [ -n "${NETLIFY_BUILD_BASE}" ]; then
+  NETLIFY_CACHE_DIR="${NETLIFY_BUILD_BASE}/cache"
+  BAZEL="${NETLIFY_CACHE_DIR}/bazelisk-linux-amd64"
+  BAZEL_OPT=(--output_user_root="${NETLIFY_CACHE_DIR}/bazel_user_root")
 
-if [ ! -e "$BAZEL" ]; then
-  (cd "$NETLIFY_CACHE_DIR" && curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-linux-amd64")
-  chmod +x "$BAZEL"
+  if [ ! -e "$BAZEL" ]; then
+    (cd "$NETLIFY_CACHE_DIR" && curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-linux-amd64")
+    chmod +x "$BAZEL"
+  fi
+else
+  BAZEL=bazel
+  BAZEL_OPT=()
 fi
-"$BAZEL" --batch build --disk_cache="${NETLIFY_CACHE_DIR}/bazel" //draftcode.osak.jp:final_layout
+"$BAZEL" "${BAZEL_OPT[@]}" build //draftcode.osak.jp:final_layout

@@ -3,6 +3,8 @@ backend:
   repo: draftcode/draftcode.github.com
   branch: draftcode.osak.jp
 
+publish_mode: editorial_workflow
+
 media_folder: "draftcode.osak.jp/static/images"
 public_folder: "/images"
 
