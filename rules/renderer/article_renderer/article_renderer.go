@@ -21,7 +21,6 @@ var (
 )
 
 const (
-	timeFormat = "2006-01-02T15:04"
 	pageTpl    = `
 <!DOCTYPE html>
 <html lang=ja>
@@ -58,7 +57,7 @@ func main() {
 		if err := renderer.RenderPage(op, fm, body); err != nil {
 			log.Fatal(err)
 		}
-		t, err := time.Parse(timeFormat, fm["date"].(string))
+		t, err := time.Parse(time.RFC3339, fm["date"].(string))
 		if err != nil {
 			log.Fatal(err)
 		}
