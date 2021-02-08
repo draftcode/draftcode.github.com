@@ -4,7 +4,7 @@ date: 2021-02-07T21:53:18-08:00
 ---
 [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)というものがTwitterで流れてきたので土日でやった。やるだけだと半日でできる。今までこういう画像をどうこうする系は、単純にメタデータを取り出すとか変換する以外だとやったことなかったので楽しい。
 
-![Ray tracing rendering result](/static/images/raytracing_render.jpg)
+![Ray tracing rendering result](/images/raytracing_render.jpg)
 
 このチュートリアルではC++を使ってやっているのだけど、とりあえず一通りやって、最後の画像を生成するところでめちゃくちゃ時間がかかったので、並列化しようと思った。C++でマルチスレッドのプログラム書くのは面倒くさいなぁと思ったので、Goで書き直した。多分書き直すほうが面倒くさい。Goで書き直したら今度はRustでも書き直してみたくなったので、Rustでも書いてみた。Goに書き直すときは全くリファレンス見ずにかけたけど、Rustは全然覚えてなくて笑った。Rust書くたびにTrait objectあたりの扱いと、Iteratorあたり(というかJavaで言うCollectionのようなもの)をどうやって扱うのか良くわからないので、誰かに教えてほしい。
 
