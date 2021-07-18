@@ -31,7 +31,7 @@ function ProfileHeader() {
                     Software Engineer. SF Bay Area. Cat lover.
                 </Typography>
             </Grid>
-            <Grid item xs={4} md={2}><Image src={profilePic} /></Grid>
+            <Grid item xs={4} md={2}><Image src={profilePic} alt="face picture" /></Grid>
         </Grid>
     )
 }
@@ -53,7 +53,7 @@ function WorkExperience() {
                     <Box className={styles.cardContent}>
                         <Grid container spacing={1}>
                             <Hidden xsDown>
-                                <Grid item xs={1}><Image src={anthosLogo} /></Grid>
+                                <Grid item xs={1}><Image src={anthosLogo} alt="Anthos logo" /></Grid>
                             </Hidden>
                             <Grid item xs={12} sm={11}>
                                 <Typography paragraph variant="body1">
@@ -65,7 +65,7 @@ function WorkExperience() {
                                 </Typography>
                             </Grid>
                             <Hidden xsDown>
-                                <Grid item xs={1}><Image src={diffyLogo} /></Grid>
+                                <Grid item xs={1}><Image src={diffyLogo} alt="Diffy logo" /></Grid>
                             </Hidden>
                             <Grid item xs={12} sm={11}>
                                 <Typography paragraph variant="body1">
@@ -78,7 +78,7 @@ function WorkExperience() {
                                 </Typography>
                             </Grid>
                             <Hidden xsDown>
-                                <Grid item xs={1}><Image src={mapsLogo} /></Grid>
+                                <Grid item xs={1}><Image src={mapsLogo} alt="Google Maps logo" /></Grid>
                             </Hidden>
                             <Grid item xs={12} sm={11}>
                                 <Typography paragraph variant="body1">
@@ -102,7 +102,7 @@ function WorkExperience() {
                     <Box className={styles.cardContent}>
                         <Grid container spacing={1}>
                             <Hidden xsDown>
-                                <Grid item xs={1}><Image src={mapsLogo} /></Grid>
+                                <Grid item xs={1}><Image src={mapsLogo} alt="Google Maps logo" /></Grid>
                             </Hidden>
                             <Grid item xs={12} sm={11}>
                                 <Typography paragraph variant="body1">
@@ -249,7 +249,7 @@ function Education() {
 
                                         <Typography paragraph variant="body2">
                                             Context-oriented programming is a programming method that enables us to define behaviors
-                                            that depend on the program's execution context. I proposed an implementation method of
+                                            that depend on the program&apos;s execution context. I proposed an implementation method of
                                             Context-oriented programming in Objective-C.
                                         </Typography>
                                     </TableCell>
