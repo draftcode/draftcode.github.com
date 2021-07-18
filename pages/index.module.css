@@ -1,0 +1,27 @@
+.root {
+  padding: 16px;
+}
+
+.root > * {
+  padding-top: 16px;
+}
+
+.subtitle {
+  padding-top: 8px;
+}
+
+.itemTitle {
+  padding-top: 16px;
+}
+
+.workTeam {
+  margin: 16px 0;
+}
+
+.cardHeader {
+  padding-bottom: 0;
+}
+
+.cardContent {
+  padding: 0 16px;
+}
