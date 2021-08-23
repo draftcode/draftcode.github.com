@@ -44,11 +44,19 @@ function WorkExperience() {
                     Work Experience
                 </Typography>
             </Grid>
+            <Grid item style={{width: "100%"}}>
+                <Card variant="outlined">
+                    <CardHeader
+                        title="Launchable, Inc."
+                        subheader="Software Engineer, August 2021&ndash;"
+                    />
+                </Card>
+            </Grid>
             <Grid item>
                 <Card variant="outlined">
                     <CardHeader
                         title="Google, LLC"
-                        subheader="Software Engineer, August 2015&ndash;"
+                        subheader="Software Engineer, August 2015&ndash;August 2021"
                     />
                     <Box className={styles.cardContent}>
                         <Grid container spacing={1}>
