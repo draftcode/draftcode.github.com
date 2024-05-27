@@ -1,0 +1,21 @@
+site_name: draftcode.osak.jp
+site_url: https://draftcode.osak.jp
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.indexes
+markdown_extensions:
+  - def_list
+plugins:
+  - blog
+  - search
+extra_css:
+  - stylesheets/extra.css
+nav:
+  - index.md
+  - classname_cheatsheet.md
+  - computer_memo.md
+  - 昔のコンテンツ/index.md
+  - Blog: blog/index.md
