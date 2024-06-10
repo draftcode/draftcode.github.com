@@ -3,7 +3,7 @@ name = "draftcode-github-com"
 version = "0.1.0"
 description = ""
 authors = [{ name = "Masaya Suzuki", email = "draftcode@gmail.com" }]
-dependencies = ["mkdocs-material"]
+dependencies = ["mkdocs-material", "markdown-cjk-spacing"]
 requires-python = ">= 3.8"
 
 [build-system]

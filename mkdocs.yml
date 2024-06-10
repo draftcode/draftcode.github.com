@@ -8,6 +8,8 @@ theme:
     - navigation.indexes
 markdown_extensions:
   - def_list
+  - markdown_cjk_spacing.cjk_spacing:
+      segment_break: true
 plugins:
   - blog
   - search
@@ -17,5 +19,36 @@ nav:
   - index.md
   - classname_cheatsheet.md
   - computer_memo.md
-  - 昔のコンテンツ/index.md
+  - 昔のコンテンツ:
+    - 昔のコンテンツ/index.md
+    - 進捗:
+      - 昔のコンテンツ/進捗/201308_book_review.md
+      - 昔のコンテンツ/進捗/201309_book_review.md
+      - 昔のコンテンツ/進捗/be_evil.md
+      - 昔のコンテンツ/進捗/ceremony_for_prospective_employees.md
+      - 昔のコンテンツ/進捗/devcamp.md
+      - 昔のコンテンツ/進捗/diary_contents.md
+      - 昔のコンテンツ/進捗/espresso_machine.md
+      - 昔のコンテンツ/進捗/get_back_in_my_life.md
+      - 昔のコンテンツ/進捗/haircut.md
+      - 昔のコンテンツ/進捗/incense.md
+      - 昔のコンテンツ/進捗/making_sushi.md
+      - 昔のコンテンツ/進捗/nexus5_crash.md
+      - 昔のコンテンツ/進捗/oden.md
+      - 昔のコンテンツ/進捗/pacific_rim.md
+      - 昔のコンテンツ/進捗/star_trek_into_darkness.md
+      - 昔のコンテンツ/進捗/to_be_a_godfather.md
+      - 昔のコンテンツ/進捗/useful_japanese_phrases.md
+      - 昔のコンテンツ/進捗/washlet.md
+      - 昔のコンテンツ/進捗/worksite_cafeteria.md
+    - 進捗メモ:
+      - 昔のコンテンツ/進捗メモ/0.md
+      - 昔のコンテンツ/進捗メモ/1.md
+      - 昔のコンテンツ/進捗メモ/2.md
+      - 昔のコンテンツ/進捗メモ/3.md
+      - 昔のコンテンツ/進捗メモ/4.md
+      - 昔のコンテンツ/進捗メモ/5.md
+      - 昔のコンテンツ/進捗メモ/6.md
+      - 昔のコンテンツ/進捗メモ/7.md
+      - 昔のコンテンツ/進捗メモ/8.md
   - Blog: blog/index.md

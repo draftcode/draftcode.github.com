@@ -1,7 +1,5 @@
 ---
 title: 昔のコンテンツ
-hide:
-  - navigation
 ---
 ## 進捗
 
