@@ -1,0 +1,147 @@
+---
+interface Role {
+  logo: string;
+  logoAlt: string;
+  project: string;
+  description: string;
+}
+
+interface Job {
+  company: string;
+  title: string;
+  period: string;
+  roles: Role[];
+}
+
+const jobs: Job[] = [
+  {
+    company: 'IVRy',
+    title: 'Platform Engineer',
+    period: 'Dec 2025 \u2013 Present',
+    roles: [
+      {
+        logo: '/images/ivry.jpg',
+        logoAlt: 'IVRy logo',
+        project: 'IVRy',
+        description: 'Platform engineering for conversational AI SaaS. Working on foundational systems including phone line infrastructure and authentication/authorization.',
+      },
+    ],
+  },
+  {
+    company: 'Aviator Technologies Japan',
+    title: 'Head of Engineering',
+    period: 'Feb 2025 \u2013 Nov 2025',
+    roles: [
+      {
+        logo: '/images/aviator.jpg',
+        logoAlt: 'Aviator logo',
+        project: 'Aviator',
+        description: 'A suite of developer productivity tools, inspired by Google. Established the Japan subsidiary.',
+      },
+    ],
+  },
+  {
+    company: 'Aviator Technologies, Inc.',
+    title: 'Head of Engineering',
+    period: 'Feb 2023 \u2013 Feb 2025',
+    roles: [
+      {
+        logo: '/images/aviator.jpg',
+        logoAlt: 'Aviator logo',
+        project: 'Aviator',
+        description: 'A suite of developer productivity tools, inspired by Google.',
+      },
+    ],
+  },
+  {
+    company: 'Launchable, Inc.',
+    title: 'Principal Software Engineer',
+    period: 'Aug 2021 \u2013 Feb 2023',
+    roles: [
+      {
+        logo: '/images/launchable.jpg',
+        logoAlt: 'Launchable logo',
+        project: 'Predictive Test Selection',
+        description: 'Predict which tests are more likely to fail by using Machine Learning.',
+      },
+    ],
+  },
+  {
+    company: 'Google, LLC',
+    title: 'Senior Software Engineer',
+    period: 'Aug 2015 \u2013 Aug 2021',
+    roles: [
+      {
+        logo: '/images/anthos.png',
+        logoAlt: 'Anthos logo',
+        project: 'Anthos',
+        description: 'Provide managed Kubernetes clusters in multi-cloud. Tech lead. The role is to coordinate with internal teams to provide managed Kubernetes clusters on AWS and Azure.',
+      },
+      {
+        logo: '/images/diffy.png',
+        logoAlt: 'Diffy logo',
+        project: 'googlesource.com',
+        description: 'Git server for Google products. Tech lead. The role was to lead the team to provide Git repositories used by Chromium, Android, etc.',
+      },
+      {
+        logo: '/images/maps.png',
+        logoAlt: 'Google Maps logo',
+        project: 'Google Maps',
+        description: 'API frontend for Google Maps. The role was to create the server infrastructure for Google Maps.',
+      },
+    ],
+  },
+  {
+    company: 'Google Japan',
+    title: 'Software Engineer',
+    period: 'Apr 2014 \u2013 Aug 2015',
+    roles: [
+      {
+        logo: '/images/maps.png',
+        logoAlt: 'Google Maps logo',
+        project: 'Google Maps',
+        description: 'API frontend for Google Maps. The role was to create the server infrastructure for Google Maps. Transferred to the headquarter after a year.',
+      },
+    ],
+  },
+];
+---
+
+<section class="observe-animate">
+  <h2 class="text-2xl font-bold mb-8 text-gray-900">Work Experience</h2>
+  <div class="relative">
+    <!-- Timeline line -->
+    <div class="absolute left-4 md:left-6 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-gradient-to-b from-blue-500 via-indigo-500 to-purple-500"></div>
+
+    <div class="space-y-10">
+      {jobs.map((job) => (
+        <div class="relative pl-12 md:pl-16">
+          <!-- Timeline dot -->
+          <div class="absolute left-4 md:left-6 top-2 w-3 h-3 -translate-x-1/2 rounded-full bg-blue-500 ring-4 ring-white z-10"></div>
+
+          <div class="group">
+            <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-3">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">{job.company}</h3>
+                <p class="text-blue-600 font-medium text-sm">{job.title}</p>
+              </div>
+              <time class="text-sm text-gray-500 whitespace-nowrap">{job.period}</time>
+            </div>
+
+            <div class="space-y-4">
+              {job.roles.map((role) => (
+                <div class="flex gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-blue-200 transition-colors">
+                  <img class="w-12 h-12 rounded-lg object-cover shrink-0" src={role.logo} alt={role.logoAlt} width="48" height="48" />
+                  <div>
+                    <p class="font-semibold text-gray-900">{role.project}</p>
+                    <p class="text-sm text-gray-600 mt-1">{role.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

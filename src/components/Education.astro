@@ -1,0 +1,67 @@
+---
+interface Degree {
+  degree: string;
+  school: string;
+  year: string;
+  lab: string;
+  concentration: string;
+  thesisTitle: string;
+  thesisDescription: string;
+}
+
+const degrees: Degree[] = [
+  {
+    degree: 'MS Computer Science',
+    school: 'Tokyo Institute of Technology',
+    year: 'March 2014',
+    lab: 'Takuo Watanabe Lab',
+    concentration: 'Model checking and Fault tolerance',
+    thesisTitle: 'Full-Automatic Exhaustive Fault-Injection on Software Models of Message-Passing Systems',
+    thesisDescription: 'Fault tolerance of distributed systems can be effectively verified by model checking and fault injection, but its process is highly error-prone. I proposed a way to solve this problem by adding a language support to modeling languages, which is a common approach in programming languages.',
+  },
+  {
+    degree: 'BS Computer Science',
+    school: 'Tokyo Institute of Technology',
+    year: 'March 2012',
+    lab: 'Takuo Watanabe Lab',
+    concentration: 'Context-oriented programming',
+    thesisTitle: 'An Implementation Method of Context-Oriented Programming in Objective-C',
+    thesisDescription: 'Context-oriented programming is a programming method that enables us to define behaviors that depend on the program\'s execution context. I proposed an implementation method of Context-oriented programming in Objective-C.',
+  },
+];
+---
+
+<section class="observe-animate">
+  <h2 class="text-2xl font-bold mb-8 text-gray-900">Education</h2>
+  <div class="space-y-6">
+    {degrees.map((deg) => (
+      <div class="p-6 rounded-xl border border-gray-200 bg-white">
+        <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-4">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">{deg.degree}</h3>
+            <p class="text-blue-600 font-medium text-sm">{deg.school}</p>
+          </div>
+          <time class="text-sm text-gray-500 whitespace-nowrap">{deg.year}</time>
+        </div>
+
+        <dl class="space-y-3 text-sm">
+          <div class="flex gap-4">
+            <dt class="font-medium text-gray-500 shrink-0 w-28 text-right">Lab</dt>
+            <dd class="text-gray-700">{deg.lab}</dd>
+          </div>
+          <div class="flex gap-4">
+            <dt class="font-medium text-gray-500 shrink-0 w-28 text-right">Concentration</dt>
+            <dd class="text-gray-700">{deg.concentration}</dd>
+          </div>
+          <div class="flex gap-4">
+            <dt class="font-medium text-gray-500 shrink-0 w-28 text-right">Thesis</dt>
+            <dd class="text-gray-700">
+              <p class="font-medium">{deg.thesisTitle}</p>
+              <p class="mt-1 text-gray-500">{deg.thesisDescription}</p>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    ))}
+  </div>
+</section>
